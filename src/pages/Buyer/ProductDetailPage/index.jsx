@@ -4,8 +4,7 @@ import { useParams } from 'react-router-dom'
 import { axiosApi } from '~/services/ApiService'
 import Swal from 'sweetalert2'
 import { useDispatch } from 'react-redux'
-import { increaseCartQuantity } from '~/redux/slices/cartSlice'
-import { setLoading } from '~/redux/slices/loaderSlice'
+import { increaseCartQuantity } from '~/redux/cartQuantitySlice/cartQuantitySlice'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
@@ -25,7 +24,6 @@ const DetailProduct = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(setLoading(true))
     try {
       axiosApi.get(`/api/v1/products/detail/${productId}`)
         .then((res) => {
@@ -38,7 +36,6 @@ const DetailProduct = () => {
     } catch (error) {
       console.error('Có lỗi xảy ra khi gọi API:', error)
     }
-    dispatch(setLoading(false))
   }, [productId, dispatch])
 
   const handleScrollToReviews = () => {

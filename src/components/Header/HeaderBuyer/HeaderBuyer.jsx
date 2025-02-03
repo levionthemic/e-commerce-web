@@ -1,9 +1,11 @@
 import { memo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
+
 import logo from '~/assets/images/AniCart.png'
-import { axiosApi } from '~/services/ApiService'
-import { setCartQuantity } from '~/redux/slices/cartSlice'
+
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchCurrentCartQuantityAPI, selectCurrentCartQuantity } from '~/redux/cartQuantitySlice/cartQuantitySlice'
+
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'
 import Badge from '@mui/material/Badge'
@@ -19,25 +21,18 @@ import SearchIcon from '@mui/icons-material/Search'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import LogoutIcon from '@mui/icons-material/Logout'
-import { ListItemIcon, ListItemText } from '@mui/material'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
 
 function HeaderBuyer() {
   const [searchValue, setSearchValue] = useState('')
   const navigate = useNavigate()
-  const cartQuantity = useSelector((state) => state.cart.quantity)
+
+  const cartQuantity = useSelector(selectCurrentCartQuantity)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    axiosApi
-      .get('api/v1/cart/' + localStorage.getItem('cartId'))
-      .then((res) => {
-        const quantity = res.data.data.length
-        dispatch(setCartQuantity(quantity))
-      })
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log(error)
-      })
+    dispatch(fetchCurrentCartQuantityAPI())
   }, [dispatch])
 
   const [anchorEl, setAnchorEl] = useState(null)
@@ -161,7 +156,7 @@ function HeaderBuyer() {
             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             sx={{ '& .MuiMenuItem-root': { fontSize: '0.875rem' } }}
           >
-            <MenuItem onClick={handleClose}>Tài khoản của tôi</MenuItem>
+            <MenuItem onClick={() => { handleClose(); navigate('/user/info')} }>Tài khoản của tôi</MenuItem>
             <MenuItem onClick={handleClose}>Đơn hàng của tôi</MenuItem>
             <MenuItem onClick={handleClose}>Cài đặt</MenuItem>
             <Divider />

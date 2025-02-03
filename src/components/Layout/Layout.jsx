@@ -6,16 +6,8 @@ import SiderAdmin from '../Sider/SiderAdmin'
 import HeaderAdmin from '../Header/HeaderAdmin'
 import HeaderBuyer from '../Header/HeaderBuyer/HeaderBuyer'
 import { Box } from '@mui/material'
-import { useSelector } from 'react-redux'
-import Loader from '../Loader/Loader'
 
 function DefaultComponent({ children, isShowHeader, role }) {
-  const isLoading = useSelector((state) => state.loader.isLoading)
-
-  if (isLoading) {
-    return <Loader />
-  }
-
   if (role === 'seller') {
     return (
       <>

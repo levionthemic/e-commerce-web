@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { axiosApi } from '~/services/ApiService'
 import ProductItem from '~/components/ProductItem/ProductItem'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { animateScroll } from 'react-scroll'
 import Sider from './Sider/Sider'
 import { Spin } from 'antd'
@@ -10,7 +10,6 @@ import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Pagination from '@mui/material/Pagination'
-import PaginationItem from '@mui/material/PaginationItem'
 import Typography from '@mui/material/Typography'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
@@ -139,6 +138,16 @@ const SearchPage = () => {
     }
   }, [keyword])
 
+  const handlePageChange = (event, value) => {
+    animateScroll.scrollToTop({
+      duration: 800,
+      smooth: true,
+      offset: -70
+    })
+    url.searchParams.set('page', value)
+    navigate(url.pathname + url.search)
+  }
+
   return (
     <Container disableGutters maxWidth='xl'>
       <Grid container columnSpacing={5}>
@@ -154,8 +163,11 @@ const SearchPage = () => {
 
         <Grid item xl={10} sx={{ paddingTop: '20px' }}>
           <Box>
-            <Typography variant='h5'>Kết quả tìm kiếm cho &quot;{keyword}&quot;</Typography>
-            <Typography variant='span'>Trang {page}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant='h5'>Kết quả tìm kiếm cho &quot;{keyword}&quot;</Typography>
+              <Typography variant='span'>Trang {page}</Typography>
+            </Box>
+
             <Box py={2}>
               <FormControl sx={{ width: 300 }}>
                 <InputLabel id="sort-select-label">Sắp xếp theo:</InputLabel>
@@ -216,17 +228,10 @@ const SearchPage = () => {
               )}
             </Box>
 
-            <Pagination
-              page={page}
-              count={10}
-              renderItem={(item) => (
-                <PaginationItem
-                  component={Link}
-                  to={`/inbox${item.page === 1 ? '' : `?page=${item.page}`}`}
-                  {...item}
-                />
-              )}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'row-reverse', my: 3 }}>
+              <Pagination count={totalPages} page={page} onChange={handlePageChange} />
+            </Box>
+
           </Box>
         </Grid>
       </Grid>

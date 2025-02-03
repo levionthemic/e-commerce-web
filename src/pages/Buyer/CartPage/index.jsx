@@ -5,7 +5,7 @@ import { Table } from 'antd'
 import { DeleteOutlined, DiffOutlined } from '@ant-design/icons'
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
-import { decreaseCartQuantity } from '~/redux/slices/cartSlice'
+import { decreaseCartQuantity, selectCurrentCartQuantity } from '~/redux/cartQuantitySlice/cartQuantitySlice'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Box from '@mui/material/Box'
@@ -20,7 +20,7 @@ function CartPage() {
 
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const cartQuantity = useSelector((state) => state.cart.quantity)
+  const cartQuantity = useSelector(selectCurrentCartQuantity)
 
   const showUpdateButton = (e, temp, indexRow) => {
     const updateButton =
