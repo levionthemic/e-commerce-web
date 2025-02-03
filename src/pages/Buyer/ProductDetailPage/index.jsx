@@ -107,7 +107,7 @@ const DetailProduct = () => {
               alt={product?.name}
               style={{
                 maxHeight: '500px',
-                objectFit: 'contain'
+                objectFit: 'cover'
               }}
             />
           </Box>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { axiosApi } from '~/services/ApiService'
 import { useNavigate } from 'react-router-dom'
-import { Table, Skeleton } from 'antd'
+import { Table } from 'antd'
 import { DeleteOutlined, DiffOutlined } from '@ant-design/icons'
 import Swal from 'sweetalert2'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,10 +12,9 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 
-const CartPage = () => {
+function CartPage() {
   const [cartList, setCartList] = useState([])
   const [quantities, setQuantities] = useState([])
-  const [loading, setLoading] = useState(true)
 
   const [selectedRows, setSelectedRows] = useState([])
 
@@ -34,6 +33,7 @@ const CartPage = () => {
       updateButton.classList.add('d-none')
     }
   }
+
   const handleIncreaseQuantity = (e) => {
     const indexRow =
       e.target.parentElement.parentElement.parentElement.getAttribute(
@@ -173,18 +173,15 @@ const CartPage = () => {
   }
 
   useEffect(() => {
-    setLoading(true)
     axiosApi
       .get('/api/v1/cart/' + localStorage.getItem('cartId'))
       .then((res) => {
         setCartList(res.data.data)
         setQuantities(res.data.data.map((item) => item.quantity))
-        setLoading(false)
       })
       .catch((error) => {
         setCartList([])
         console.log(error.response)
-        setLoading(false)
       })
   }, [cartQuantity])
 
@@ -371,66 +368,57 @@ const CartPage = () => {
   return (
     <Container disableGutters maxWidth='xl'>
       <Typography variant='h5' py={4}>Giỏ Hàng Của Bạn</Typography>
-      {loading ? (
-        <>
-          <div className="position-relative">
-            <Skeleton active paragraph={{ rows: 6 }} />
-          </div>
-        </>
-      ) : (
-        <>
-          {cartList.length === 0 ? (
-            <p>Giỏ hàng của bạn đang trống.</p>
-          ) : (
-            <Box>
-              {/* Using MUI Table instead */}
-              <Table dataSource={data} columns={columns} />
 
-              <Box sx={{
-                backgroundColor: '#fff',
-                borderRadius: '8px',
-                padding: '15px',
-                border: '1px solid #e0e0e0',
-                width: 'fit-content',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                position: 'relative',
-                left: '85%'
-              }}>
-                <Typography variant='h5' pb={2}>
+      {cartList.length === 0 ? (
+        <p>Giỏ hàng của bạn đang trống.</p>
+      ) : (
+        <Box>
+          {/* Using MUI Table instead */}
+          <Table dataSource={data} columns={columns} />
+
+          <Box sx={{
+            backgroundColor: '#fff',
+            borderRadius: '8px',
+            padding: '15px',
+            border: '1px solid #e0e0e0',
+            width: 'fit-content',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            position: 'relative',
+            left: '85%'
+          }}>
+            <Typography variant='h5' pb={2}>
                   Tổng cộng: {totalPrice.toLocaleString()}
-                  <sup>đ</sup>
-                </Typography>
-                <Button
-                  variant='contained'
-                  sx={{
-                    bgcolor: '#28a745',
-                    border: 'none',
-                    width: '100%',
-                    '&:hover': { bgcolor: '#104d1d' }
-                  }}
-                  onClick={() => {
-                    const selectedItems = cartList.filter((_, index) =>
-                      selectedRows.includes(index)
-                    )
-                    if (selectedItems.length === 0) {
-                      Swal.fire({
-                        icon: 'warning',
-                        title: 'Chưa chọn sản phẩm!',
-                        text: 'Vui lòng chọn ít nhất một sản phẩm để tiếp tục.'
-                      })
-                      return
-                    }
-                    navigate('/checkout', {
-                      state: { cartList: selectedItems }
-                    })
-                  }}
-                >
+              <sup>đ</sup>
+            </Typography>
+            <Button
+              variant='contained'
+              sx={{
+                bgcolor: '#28a745',
+                border: 'none',
+                width: '100%',
+                '&:hover': { bgcolor: '#104d1d' }
+              }}
+              onClick={() => {
+                const selectedItems = cartList.filter((_, index) =>
+                  selectedRows.includes(index)
+                )
+                if (selectedItems.length === 0) {
+                  Swal.fire({
+                    icon: 'warning',
+                    title: 'Chưa chọn sản phẩm!',
+                    text: 'Vui lòng chọn ít nhất một sản phẩm để tiếp tục.'
+                  })
+                  return
+                }
+                navigate('/checkout', {
+                  state: { cartList: selectedItems }
+                })
+              }}
+            >
                   Mua Hàng
-                </Button>
-              </Box>
-            </Box>
-          )}
-        </>
+            </Button>
+          </Box>
+        </Box>
       )}
     </Container>
   )

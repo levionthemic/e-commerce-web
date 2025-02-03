@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { routes } from './routes'
-import DefaultComponent from './components/DefaultComponent/DefaultComponent'
+import DefaultComponent from './components/Layout/Layout'
 import PrivateRoute from './components/PrivateRoute'
 
 function App() {

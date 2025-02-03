@@ -18,6 +18,8 @@ import InputAdornment from '@mui/material/InputAdornment'
 import SearchIcon from '@mui/icons-material/Search'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import LogoutIcon from '@mui/icons-material/Logout'
+import { ListItemIcon, ListItemText } from '@mui/material'
 
 function HeaderBuyer() {
   const [searchValue, setSearchValue] = useState('')
@@ -55,12 +57,12 @@ function HeaderBuyer() {
     <Box sx={{
       display: 'flex',
       alignItems: 'center',
-      height: '60px',
+      height: '70px',
       position: 'sticky',
       top: 0,
       left: 0,
       zIndex: 999,
-      bgcolor: '#ddd'
+      bgcolor: 'primary.main'
     }}>
       <Container disableGutters maxWidth='xl' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }}>
@@ -71,12 +73,12 @@ function HeaderBuyer() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '20px'
+          gap: 5
         }}>
-          <Button>Trang chủ</Button>
-          <Button>Sản phẩm</Button>
-          <Button>Về chúng tôi</Button>
-          <Button>Liên hệ</Button>
+          <Button sx={{ color: 'secondary.main' }} onClick={() => { navigate('/')}}>Trang chủ</Button>
+          <Button sx={{ color: 'secondary.main' }}>Sản phẩm</Button>
+          <Button sx={{ color: 'secondary.main' }}>Về chúng tôi</Button>
+          <Button sx={{ color: 'secondary.main' }}>Liên hệ</Button>
         </Box>
 
         <Box sx={{
@@ -91,13 +93,29 @@ function HeaderBuyer() {
               label="Tìm kiếm sản phẩm..."
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
+                  <InputAdornment position="start" sx={{ color: 'secondary.main' }}>
                     <SearchIcon />
                   </InputAdornment>
                 )
               }}
               variant="standard"
-              sx={{ width: '400px' }}
+              sx={{
+                width: '400px',
+                '& .MuiFormLabel-root': { color: 'white', '&.Mui-focused': { color: 'white' } },
+                '& .MuiInputBase-root': {
+                  color: 'white',
+                  '&:not(.Mui-disabled, .Mui-error):before': { borderBottom: '1px solid white' },
+                  '&::after': { borderBottom: '1px solid white' },
+                  '&:hover': {
+                    '&:not(.Mui-disabled, .Mui-error):before': { borderBottom: '1px solid white' },
+                    '&:not(.Mui-disabled, .Mui-error):after': { borderBottom: '1px solid white' }
+                  },
+                  '&.Mui-focused': {
+                    '&::before': { borderBottom: '1px solid white' },
+                    '&::after': { borderBottom: '1px solid white' }
+                  }
+                }
+              }}
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
             />
@@ -111,10 +129,10 @@ function HeaderBuyer() {
               gap: '10px',
               '&:hover': { borderRadius: '10px' }
             }}>
-            <Badge badgeContent={cartQuantity} showZero color='primary'>
-              <ShoppingCartOutlinedIcon />
+            <Badge badgeContent={cartQuantity} showZero color='warning'>
+              <ShoppingCartOutlinedIcon sx={{ color: 'white' }}/>
             </Badge>
-            <Typography variant='span' sx={{ fontSize: '.875rem' }}>Giỏ hàng</Typography>
+            <Typography variant='span' sx={{ fontSize: '.875rem', color: 'white' }}>Giỏ hàng</Typography>
           </IconButton>
 
           <IconButton
@@ -130,8 +148,8 @@ function HeaderBuyer() {
               '&:hover': { borderRadius: '10px' }
             }}
           >
-            <AccountCircleOutlinedIcon />
-            <Typography variant='span' sx={{ fontSize: '.875rem' }}>Tài khoản</Typography>
+            <AccountCircleOutlinedIcon sx={{ color: 'white' }}/>
+            <Typography variant='span' sx={{ fontSize: '.875rem', color: 'white' }}>Tài khoản</Typography>
           </IconButton>
           <Menu
             id="header-user-menu"
@@ -139,7 +157,7 @@ function HeaderBuyer() {
             anchorEl={anchorEl}
             open={open}
             onClose={handleClose}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             transformOrigin={{ vertical: 'top', horizontal: 'left' }}
             sx={{ '& .MuiMenuItem-root': { fontSize: '0.875rem' } }}
           >
@@ -147,7 +165,10 @@ function HeaderBuyer() {
             <MenuItem onClick={handleClose}>Đơn hàng của tôi</MenuItem>
             <MenuItem onClick={handleClose}>Cài đặt</MenuItem>
             <Divider />
-            <MenuItem onClick={handleClose}>Đăng xuất</MenuItem>
+            <MenuItem onClick={handleClose} sx={{ color: 'warning.dark', fontWeight: 'bold' }}>
+              <ListItemIcon><LogoutIcon sx={{ color: 'warning.dark' }} fontSize="small" /></ListItemIcon>
+              <ListItemText>Đăng xuất</ListItemText>
+            </MenuItem>
           </Menu>
         </Box>
       </Container>

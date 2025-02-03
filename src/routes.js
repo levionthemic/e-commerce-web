@@ -4,13 +4,13 @@ import ForgotPassword from '~/pages/Auth/ForgotPassword'
 import OTPConfirm from '~/pages/Auth/OTPConfirm'
 import ResetPassword from '~/pages/Auth/ResetPassword'
 
-import Home from '~/pages/Buyer/Home'
+import HomePage from '~/pages/Buyer/HomePage'
 import SearchPage from '~/pages/Buyer/SearchPage'
 import UserInfo from '~/pages/Buyer/User/UserInfo'
 import CartPage from '~/pages/Buyer/CartPage'
-import DetailProduct from '~/pages/Buyer/DetailProduct'
+import DetailProduct from '~/pages/Buyer/ProductDetailPage'
 import UserOrder from '~/pages/Buyer/User/UserOrder'
-import Checkout from '~/pages/Buyer/Checkout'
+import Checkout from '~/pages/Buyer/CheckoutPage'
 
 import ShopOverview from '~/pages/Shoper/ShopOverview'
 import ShopProfle from '~/pages/Shoper/ShopProfile'
@@ -39,7 +39,7 @@ export const routes = [
   // Các route dành cho khách hàng
   {
     path: '/',
-    page: Home,
+    page: HomePage,
     isShowHeader: true,
     isAuthorized: true
   },

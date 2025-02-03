@@ -5,18 +5,24 @@ import { experimental_extendTheme as extendTheme } from '@mui/material/styles'
 const theme = extendTheme({
   eCommerce: { },
   colorSchemes: {
-    // light: {
-    //   palette: {
-    //     primary: teal,
-    //     secondary: deepOrange
-    //   }
-    // },
-    // dark: {
-    //   palette: {
-    //     primary: cyan,
-    //     secondary: orange
-    //   }
-    // }
+    light: {
+      palette: {
+        primary: {
+          main: '#007BFF',
+          background: '#FFFFFF'
+        },
+        secondary: { main: '#F5F5F5' }
+      }
+    },
+    dark: {
+      palette: {
+        primary: {
+          main: '#007BFF',
+          background: '#1E1E1E'
+        },
+        secondary: { main: '#F5F5F5' }
+      }
+    }
   },
   components: {
     MuiCssBaseline: {

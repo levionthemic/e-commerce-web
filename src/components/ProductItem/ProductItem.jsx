@@ -19,21 +19,21 @@ function ProductItem({ product, loading, width }) {
   const navigate = useNavigate()
 
   if (loading) {
-    <Card className="product-card">
-      <Skeleton height={160} />
-      <Card.Body>
-        <Card.Title>
-          <Skeleton className="card-title" />
-        </Card.Title>
-        <Card.Text>
-          <Skeleton className="product-price" />
-        </Card.Text>
-        <Card.Text>
-          <Skeleton className="product-info" />
-        </Card.Text>
-        <Skeleton className="w-100 .btn" />
-      </Card.Body>
-    </Card>
+    // <Card className="product-card">
+    //   <Skeleton height={160} />
+    //   <Card.Body>
+    //     <Card.Title>
+    //       <Skeleton className="card-title" />
+    //     </Card.Title>
+    //     <Card.Text>
+    //       <Skeleton className="product-price" />
+    //     </Card.Text>
+    //     <Card.Text>
+    //       <Skeleton className="product-info" />
+    //     </Card.Text>
+    //     <Skeleton className="w-100 .btn" />
+    //   </Card.Body>
+    // </Card>
   }
 
   return (
