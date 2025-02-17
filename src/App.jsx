@@ -5,37 +5,35 @@ import PrivateRoute from './components/PrivateRoute'
 
 function App() {
   return (
-    <>
-      <Routes>
-        {routes.map((route) => {
-          const Page = route.page
-          const Layout = route.isAuthorized ? (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={
-                <PrivateRoute>
-                  <DefaultComponent isShowHeader={route.isShowHeader} role={route.role}>
-                    <Page />
-                  </DefaultComponent>
-                </PrivateRoute>
-              }
-            />
-          ) : (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={
-                <>
+    <Routes>
+      {routes.map((route) => {
+        const Page = route.page
+        const Layout = route.isAuthorized ? (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={
+              <PrivateRoute>
+                <DefaultComponent isShowHeader={route.isShowHeader} role={route.role}>
                   <Page />
-                </>
-              }
-            />
-          )
-          return Layout
-        })}
-      </Routes>
-    </>
+                </DefaultComponent>
+              </PrivateRoute>
+            }
+          />
+        ) : (
+          <Route
+            key={route.path}
+            path={route.path}
+            element={
+              <>
+                <Page />
+              </>
+            }
+          />
+        )
+        return Layout
+      })}
+    </Routes>
   )
 }
 

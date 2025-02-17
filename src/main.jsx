@@ -10,7 +10,7 @@ import theme from './theme.js'
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter basename='/'>
       <CssVarsProvider theme={theme}>
         <CssBaseline />
         <App />
