@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import logo from '~/assets/images/AniCart.png'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchCurrentCartQuantityAPI, selectCurrentCartQuantity } from '~/redux/cartQuantitySlice/cartQuantitySlice'
+import { fetchCurrentCartQuantityAPI, selectCurrentCartQuantity } from '~/redux/cartQuantity/cartQuantitySlice'
 
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'
