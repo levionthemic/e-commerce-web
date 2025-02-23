@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import CircularProgress from '@mui/material/CircularProgress'
 import Typography from '@mui/material/Typography'
 
-function Loader() {
+function Loader({ caption }) {
   return (
     <Box sx={{
       width: '100vw',
@@ -13,7 +13,7 @@ function Loader() {
       gap: 2
     }}>
       <CircularProgress />
-      <Typography>Loading page...</Typography>
+      <Typography>{caption}</Typography>
     </Box>
   )
 }

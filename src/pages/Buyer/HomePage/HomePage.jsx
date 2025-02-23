@@ -1,8 +1,7 @@
-/* eslint-disable no-console */
-import { memo, useEffect, useState } from 'react'
+
+import { useEffect, useState } from 'react'
 import banner from '~/assets/images/banner.png'
 import 'react-multi-carousel/lib/styles.css'
-import { axiosApi } from '~/services/ApiService'
 import ProductItem from '~/components/ProductItem/ProductItem'
 import { animateScroll } from 'react-scroll'
 import Button from '@mui/material/Button'
@@ -16,6 +15,7 @@ import SupportAgentIcon from '@mui/icons-material/SupportAgent'
 import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange'
 import HighQualityIcon from '@mui/icons-material/HighQuality'
 import CategoryBar from './CategoryBar/CategoryBar'
+import { getCategoriesAPI, getProductsAPI } from '~/apis'
 
 const responsiveCarousel = {
   superLargeDesktop: {
@@ -75,52 +75,26 @@ function HomePage() {
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
-    axiosApi
-      .get('/api/v1/products')
-      .then((res) => {
-        const sortedProducts = res.data.data
-          .filter(
-            (product) =>
-              product.quantity_sold && product.quantity_sold.value > 0
-          )
-          .sort((a, b) => b.quantity_sold.value - a.quantity_sold.value)
-          .slice(0, 50)
-        setBestSellingProducts(sortedProducts)
-      })
-      .catch((error) => {
-        console.error('Có lỗi khi lấy dữ liệu sản phẩm:', error)
-        window.location.reload()
-      })
+    getProductsAPI().then((data) => {
+      const sortedProducts = data
+        .filter((product) => product.quantitySold > 0 )
+        .sort((a, b) => b.quantitySold - a.quantitySold)
+        .slice(0, 50)
+      setBestSellingProducts(sortedProducts)
+    })
   }, [])
 
   useEffect(() => {
-    axiosApi
-      .get('/api/v1/products')
-      .then((res) => {
-        const sortedProducts = res.data.data
-          .filter(
-            (product) =>
-              product.rating_average !== null &&
-              product.rating_average !== undefined
-          )
-          .sort((a, b) => b.rating_average - a.rating_average)
-        setRecommendedProducts(sortedProducts)
-      })
-      .catch((error) => {
-        console.error('Có lỗi khi lấy dữ liệu sản phẩm:', error)
-        window.location.reload()
-      })
+    getProductsAPI().then((data) => {
+      const sortedProducts = data
+        .filter((product) => product.rate !== null && product.rate !== undefined)
+        .sort((a, b) => b.rate - a.rate)
+      setRecommendedProducts(sortedProducts)
+    })
   }, [])
 
   useEffect(() => {
-    axiosApi
-      .get('/api/v1/category')
-      .then((res) => {
-        setCategories(res.data.data)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    getCategoriesAPI().then((data) => setCategories(data))
   }, [])
 
   const loadMoreRecommendedProducts = () => {
@@ -168,7 +142,7 @@ function HomePage() {
               ? bestSellingProducts.map((product) => (
                 <ProductItem
                   product={product}
-                  key={product.id}
+                  key={product._id}
                   width={'240px'}
                 />
               ))
@@ -248,7 +222,7 @@ function HomePage() {
               ? recommendedProducts
                 .slice(0, productsDisplayed)
                 .map((product) => (
-                  <ProductItem product={product} key={product.id} />
+                  <ProductItem product={product} key={product._id} />
                 ))
               : [...Array(40)].map((_, index) => (
                 <ProductItem product={null} loading={true} key={index} />
@@ -280,4 +254,4 @@ function HomePage() {
   )
 }
 
-export default memo(HomePage)
+export default HomePage
