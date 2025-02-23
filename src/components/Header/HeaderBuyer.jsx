@@ -1,10 +1,10 @@
-import { memo, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import logo from '~/assets/images/AniCart.png'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchCurrentCartQuantityAPI, selectCurrentCartQuantity } from '~/redux/cartQuantity/cartQuantitySlice'
+import { fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
 
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'
@@ -23,16 +23,18 @@ import Button from '@mui/material/Button'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
+import { useConfirm } from 'material-ui-confirm'
+import { logoutUserAPI } from '~/redux/user/userSlice'
 
 function HeaderBuyer() {
   const [searchValue, setSearchValue] = useState('')
   const navigate = useNavigate()
 
-  const cartQuantity = useSelector(selectCurrentCartQuantity)
+  const cart = useSelector(selectCurrentCart)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch(fetchCurrentCartQuantityAPI())
+    dispatch(fetchCurrentCartAPI())
   }, [dispatch])
 
   const [anchorEl, setAnchorEl] = useState(null)
@@ -48,6 +50,17 @@ function HeaderBuyer() {
     }
   }
 
+  const confirmLogout = useConfirm()
+  const handleLogout = async () => {
+    confirmLogout({
+      title: 'Bạn có chắc chắn muốn đăng xuất?',
+      confirmationText: 'Xác nhận',
+      cancellationText: 'Hủy'
+    }).then(() => {
+      dispatch(logoutUserAPI())
+    }).catch(() => {})
+  }
+
   return (
     <Box sx={{
       display: 'flex',
@@ -61,7 +74,12 @@ function HeaderBuyer() {
     }}>
       <Container disableGutters maxWidth='xl' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flex: '0 0 auto' }}>
-          <img src={logo} alt="E-shop" style={{ height: 45, width: 100, borderRadius: '20px', cursor: 'pointer' }} onClick={() => navigate('/')}/>
+          <img
+            src={logo}
+            alt="E-shop"
+            style={{ height: 45, width: 100, borderRadius: '20px', cursor: 'pointer' }}
+            onClick={() => navigate('/')}
+          />
         </Box>
 
         <Box sx={{
@@ -124,7 +142,7 @@ function HeaderBuyer() {
               gap: '10px',
               '&:hover': { borderRadius: '10px' }
             }}>
-            <Badge badgeContent={cartQuantity} showZero color='warning'>
+            <Badge badgeContent={cart?.length} showZero color='warning'>
               <ShoppingCartOutlinedIcon sx={{ color: 'white' }}/>
             </Badge>
             <Typography variant='span' sx={{ fontSize: '.875rem', color: 'white' }}>Giỏ hàng</Typography>
@@ -160,7 +178,7 @@ function HeaderBuyer() {
             <MenuItem onClick={handleClose}>Đơn hàng của tôi</MenuItem>
             <MenuItem onClick={handleClose}>Cài đặt</MenuItem>
             <Divider />
-            <MenuItem onClick={handleClose} sx={{ color: 'warning.dark', fontWeight: 'bold' }}>
+            <MenuItem onClick={handleLogout} sx={{ color: 'warning.dark', fontWeight: 'bold' }}>
               <ListItemIcon><LogoutIcon sx={{ color: 'warning.dark' }} fontSize="small" /></ListItemIcon>
               <ListItemText>Đăng xuất</ListItemText>
             </MenuItem>
@@ -171,4 +189,4 @@ function HeaderBuyer() {
   )
 }
 
-export default memo(HeaderBuyer)
+export default HeaderBuyer

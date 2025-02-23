@@ -4,7 +4,7 @@ import ForgotPassword from '~/pages/Auth/ForgotPassword'
 import OTPConfirm from '~/pages/Auth/OTPConfirm'
 import ResetPassword from '~/pages/Auth/ResetPassword'
 
-import HomePage from '~/pages/Buyer/HomePage'
+import HomePage from '~/pages/Buyer/HomePage/HomePage'
 import SearchPage from '~/pages/Buyer/SearchPage'
 import UserInfo from '~/pages/Buyer/User/UserInfo'
 import CartPage from '~/pages/Buyer/CartPage'

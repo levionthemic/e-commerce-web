@@ -1,12 +1,12 @@
 import Box from '@mui/material/Box'
-import HeaderBuyer from '../Header/HeaderBuyer/HeaderBuyer'
 import { Outlet } from 'react-router-dom'
 import Footer from '../Footer/Footer'
+import Header from '../Header/Header'
 
-function BuyerLayout() {
+function BuyerLayout({ type }) {
   return (
     <Box>
-      <HeaderBuyer />
+      <Header type={type} />
       <Outlet />
       <Footer />
     </Box>

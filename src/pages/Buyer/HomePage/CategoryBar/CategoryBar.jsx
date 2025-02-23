@@ -5,7 +5,7 @@ import Container from '@mui/material/Container'
 import Chip from '@mui/material/Chip'
 import { Avatar } from '@mui/material'
 
-function CategoryBar({ categories }) {
+function CategoryBar({ categories = [] }) {
   return (
     <Box py={2} sx={{ bgcolor: 'secondary.main' }} >
       <Container disableGutters maxWidth="xl" sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -19,15 +19,14 @@ function CategoryBar({ categories }) {
           gap: '5px'
         }}>
           {categories?.map((item) => (
-            <Tooltip key={item.id} title={item.text} placement='top-start'>
+            <Tooltip key={item._id} title={item.name} placement='top-start'>
               <Chip
-                avatar={<Avatar src={item.icon_url} />}
-                label={item.text}
+                avatar={<Avatar src={item.iconUrl} />}
+                label={item.name}
                 sx={{ flex: 1, display: 'flex', alignItems: 'center', overflowX: 'hidden' }}
                 clickable
               />
             </Tooltip>
-
           ))}
         </Box>
       </Container>

@@ -47,7 +47,7 @@ function ProductItem({ product, loading, width }) {
         component="img"
         alt=""
         height="160"
-        image={product?.thumbnail_url || '/images/default/default-product.png'}
+        image={product?.thumbnailUrl || '/images/default/default-product.png'}
       />
       <CardContent>
         <Typography

@@ -22,6 +22,11 @@ import FieldErrorAlert from '~/components/Form/FieldErrorAlert'
 import { useDispatch } from 'react-redux'
 import { loginUserAPI } from '~/redux/user/userSlice'
 import { toast } from 'react-toastify'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+
+import FormLabel from '@mui/material/FormLabel'
 
 function LoginForm() {
   const { register, handleSubmit, formState: { errors } } = useForm()
@@ -34,10 +39,10 @@ function LoginForm() {
   const navigate = useNavigate()
 
   const submitLogIn = (data) => {
-    const { email, password } = data
+    const { email, password, role } = data
     toast.promise(
-      dispatch(loginUserAPI({ email, password })),
-      { pending: 'Login is in progress...' }
+      dispatch(loginUserAPI({ email, password, role })),
+      { pending: 'Đang đăng nhập...' }
     ).then(res => {
       // Đoạn này phải kiểm tra không có lỗi (login thành công) thì mới redirect về route '/'
       if (!res.error) navigate('/')
@@ -47,7 +52,7 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit(submitLogIn)}>
       <Zoom in={true} style={{ transitionDelay: '200ms' }}>
-        <MuiCard sx={{ minWidth: 380, maxWidth: 380 }}>
+        <MuiCard sx={{ minWidth: 400, maxWidth: 400 }}>
           <Box sx={{
             margin: '1em',
             display: 'flex',
@@ -57,32 +62,39 @@ function LoginForm() {
             <Avatar sx={{ bgcolor: 'primary.main' }}><LockIcon /></Avatar>
             <Avatar sx={{ bgcolor: 'primary.main' }}><WebIcon /></Avatar>
           </Box>
+
           <Box sx={{ marginTop: '1em', display: 'flex', justifyContent: 'center', color: theme => theme.palette.grey[500] }}>
-            Author: Levionthemic
+            Chào mừng bạn đến với website của chúng tôi!
           </Box>
+
+          <Box sx={{ marginTop: '1em', display: 'flex', justifyContent: 'center', color: theme => theme.palette.grey[900], fontSize: '1.5rem' }}>
+            ĐĂNG NHẬP
+          </Box>
+
           <Box sx={{ marginTop: '1em', display: 'flex', justifyContent: 'center', flexDirection: 'column', padding: '0 1em' }}>
             {verifiedEmail &&
               <Alert severity="success" sx={{ '.MuiAlert-message': { overflow: 'hidden' } }}>
-                Your email&nbsp;
+                Email của bạn:&nbsp;
                 <Typography variant="span" sx={{ fontWeight: 'bold', '&:hover': { color: '#fdba26' } }}>{verifiedEmail}</Typography>
-                &nbsp;has been verified.<br />Now you can login to enjoy our services! Have a good day!
+                &nbsp;đã được xác thực.<br />Ngay bây giờ bạn có thể đăng nhập để có thể trải nghiệm dịch vụ của chúng tôi! Chúc bạn một ngày tốt lành!
               </Alert>
             }
             {registeredEmail &&
               <Alert severity="info" sx={{ '.MuiAlert-message': { overflow: 'hidden' } }}>
-              An email has been sent to&nbsp;
+              Chúng tôi đã gửi 1 email đến email:&nbsp;
                 <Typography variant="span" sx={{ fontWeight: 'bold', '&:hover': { color: '#fdba26' } }}>{registeredEmail}</Typography>
-                <br />Please check and verify your account before logging in!
+                <br />Hãy kiểm tra và xác thực trước khi đăng nhập!
               </Alert>
             }
           </Box>
+
           <Box sx={{ padding: '0 1em 1em 1em' }}>
             <Box sx={{ marginTop: '1em' }}>
               <TextField
                 autoComplete="nope"
                 autoFocus
                 fullWidth
-                label="Enter Email..."
+                label="Nhập Email..."
                 type="text"
                 variant="outlined"
                 error={!!errors['email']} // Dùng prop này để hiện viền đỏ khi có error
@@ -96,15 +108,16 @@ function LoginForm() {
               />
               <FieldErrorAlert errors={errors} fieldName={'email'}/>
             </Box>
+
             <Box sx={{ marginTop: '1em' }}>
               <TextField
                 fullWidth
-                label="Enter Password..."
+                label="Nhập Mật khẩu..."
                 type="password"
                 variant="outlined"
                 error={!!errors['password']}
                 {...register('password', {
-                  required: PASSWORD_RULE_MESSAGE,
+                  required: FIELD_REQUIRED_MESSAGE,
                   pattern: {
                     value: PASSWORD_RULE,
                     message: PASSWORD_RULE_MESSAGE
@@ -113,7 +126,35 @@ function LoginForm() {
               />
               <FieldErrorAlert errors={errors} fieldName={'password'} />
             </Box>
+
+            <Box sx={{ marginTop: '1em' }}>
+              <FormLabel id="role-radio">Vai trò:</FormLabel>
+              <RadioGroup row aria-labelledby="role-radio" name='role'>
+                <FormControlLabel
+                  value="buyer"
+                  control={
+                    <Radio {...register('role', { required: FIELD_REQUIRED_MESSAGE })}/>
+                  }
+                  label="Người mua"
+                />
+                <FormControlLabel
+                  value="seller"
+                  control={<Radio {...register('role', { required: FIELD_REQUIRED_MESSAGE })}/>
+                  }
+                  label="Người bán"
+                />
+                <FormControlLabel
+                  value="admin"
+                  control={
+                    <Radio {...register('role', { required: FIELD_REQUIRED_MESSAGE })}/>
+                  }
+                  label="Quản trị viên"
+                />
+              </RadioGroup>
+              <FieldErrorAlert errors={errors} fieldName={'role'} />
+            </Box>
           </Box>
+
           <CardActions sx={{ padding: '0 1em 1em 1em' }}>
             <Button
               className='interceptor-loading'
@@ -126,10 +167,11 @@ function LoginForm() {
               Login
             </Button>
           </CardActions>
-          <Box sx={{ padding: '0 1em 1em 1em', textAlign: 'center' }}>
-            <Typography>New to Trello MERN Stack Advanced?</Typography>
+
+          <Box sx={{ padding: '1em 1em 1em 1em', textAlign: 'center' }}>
+            <Typography>Lần đầu đăng nhập?</Typography>
             <Link to="/register" style={{ textDecoration: 'none' }}>
-              <Typography sx={{ color: 'primary.main', '&:hover': { color: '#ffbb39' } }}>Create account!</Typography>
+              <Typography sx={{ color: 'primary.main', '&:hover': { color: '#ffbb39' } }}>Tạo tài khoản!</Typography>
             </Link>
           </Box>
         </MuiCard>
