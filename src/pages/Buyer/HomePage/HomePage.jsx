@@ -76,20 +76,15 @@ function HomePage() {
 
   useEffect(() => {
     getProductsAPI().then((data) => {
-      const sortedProducts = data
+      const bestSellingProducts = data
         .filter((product) => product.quantitySold > 0 )
         .sort((a, b) => b.quantitySold - a.quantitySold)
         .slice(0, 50)
-      setBestSellingProducts(sortedProducts)
-    })
-  }, [])
-
-  useEffect(() => {
-    getProductsAPI().then((data) => {
-      const sortedProducts = data
+      const recommendedProducts = data
         .filter((product) => product.rate !== null && product.rate !== undefined)
         .sort((a, b) => b.rate - a.rate)
-      setRecommendedProducts(sortedProducts)
+      setBestSellingProducts(bestSellingProducts)
+      setRecommendedProducts(recommendedProducts)
     })
   }, [])
 
