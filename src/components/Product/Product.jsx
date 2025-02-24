@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import { memo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Rating from '@mui/material/Rating'
 
@@ -15,7 +14,7 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { Divider } from '@mui/material'
 
-function ProductItem({ product, loading, width }) {
+function Product({ product, loading, width }) {
   const navigate = useNavigate()
 
   if (loading) {
@@ -39,7 +38,7 @@ function ProductItem({ product, loading, width }) {
   return (
     <Card
       onClick={() => {
-        navigate(`/detailproduct/${product.id}`)
+        navigate(`/buyer/product/${product._id}`)
       }}
       sx={{ cursor: 'pointer', width: width }}
     >
@@ -74,7 +73,7 @@ function ProductItem({ product, loading, width }) {
         }}>
           {(
             product?.price *
-                  (1 - product?.discount_rate / 100)
+                  (1 - product?.discountPercentage / 100)
           ).toLocaleString()}
           <sup>đ</sup>
         </Typography>
@@ -87,16 +86,16 @@ function ProductItem({ product, loading, width }) {
           my: 1
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant='span'>{product?.rating_average || '0'}</Typography>
+            <Typography variant='span'>{product?.rate || '0'}</Typography>
             <Rating
               size='small'
-              name="rating-average"
-              value={product?.rating_average || 0}
+              name="rate"
+              value={product?.rate || 0}
               precision={0.1}
               readOnly />
           </Box>
 
-          <Typography variant='span'>| Đã bán: {product?.quantity_sold?.value || 0}</Typography>
+          <Typography variant='span'>| Đã bán: {product?.quantitySold || 0}</Typography>
         </Box>
       </CardContent>
       <Divider />
@@ -109,4 +108,4 @@ function ProductItem({ product, loading, width }) {
   )
 }
 
-export default memo(ProductItem)
+export default Product

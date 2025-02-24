@@ -23,7 +23,7 @@ injectStore(store)
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 root.render(
-  <BrowserRouter basename='/'>
+  <BrowserRouter>
     <Provider store={store}>
       <PersistGate loading={<Loader />} persistor={persistor}>
         <CssVarsProvider theme={theme}>

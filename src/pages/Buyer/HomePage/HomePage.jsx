@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import banner from '~/assets/images/banner.png'
 import 'react-multi-carousel/lib/styles.css'
-import ProductItem from '~/components/ProductItem/ProductItem'
+import Product from '~/components/Product/Product'
 import { animateScroll } from 'react-scroll'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
@@ -140,14 +140,14 @@ function HomePage() {
           <CustomCarousel>
             {bestSellingProducts.length > 0
               ? bestSellingProducts.map((product) => (
-                <ProductItem
+                <Product
                   product={product}
                   key={product._id}
                   width={'240px'}
                 />
               ))
               : [...Array(6)].map((_, index) => (
-                <ProductItem
+                <Product
                   product={null}
                   key={index}
                   loading={true}
@@ -222,10 +222,10 @@ function HomePage() {
               ? recommendedProducts
                 .slice(0, productsDisplayed)
                 .map((product) => (
-                  <ProductItem product={product} key={product._id} />
+                  <Product product={product} key={product._id} />
                 ))
               : [...Array(40)].map((_, index) => (
-                <ProductItem product={null} loading={true} key={index} />
+                <Product product={null} loading={true} key={index} />
               ))}
           </Box>
         </Box>

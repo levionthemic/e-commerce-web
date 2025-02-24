@@ -10,7 +10,7 @@ import CardActions from '@mui/material/CardActions'
 import TextField from '@mui/material/TextField'
 import Zoom from '@mui/material/Zoom'
 import Alert from '@mui/material/Alert'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import {
   EMAIL_RULE,
   PASSWORD_RULE,
@@ -27,9 +27,10 @@ import RadioGroup from '@mui/material/RadioGroup'
 import FormControlLabel from '@mui/material/FormControlLabel'
 
 import FormLabel from '@mui/material/FormLabel'
+import { PAGE_TYPE } from '~/utils/constants'
 
 function LoginForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm()
+  const { register, handleSubmit, formState: { errors }, control } = useForm()
 
   const [searchParams] = useSearchParams()
   const registeredEmail = searchParams.get('registeredEmail')
@@ -129,28 +130,38 @@ function LoginForm() {
 
             <Box sx={{ marginTop: '1em' }}>
               <FormLabel id="role-radio">Vai trò:</FormLabel>
-              <RadioGroup row aria-labelledby="role-radio" name='role'>
-                <FormControlLabel
-                  value="buyer"
-                  control={
-                    <Radio {...register('role', { required: FIELD_REQUIRED_MESSAGE })}/>
-                  }
-                  label="Người mua"
-                />
-                <FormControlLabel
-                  value="seller"
-                  control={<Radio {...register('role', { required: FIELD_REQUIRED_MESSAGE })}/>
-                  }
-                  label="Người bán"
-                />
-                <FormControlLabel
-                  value="admin"
-                  control={
-                    <Radio {...register('role', { required: FIELD_REQUIRED_MESSAGE })}/>
-                  }
-                  label="Quản trị viên"
-                />
-              </RadioGroup>
+              <Controller
+                name="role"
+                defaultValue={PAGE_TYPE.BUYER}
+                control={control}
+                render={({ field }) => (
+                  <RadioGroup
+                    {...field}
+                    row
+                    onChange={(event, value) => field.onChange(value)}
+                    value={field.value}
+                  >
+                    <FormControlLabel
+                      value={PAGE_TYPE.BUYER}
+                      control={<Radio size="small" />}
+                      label="Người mua"
+                      labelPlacement="end"
+                    />
+                    <FormControlLabel
+                      value={PAGE_TYPE.SELLER}
+                      control={<Radio size="small" />}
+                      label="Người bán"
+                      labelPlacement="end"
+                    />
+                    <FormControlLabel
+                      value={PAGE_TYPE.ADMIN}
+                      control={<Radio size="small" />}
+                      label="Quản trị viên"
+                      labelPlacement="end"
+                    />
+                  </RadioGroup>
+                )}
+              />
               <FieldErrorAlert errors={errors} fieldName={'role'} />
             </Box>
           </Box>

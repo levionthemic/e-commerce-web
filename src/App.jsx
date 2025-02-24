@@ -2,10 +2,11 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from './redux/user/userSlice'
 
-import Layout from './components/Layout/Layout'
 import HomePage from './pages/Buyer/HomePage/HomePage'
 import Auth from './pages/Auth/Auth'
 import AccountVerification from './pages/Auth/AccountVerification'
+import ProductDetailPage from './pages/Buyer/ProductDetailPage/ProductDetailPage'
+import BuyerLayout from './components/Layout/BuyerLayout'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -14,6 +15,7 @@ const PrivateRoute = ({ user }) => {
 
 function App() {
   const currentUser = useSelector(selectCurrentUser)
+
   return (
     <Routes>
       <Route path='/' element={
@@ -26,8 +28,9 @@ function App() {
 
       <Route element={<PrivateRoute user={currentUser} />}>
         {/* Buyer pages */}
-        <Route path='buyer' element={<Layout />}>
+        <Route path='/buyer' element={<BuyerLayout />}>
           <Route index element={<HomePage />} />
+          <Route path='product/:productId' element={<ProductDetailPage />} />
         </Route>
       </Route>
     </Routes>

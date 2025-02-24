@@ -1,10 +1,6 @@
-/* eslint-disable no-console */
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { axiosApi } from '~/services/ApiService'
-import Swal from 'sweetalert2'
 import { useDispatch } from 'react-redux'
-import { increaseCartQuantity } from '~/redux/cart/cartSlice'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
@@ -15,84 +11,72 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
+import { getProductDetailsAPI } from '~/apis'
 
-const DetailProduct = () => {
+function ProductDetailPage() {
   const { productId } = useParams()
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
-  const reviewSectionRef = useRef(null)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    try {
-      axiosApi.get(`/api/v1/products/detail/${productId}`)
-        .then((res) => {
-          if (res.data.code === 200) {
-            setProduct(res.data.data)
-          } else {
-            console.error('Sản phẩm không tồn tại')
-          }
-        })
-    } catch (error) {
-      console.error('Có lỗi xảy ra khi gọi API:', error)
-    }
-  }, [productId, dispatch])
+    getProductDetailsAPI(productId)
+      .then((data) => {
+        setProduct(data)
+      })
+  }, [productId])
 
-  const handleScrollToReviews = () => {
-    if (reviewSectionRef.current) {
-      reviewSectionRef.current.scrollIntoView({ behavior: 'smooth' })
-    }
+  // const handleAddToCart = () => {
+  //   axiosApi
+  //     .post('api/v1/cart/add', {
+  //       cartId: localStorage.getItem('cartId'),
+  //       productId: productId,
+  //       quantity: quantity
+  //     })
+  //     .then((res) => {
+  //       Swal.fire({
+  //         toast: true,
+  //         position: 'top-end',
+  //         showConfirmButton: false,
+  //         timer: 1500,
+  //         timerProgressBar: true,
+  //         didOpen: (toast) => {
+  //           toast.onmouseenter = Swal.stopTimer
+  //           toast.onmouseleave = Swal.resumeTimer
+  //         },
+  //         icon: 'success',
+  //         title: 'Thêm vào giỏ hàng thành công!'
+  //       })
+  //       if (res.data.hasQuantityUpdated)
+  //         dispatch(increaseCartQuantity(1))
+  //     })
+  //     .catch(() => {
+  //       Swal.fire({
+  //         toast: true,
+  //         position: 'top-end',
+  //         showConfirmButton: false,
+  //         timer: 1500,
+  //         timerProgressBar: true,
+  //         didOpen: (toast) => {
+  //           toast.onmouseenter = Swal.stopTimer
+  //           toast.onmouseleave = Swal.resumeTimer
+  //         },
+  //         icon: 'error',
+  //         title: 'Không thể thêm sản phẩm vào giỏ hàng!'
+  //       })
+  //     })
+  // }
+  if (!product) {
+    return <>Loading...</>
   }
-
-  const handleAddToCart = () => {
-    axiosApi
-      .post('api/v1/cart/add', {
-        cartId: localStorage.getItem('cartId'),
-        productId: productId,
-        quantity: quantity
-      })
-      .then((res) => {
-        Swal.fire({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 1500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer
-            toast.onmouseleave = Swal.resumeTimer
-          },
-          icon: 'success',
-          title: 'Thêm vào giỏ hàng thành công!'
-        })
-        if (res.data.hasQuantityUpdated)
-          dispatch(increaseCartQuantity(1))
-      })
-      .catch(() => {
-        Swal.fire({
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 1500,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer
-            toast.onmouseleave = Swal.resumeTimer
-          },
-          icon: 'error',
-          title: 'Không thể thêm sản phẩm vào giỏ hàng!'
-        })
-      })
-  }
-
   return (
     <Container disableGutters maxWidth='xl'>
       <Grid container columnSpacing={3} mt={4}>
-        <Grid item xl={3}>
+        <Grid item xl={3} lg={3}>
           <Box sx={{
             position: 'relative',
             overflow: 'hidden',
-            height: '100%',
+            height: 'fit-content',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -100,7 +84,7 @@ const DetailProduct = () => {
             borderRadius: '10px'
           }}>
             <img
-              src={product?.thumbnail_url}
+              src={product?.thumbnailUrl}
               alt={product?.name}
               style={{
                 maxHeight: '500px',
@@ -110,7 +94,7 @@ const DetailProduct = () => {
           </Box>
         </Grid>
 
-        <Grid item xl={9}>
+        <Grid item xl={6} lg={6}>
           <Typography py={2} variant='h4'>{product?.name}</Typography>
 
           <Divider />
@@ -119,11 +103,11 @@ const DetailProduct = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', pb: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Rating
-                  name="rating-average"
-                  value={product?.rating_average || 0}
+                  name="rate"
+                  value={product?.rate || 0}
                   precision={0.1}
                   readOnly />
-                <Typography variant='span'>{product?.rating_average || 0}</Typography>
+                <Typography variant='span'>{product?.rate || 0}</Typography>
               </Box>
 
               <div style={{ border: '1px solid #ddd', height: '20px' }}></div>
@@ -141,7 +125,6 @@ const DetailProduct = () => {
                 <Typography
                   variant='span'
                   sx={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}
-                  onClick={handleScrollToReviews}
                 >
                   <Typography variant='span'>Đánh giá </Typography>
                   <BorderColorIcon fontSize='0.875rem'/>
@@ -149,16 +132,16 @@ const DetailProduct = () => {
               </Box>
             </Box>
 
-            <Typography>Mã sản phẩm: <u>{product?.id}</u></Typography>
+            <Typography>Mã sản phẩm: <u>{product?._id}</u></Typography>
 
             <Typography>
                 Số lượng còn:{' '}
-              {product?.stock_item ? product?.stock_item.qty : 0}
+              {product?.quantityInStock || 0}
             </Typography>
 
             <Typography>
                 Đã bán:{' '}
-              {product?.quantity_sold ? product?.quantity_sold.value : '0'}
+              {product?.quantitySold || '0'}
             </Typography>
           </Box>
 
@@ -167,7 +150,7 @@ const DetailProduct = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Typography variant='span' sx={{ color: '#f90606', fontWeight: 600, fontSize: '25px' }}>
               {(
-                product?.price * (1 - product?.discount_rate / 100)
+                product?.price * (1 - product?.discountPercentage / 100)
               ).toLocaleString()}
               <sup>đ</sup>
             </Typography>
@@ -179,7 +162,7 @@ const DetailProduct = () => {
               bgcolor: 'rgb(245, 245, 250)',
               borderRadius: '8px'
             }}>
-              {`-${product?.discount_rate}%`}
+              {`-${product?.discountPercentage}%`}
             </Typography>
 
             <Typography variant='span' sx={{
@@ -225,9 +208,9 @@ const DetailProduct = () => {
               <AddIcon
                 onClick={() =>
                   setQuantity(
-                    quantity < (product?.stock_item.qty || 1000)
+                    quantity < (product?.quantityInStock || 1000)
                       ? quantity + 1
-                      : product?.stock_item.qty || 1000
+                      : product?.quantityInStock || 1000
                   )
                 }
                 style={{ cursor: 'pointer', fontSize: '20px' }}
@@ -273,24 +256,35 @@ const DetailProduct = () => {
                   transition: 'bgcolor 0.3s, transform 0.3s ease-in-out'
                 }
               }}
-              onClick={handleAddToCart}
+              // onClick={handleAddToCart}
             >
                   Thêm vào giỏ hàng
             </Button>
           </Box>
 
           <Divider />
+
+          <Box my={3} p={2} sx={{ bgcolor: '#f8f9fa' }}>
+            <Typography variant='h5' mb={2}>Mô tả sản phẩm</Typography>
+            <div dangerouslySetInnerHTML={{ __html: product?.description }} style={{ textAlign: 'justify' }}/>
+          </Box>
+        </Grid>
+
+        <Grid item xl={3} lg={3}>
+          <Box sx={{
+            position: 'relative',
+            overflow: 'hidden',
+            height: 'fit-content',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Typography variant='h5'>Đánh giá sản phẩm</Typography>
+          </Box>
         </Grid>
       </Grid>
-
-      <Box my={3} p={2} sx={{ bgcolor: '#f8f9fa' }}>
-        <Typography variant='h4' sx={{ textAlign: 'center' }}>MÔ TẢ SẢN PHẨM</Typography>
-        <div dangerouslySetInnerHTML={{ __html: product?.description }} />
-      </Box>
-
-
     </Container>
   )
 }
 
-export default DetailProduct
+export default ProductDetailPage

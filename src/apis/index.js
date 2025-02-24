@@ -23,6 +23,11 @@ export const getProductsAPI = async () => {
   return response.data
 }
 
+export const getProductDetailsAPI = async (productId) => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/products/${productId}`)
+  return response.data
+}
+
 // Categories APIs
 export const getCategoriesAPI = async () => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/categories`)

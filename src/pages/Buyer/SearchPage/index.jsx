@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react'
 import { axiosApi } from '~/services/ApiService'
-import ProductItem from '~/components/ProductItem/ProductItem'
+import ProductItem from '~/components/Product/Product'
 import { useNavigate } from 'react-router-dom'
 import { animateScroll } from 'react-scroll'
 import Sider from './Sider/Sider'
