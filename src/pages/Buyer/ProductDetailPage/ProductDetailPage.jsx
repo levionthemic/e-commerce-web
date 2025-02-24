@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
 import Box from '@mui/material/Box'
@@ -11,13 +11,21 @@ import BorderColorIcon from '@mui/icons-material/BorderColor'
 import RemoveIcon from '@mui/icons-material/Remove'
 import AddIcon from '@mui/icons-material/Add'
 import Button from '@mui/material/Button'
-import { getProductDetailsAPI } from '~/apis'
+import { getProductDetailsAPI, updateProductDetailAPI } from '~/apis'
+import { selectCurrentUser } from '~/redux/user/userSlice'
+import Avatar from '@mui/material/Avatar'
+import TextField from '@mui/material/TextField'
+import Tooltip from '@mui/material/Tooltip'
+import moment from 'moment'
 
 function ProductDetailPage() {
   const { productId } = useParams()
+
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
+
   const dispatch = useDispatch()
+  const currentUser = useSelector(selectCurrentUser)
 
   useEffect(() => {
     getProductDetailsAPI(productId)
@@ -66,9 +74,29 @@ function ProductDetailPage() {
   //       })
   //     })
   // }
+
+  const handleAddCardComment = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      if (!event.target?.value) return
+
+      const commentToAdd = {
+        userAvatar: currentUser?.avatar,
+        userDisplayName: currentUser?.displayName,
+        content: event.target.value.trim()
+      }
+
+      updateProductDetailAPI(product._id, { commentToAdd: commentToAdd }).then((data) => {
+        event.target.value = ''
+        setProduct(data)
+      })
+    }
+  }
+
   if (!product) {
     return <>Loading...</>
   }
+
   return (
     <Container disableGutters maxWidth='xl'>
       <Grid container columnSpacing={3} mt={4}>
@@ -120,7 +148,7 @@ function ProductDetailPage() {
                 color: 'rgba(0, 0, 0, 0.7)'
               }}>
                 <Typography variant='span' sx={{ marginRight: '-5px' }}>
-                  {product?.reviews ? product?.reviews.length : 0}
+                  {product?.comments ? product?.comments.length : 0}
                 </Typography>
                 <Typography
                   variant='span'
@@ -274,12 +302,65 @@ function ProductDetailPage() {
           <Box sx={{
             position: 'relative',
             overflow: 'hidden',
-            height: 'fit-content',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            height: 'fit-content'
           }}>
             <Typography variant='h5'>Đánh giá sản phẩm</Typography>
+
+            <Box sx={{ mt: 2 }}>
+              {/* Xử lý thêm comment vào Card */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <Avatar
+                  sx={{ width: 36, height: 36, cursor: 'pointer' }}
+                  alt={currentUser?.displayName}
+                  src={currentUser?.avatar}
+                />
+                <TextField
+                  fullWidth
+                  placeholder="Viết bình luận..."
+                  type="text"
+                  variant="outlined"
+                  multiline
+                  onKeyDown={handleAddCardComment}
+                />
+              </Box>
+
+              {/* Hiển thị danh sách các comments */}
+              {(!product?.comments || product?.comments?.length === 0) && <Typography sx={{ pl: '45px', fontSize: '14px', fontWeight: '500', color: '#b1b1b1' }}>Chưa có đánh giá!</Typography>
+              }
+              {product?.comments?.map((comment, index) =>
+                <Box sx={{ display: 'flex', gap: 1, width: '100%', mb: 1.5 }} key={index}>
+                  <Tooltip title={comment?.userDisplayName}>
+                    <Avatar
+                      sx={{ width: 36, height: 36, cursor: 'pointer' }}
+                      alt={comment?.userDisplayName}
+                      src={comment?.userAvatar}
+                    />
+                  </Tooltip>
+                  <Box sx={{ width: 'inherit' }}>
+                    <Typography variant="span" sx={{ fontWeight: 'bold', mr: 1 }}>
+                      {comment?.userDisplayName}
+                    </Typography>
+
+                    <Typography variant="span" sx={{ fontSize: '12px' }}>
+                      {moment(comment?.commentedAt).format('llll')}
+                    </Typography>
+
+                    <Box sx={{
+                      display: 'block',
+                      bgcolor: (theme) => theme.palette.mode === 'dark' ? '#33485D' : 'white',
+                      p: '8px 12px',
+                      mt: '4px',
+                      border: '0.5px solid rgba(0, 0, 0, 0.2)',
+                      borderRadius: '4px',
+                      wordBreak: 'break-word',
+                      boxShadow: '0 0 1px rgba(0, 0, 0, 0.2)'
+                    }}>
+                      {comment?.content}
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+            </Box>
           </Box>
         </Grid>
       </Grid>

@@ -28,6 +28,11 @@ export const getProductDetailsAPI = async (productId) => {
   return response.data
 }
 
+export const updateProductDetailAPI = async (productId, updateData) => {
+  const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/products/${productId}`, updateData)
+  return response.data
+}
+
 // Categories APIs
 export const getCategoriesAPI = async () => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/categories`)
