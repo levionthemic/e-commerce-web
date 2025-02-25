@@ -1,4 +1,5 @@
 import ReactDOM from 'react-dom/client'
+import './index.css'
 
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles'
 import theme from './theme.js'

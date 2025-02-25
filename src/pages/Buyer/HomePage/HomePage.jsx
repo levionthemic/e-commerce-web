@@ -4,7 +4,7 @@ import banner from '~/assets/images/banner.png'
 import 'react-multi-carousel/lib/styles.css'
 import Product from '~/components/Product/Product'
 import { animateScroll } from 'react-scroll'
-import Button from '@mui/material/Button'
+import { Button } from '~/components/ui/button'
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
@@ -227,18 +227,7 @@ function HomePage() {
 
         <Box py={2} sx={{ display: 'flex', justifyContent: 'center' }}>
           <Button
-            variant="contained"
-            sx={{
-              textTransform: 'none',
-              color: 'white',
-              backgroundColor: 'black',
-              borderRadius: '8px',
-              padding: '4px 12px',
-              fontSize: '14px',
-              '&:hover': {
-                backgroundColor: 'rgba($color: #000000, $alpha: 0.8)'
-              }
-            }}
+            className='bg-mainMint-50'
             onClick={loadMoreRecommendedProducts}
           >
             Xem thêm
