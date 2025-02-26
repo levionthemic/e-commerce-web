@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import logo from '~/assets/images/AniCart.png'
+import logo from '~/assets/logo.png'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
@@ -77,7 +77,7 @@ function HeaderBuyer() {
           <img
             src={logo}
             alt="E-shop"
-            style={{ height: 45, width: 100, borderRadius: '20px', cursor: 'pointer' }}
+            style={{ height: 60, width: 60, borderRadius: '20px', cursor: 'pointer' }}
             onClick={() => navigate('/')}
           />
         </Box>

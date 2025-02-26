@@ -54,13 +54,33 @@ export default {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			},
-        'backGround': {
-          50: '#FFFFFF'
+        'mainColor1': {
+          100:  '#9595C9',
+          200: '#8786C0',
+          400: '#6666AE',
+          600: '#464B9F',
+          800: '#2F2F89'
         },
-        'mainOrange': { 50: '#FF6F00' },
-        'mainYellow': { 50: '#FFC107' },
-        'mainMint': { 50: '#A7E7D6' }
-  		}
+        'mainColor2': {
+          100: '#CEACD1',
+          300: '#C29BC8',
+          800: '#854C9D'
+        },
+        'mainBg': { 100: '#FFFFFF' }
+  		},
+      keyframes: {
+        fadeIn: {
+          from: { opacity: 0 },
+          to: { opacity: 1 }
+        },
+        fadeInTop: {
+          '0%': { transform: 'translateY(-30px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 }
+        }
+      },
+      animation: {
+        fadeIn: 'fadeIn .7s ease-in-out',
+        fadeInTop: 'fadeInTop 1.5s ease 0s normal none'
+      }
   	}
   },
   plugins: [tailwindcssAnimate]
