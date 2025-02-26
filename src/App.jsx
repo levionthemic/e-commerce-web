@@ -7,6 +7,7 @@ import Auth from './pages/Auth/Auth'
 import AccountVerification from './pages/Auth/AccountVerification'
 import ProductDetailPage from './pages/Buyer/ProductDetailPage/ProductDetailPage'
 import BuyerLayout from './components/Layout/BuyerLayout'
+import LandingPage from './pages/LandingPage/LandingPage'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -19,7 +20,7 @@ function App() {
   return (
     <Routes>
       <Route path='/' element={
-        <Navigate to='/buyer' replace={true} />
+        <LandingPage />
       } />
 
       <Route path='/login' element={<Auth />} />
