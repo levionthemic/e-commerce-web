@@ -1,9 +1,10 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
-import LoginForm from './LoginForm'
+// import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
+import Login from './Login'
 
 function Auth() {
   const location = useLocation()
@@ -13,7 +14,7 @@ function Auth() {
 
   const currentUser = useSelector(selectCurrentUser)
   if (currentUser) {
-    return <Navigate to='/' replace={true} />
+    return <Navigate to='/buyer' replace={true} />
   }
 
   return (
@@ -30,7 +31,8 @@ function Auth() {
       backgroundPosition: 'center',
       boxShadow: 'inset 0 0 0 2000px rgba(0, 0, 0, 0.2)'
     }}>
-      {isLogin && <LoginForm />}
+      {/* {isLogin && <LoginForm />} */}
+      {isLogin && <Login />}
       {isRegister && <RegisterForm />}
     </Box>
   )
