@@ -75,11 +75,19 @@ export default {
         },
         fadeInTop: {
           '0%': { transform: 'translateY(-30px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 }
+        },
+        phoneShake: {
+          '0%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-10deg)' },
+          '50%': { transform: 'rotate(10deg)' },
+          '75%': { transform: 'rotate(-5deg)' },
+          '100%': { transform: 'rotate(0deg)' }
         }
       },
       animation: {
         fadeIn: 'fadeIn .7s ease-in-out',
-        fadeInTop: 'fadeInTop 1.5s ease 0s normal none'
+        fadeInTop: 'fadeInTop 1.5s ease 0s normal none',
+        phoneShake: 'phoneShake 0.5s infinite ease-in-out'
       }
   	}
   },

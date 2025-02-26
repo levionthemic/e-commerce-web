@@ -10,14 +10,6 @@ import {
   FormMessage
 } from '~/components/ui/form'
 
-import { Check } from 'lucide-react'
-import { Info } from 'lucide-react'
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle
-} from '~/components/ui/alert'
-
 import { Input } from '~/components/ui/input'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 
@@ -25,10 +17,9 @@ import Joi from 'joi'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE, FIELD_REQUIRED_MESSAGE, PASSWORD_RULE, PASSWORD_RULE_MESSAGE } from '~/utils/validators'
 import { PAGE_TYPE } from '~/utils/constants'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
-import { loginUserAPI } from '~/redux/user/userSlice'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { registerUserAPI } from '~/apis'
 
 const formSchema = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).messages({
@@ -39,65 +30,45 @@ const formSchema = Joi.object({
     'string.empty': FIELD_REQUIRED_MESSAGE,
     'string.pattern.base': PASSWORD_RULE_MESSAGE
   }),
+  confirmPassword: Joi.string().required().valid(Joi.ref('password')).pattern(PASSWORD_RULE).messages({
+    'string.empty': FIELD_REQUIRED_MESSAGE,
+    'string.pattern.base': PASSWORD_RULE_MESSAGE,
+    'any.only': 'Mật khẩu xác nhận không trùng khớp!'
+  }),
   role: Joi.string().required().valid(...Object.values(PAGE_TYPE))
 })
 
-function Login() {
+function Register() {
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
+      confirmPassword: '',
       role: PAGE_TYPE.BUYER
     }
   })
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
 
-  const [searchParams] = useSearchParams()
-  const registeredEmail = searchParams.get('registeredEmail')
-  const verifiedEmail = searchParams.get('verifiedEmail')
-
-  const submitLogIn = (data) => {
+  const submitRegister = (data) => {
     const { email, password, role } = data
     toast.promise(
-      dispatch(loginUserAPI({ email, password, role })),
-      { pending: 'Đang đăng nhập...' }
-    ).then(res => {
-      if (!res.error) navigate('/buyer')
+      registerUserAPI({ email, password, role }),
+      { pending: 'Đang đăng ký...' }
+    ).then(user => {
+      navigate(`/login?registeredEmail=${user.email}`)
     })
   }
 
   return (
     <div className='w-[100vw] h-[100vh] bg-[url("~/assets/background-auth.jpg")] bg-cover bg-no-repeat bg-center'>
       <div className='w-full h-full bg-gray-900 bg-opacity-60 flex items-center justify-center animate-fadeIn'>
-        <div className='w-[500px] min-h-[500px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-4 animate-fadeInTop backdrop-blur-sm'>
-          <div className='text-center font-semibold uppercase text-4xl text-white mt-10'>Login</div>
-
-          <div className="py-4">
-            {verifiedEmail &&
-              <Alert className='bg-[#EDF7ED]/80'>
-                <Check className="h-4 w-4" />
-                <AlertTitle className='font-semibold'>Xác nhận thành công!</AlertTitle>
-                <AlertDescription>
-                  Email của bạn:&nbsp;<b><i>{verifiedEmail}</i></b>&nbsp;đã được xác thực. Ngay bây giờ bạn có thể đăng nhập để có thể trải nghiệm dịch vụ của chúng tôi! <br />Chúc bạn một ngày tốt lành!
-                </AlertDescription>
-              </Alert>
-            }
-            {registeredEmail &&
-              <Alert className='bg-[#E5F6FD]/80'>
-                <Info className="h-4 w-4 items-center" />
-                <AlertTitle>Thông báo!</AlertTitle>
-                <AlertDescription>
-                  Chúng tôi đã gửi 1 email đến email:&nbsp;<br /><b>{registeredEmail}</b> <br />Hãy kiểm tra và xác thực trước khi đăng nhập!
-                </AlertDescription>
-              </Alert>
-            }
-          </div>
+        <div className='min-w-[500px] min-h-[700px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-2 animate-fadeInTop backdrop-blur-sm'>
+          <div className='text-center font-semibold uppercase text-4xl text-white mt-10'>SIGN UP</div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(submitLogIn)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(submitRegister)} className="space-y-8">
               <FormField
                 control={form.control}
                 name="email"
@@ -126,7 +97,7 @@ function Login() {
                     <FormLabel className='text-white text-base'>Mật khẩu</FormLabel>
                     <FormControl>
                       <Input
-                        type="password"
+                        type='password'
                         placeholder="Vd: 12345678a"
                         className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 text-white rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['password'] && 'border-red-500'}`}
                         {...field}
@@ -134,6 +105,27 @@ function Login() {
                     </FormControl>
                     <FormDescription className='text-white'>
                       Mật khẩu phải có ít nhất 8 kí tự, 1 chữ cái và 1 chữ số.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-white text-base'>Xác nhận mật khẩu</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='password'
+                        placeholder="Vd: 12345678a"
+                        className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 text-white rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['confirmPassword'] && 'border-red-500'}`}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription className='text-white'>
+                      Mật khẩu xác nhận phải trùng khớp.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -180,11 +172,11 @@ function Login() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className='bg-mainColor2-800/85 rounded-full w-full animate-fadeInTop py-5 text-md'>Đăng nhập</Button>
+              <Button type="submit" className='bg-mainColor2-800/85 rounded-full w-full animate-fadeInTop py-5 text-md'>Đăng ký</Button>
             </form>
           </Form>
 
-          <div className='mt-8 text-xs text-center text-white'>Chưa có tài khoản? <div className='underline cursor-pointer scale-100 font-semibold hover:scale-110 hover:transition-transform hover:ease-in-out hover:duration-200' onClick={() => navigate('/register')}>Đăng kí</div></div>
+          <div className='mt-8 text-xs text-center text-white'>Đã có tài khoản? <div className='underline cursor-pointer scale-100 font-semibold hover:scale-110 hover:transition-transform hover:ease-in-out hover:duration-200' onClick={() => navigate('/login')}>Đăng nhập</div></div>
 
         </div>
       </div>
@@ -192,4 +184,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Register
