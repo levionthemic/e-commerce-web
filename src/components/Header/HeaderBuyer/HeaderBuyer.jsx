@@ -1,60 +1,50 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-
-import logo from '~/assets/logo.png'
+import { useEffect } from 'react'
+import { createSearchParams, useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
 
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'
-import Badge from '@mui/material/Badge'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
-import Container from '@mui/material/Container'
-import Divider from '@mui/material/Divider'
-import Box from '@mui/material/Box'
-import IconButton from '@mui/material/IconButton'
-import TextField from '@mui/material/TextField'
-import InputAdornment from '@mui/material/InputAdornment'
-import SearchIcon from '@mui/icons-material/Search'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import LogoutIcon from '@mui/icons-material/Logout'
-import ListItemIcon from '@mui/material/ListItemIcon'
-import ListItemText from '@mui/material/ListItemText'
 import { useConfirm } from 'material-ui-confirm'
-import { logoutUserAPI } from '~/redux/user/userSlice'
+import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
 import { Input } from '~/components/ui/input'
 
 import { LuShoppingCart } from 'react-icons/lu'
 import { IoNotificationsOutline } from 'react-icons/io5'
 import MenuBar from './MenuBar'
 
-// import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '~/components/ui/dropdown-menu'
+import { Badge } from '~/components/ui/badge'
+import { useForm } from 'react-hook-form'
 
 
 function HeaderBuyer() {
-  const [searchValue, setSearchValue] = useState('')
   const navigate = useNavigate()
 
   const cart = useSelector(selectCurrentCart)
+  const currentUser = useSelector(selectCurrentUser)
   const dispatch = useDispatch()
+
+  const { handleSubmit, register } = useForm()
 
   useEffect(() => {
     dispatch(fetchCurrentCartAPI())
   }, [dispatch])
 
-  const [anchorEl, setAnchorEl] = useState(null)
-  const open = Boolean(anchorEl)
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
 
-  const handleSearch = (event) => {
-    event.preventDefault()
-    if (searchValue.trim()) {
-      navigate(`/search?keyword=${searchValue.trim()}&page=1`)
+  const handleSearch = (data) => {
+    const searchValue = data.searchValue.trim()
+    if (searchValue) {
+      navigate(`/buyer/search?${createSearchParams({ 'keyword': searchValue })}`)
     }
   }
 
@@ -71,7 +61,7 @@ function HeaderBuyer() {
 
   return (
     <>
-      <div className='container mx-auto mt-6 mb-3'>
+      <div className='container mx-auto mt-6 mb-4'>
         <div className="flex items-center justify-between">
           <div
             className='text-4xl font-medium text-mainColor1-600 cursor-pointer hover:scale-105 transition-transform hover:duration-500'
@@ -79,24 +69,47 @@ function HeaderBuyer() {
           >
           LEVI
           </div>
-          <div className="">
-            <Input
-              className='min-w-96 placeholder:text-sm placeholder:text-mainColor1-100 rounded-full border-mainColor1-800 text-mainColor1-600 hover:border-[2px] focus:border-[2px]'
-              placeholder='Bạn cần tìm gì?'
-            />
+          <div className="flex-1 flex justify-center">
+            <form action="#" onSubmit={handleSubmit(handleSearch)}>
+              <Input
+                className='min-w-96 w-[80%] placeholder:text-sm placeholder:text-mainColor1-100 rounded-full border-mainColor1-800 text-mainColor1-600 hover:border-[2px] focus:border-[2px]'
+                placeholder='Bạn cần tìm gì?'
+                {...register('searchValue')}
+              />
+            </form>
           </div>
 
           <div className='flex items-center gap-6'>
-            <IoNotificationsOutline className='text-mainColor1-600 text-xl' />
-            <LuShoppingCart className='text-mainColor1-600 text-xl' />
-            {/* <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar> */}
-
+            <IoNotificationsOutline className='text-mainColor1-600 text-xl font-bold' />
+            <div className='relative'>
+              <LuShoppingCart className='text-mainColor1-600 text-xl' />
+              <Badge className="w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-600">
+                {cart?.length || 0}
+              </Badge>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className='cursor-pointer'>
+                  <AvatarImage src={currentUser?.avatar} />
+                  <AvatarFallback>LV</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-40">
+                <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>Hồ sơ</DropdownMenuItem>
+                  <DropdownMenuItem>Đơn hàng</DropdownMenuItem>
+                  <DropdownMenuItem>Cài đặt</DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className='text-red-600 font-medium'
+                  onClick={handleLogout}
+                >Log out</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-
-
         </div>
       </div>
       <MenuBar />

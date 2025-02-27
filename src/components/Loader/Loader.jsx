@@ -6,7 +6,7 @@ function Loader({ caption }) {
   return (
     <Box sx={{
       width: '100vw',
-      height: '100vh',
+      height: 'calc(100vh - 36px - 40px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',

@@ -5,3 +5,6 @@ export const PAGE_TYPE = {
   SELLER: 'seller',
   ADMIN: 'admin'
 }
+
+export const DEFAULT_ITEMS_PER_PAGE = 40
+export const DEFAULT_PAGE = 1
