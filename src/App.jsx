@@ -8,6 +8,7 @@ import AccountVerification from './pages/Auth/AccountVerification'
 import ProductDetailPage from './pages/Buyer/ProductDetailPage/ProductDetailPage'
 import BuyerLayout from './components/Layout/BuyerLayout'
 import LandingPage from './pages/LandingPage/LandingPage'
+import SearchPage from './pages/Buyer/SearchPage/SearchPage'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -31,6 +32,7 @@ function App() {
         {/* Buyer pages */}
         <Route path='/buyer' element={<BuyerLayout />}>
           <Route index element={<HomePage />} />
+          <Route path='search' element={<SearchPage />} />
           <Route path='product/:productId' element={<ProductDetailPage />} />
         </Route>
       </Route>

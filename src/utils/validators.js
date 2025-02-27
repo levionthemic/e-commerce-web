@@ -2,7 +2,7 @@ export const FIELD_REQUIRED_MESSAGE = 'Trường này không được để tr�
 export const EMAIL_RULE = /^\S+@\S+\.\S+$/
 export const EMAIL_RULE_MESSAGE = 'Email không hợp lệ. (example@levionthemic.com)'
 export const PASSWORD_RULE = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d\W]{8,256}$/
-export const PASSWORD_RULE_MESSAGE = 'Mật khẩu phải chứa ít nhất 1 chữ cái, 1 chữ số, và độ dài tối thiểu 8 kí tự.'
+export const PASSWORD_RULE_MESSAGE = 'Mật khẩu phải có ít nhất 8 kí tự, 1 chữ cái và 1 chữ số.'
 export const PASSWORD_CONFIRMATION_MESSAGE = 'Mật khẩu Xác nhận không trùng khớp!'
 
 

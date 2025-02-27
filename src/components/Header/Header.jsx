@@ -1,5 +1,5 @@
 import { PAGE_TYPE } from '~/utils/constants'
-import HeaderBuyer from './HeaderBuyer'
+import HeaderBuyer from './HeaderBuyer/HeaderBuyer'
 
 function Header({ type }) {
   return (

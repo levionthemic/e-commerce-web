@@ -18,8 +18,8 @@ export const refreshTokenAPI = async () => {
 }
 
 // Products APIs
-export const getProductsAPI = async () => {
-  const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/products`)
+export const getProductsAPI = async (searchPath = '') => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/products${searchPath}`)
   return response.data
 }
 
