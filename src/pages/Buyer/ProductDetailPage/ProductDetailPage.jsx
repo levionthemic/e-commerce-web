@@ -7,17 +7,19 @@ import Typography from '@mui/material/Typography'
 
 import Rating from '@mui/material/Rating'
 
-import RemoveIcon from '@mui/icons-material/Remove'
-import AddIcon from '@mui/icons-material/Add'
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
+import { IoMdAdd } from 'react-icons/io'
+import { RiSubtractFill } from 'react-icons/ri'
 
 import { getProductDetailsAPI, updateProductDetailAPI } from '~/apis'
 import { selectCurrentUser } from '~/redux/user/userSlice'
-import Avatar from '@mui/material/Avatar'
 import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import moment from 'moment'
 import Loader from '~/components/Loader/Loader'
 import { Button } from '~/components/ui/button'
+import { Textarea } from '~/components/ui/textarea'
+
 
 function ProductDetailPage() {
   const { productId } = useParams()
@@ -161,21 +163,20 @@ function ProductDetailPage() {
 
           <div className="">
             <div className='rounded-lg bg-white p-3 mb-4'>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className='flex items-center gap-3'>
                 <div className='font-semibold text-mainColor2-800'>Số lượng:</div>
-
                 <div className='flex items-center justify-between border border-mainColor2-100 rounded-lg p-1'>
-                  <RemoveIcon
+                  <RiSubtractFill
+                    className='cursor-pointer text-xl text-mainColor2-800 hover:bg-mainColor2-800/40 rounded-md'
                     onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}
-                    sx={{ cursor: 'pointer', fontSize: '20px' }}
                   />
                   <input
                     value={quantity}
                     onChange={(e) => { setQuantity(e.target.value) }}
                     readOnly
-                    className='w-[50px] text-center mx-1.5 border-none outline-none text-md font-medium text-mainColor2-800'
+                    className='w-[50px] text-center mx-1.5 border-none outline-none text-md font-semibold text-mainColor2-800'
                   />
-                  <AddIcon
+                  <IoMdAdd
                     onClick={() =>
                       setQuantity(
                         quantity < (product?.quantityInStock || 1000)
@@ -183,33 +184,36 @@ function ProductDetailPage() {
                           : product?.quantityInStock || 1000
                       )
                     }
-                    style={{ cursor: 'pointer', fontSize: '20px' }}
+                    className='cursor-pointer text-xl text-mainColor2-800 hover:bg-mainColor2-800/40 rounded-md'
                   />
                 </div>
-              </Box>
+              </div>
 
-              <div className='flex gap-2 mt-4 mb-2'>
-                <Button className='bg-mainColor2-800 hover:bg-mainColor2-300'>Mua ngay</Button>
-                <Button className='bg-white border-mainColor1-800 text-mainColor1-800 border hover:bg-mainColor1-800/90 hover:text-white'>Thêm vào giỏ hàng</Button>
+              <div className='my-5'>
+                <div className='mb-1 text-mainColor2-800/90'>Tạm tính</div>
+                <div className='text-gray-700 font-bold text-2xl tracking-normal'>
+                  {(
+                    product?.price * (1 - product?.discountPercentage / 100)
+                  ).toLocaleString()}
+                  <sup>đ</sup>
+                </div>
+              </div>
+
+              <div className='flex flex-col gap-2 mt-4 mb-2'>
+                <Button className='w-full bg-mainColor2-800 hover:bg-mainColor2-300 text-lg'>Mua ngay</Button>
+                <Button className='w-full bg-white border-mainColor1-800 text-mainColor1-800 border hover:bg-mainColor1-800/90 hover:text-white'>Thêm vào giỏ hàng</Button>
               </div>
             </div>
 
-            <Box sx={{
-              position: 'relative',
-              overflow: 'hidden',
-              height: 'fit-content'
-            }}>
-              <Typography variant='h5'>Đánh giá sản phẩm</Typography>
-
-              <Box sx={{ mt: 2 }}>
-                {/* Xử lý thêm comment vào Card */}
+            <div className='rounded-lg bg-white p-3 mb-4 relative h-fit'>
+              <div className='text-xl font-semibold text-mainColor2-800'>Đánh giá sản phẩm</div>
+              <div className='mt-4'>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <Avatar
-                    sx={{ width: 36, height: 36, cursor: 'pointer' }}
-                    alt={currentUser?.displayName}
-                    src={currentUser?.avatar}
-                  />
-                  <TextField
+                  <Avatar className='cursor-pointer'>
+                    <AvatarImage src={currentUser?.avatar} />
+                    <AvatarFallback>LV</AvatarFallback>
+                  </Avatar>
+                  <Textarea
                     fullWidth
                     placeholder="Viết bình luận..."
                     type="text"
@@ -219,44 +223,34 @@ function ProductDetailPage() {
                   />
                 </Box>
 
-                {/* Hiển thị danh sách các comments */}
-                {(!product?.comments || product?.comments?.length === 0) && <Typography sx={{ pl: '45px', fontSize: '14px', fontWeight: '500', color: '#b1b1b1' }}>Chưa có đánh giá!</Typography>
+                {(!product?.comments || product?.comments?.length === 0) &&
+                  <span className='pl-12 text-md font-medium text-gray-400'>Chưa có đánh giá!</span>
                 }
                 {product?.comments?.map((comment, index) =>
-                  <Box sx={{ display: 'flex', gap: 1, width: '100%', mb: 1.5 }} key={index}>
+                  <div className='flex gap-3 w-full mb-1.5' key={index}>
                     <Tooltip title={comment?.userDisplayName}>
-                      <Avatar
-                        sx={{ width: 36, height: 36, cursor: 'pointer' }}
-                        alt={comment?.userDisplayName}
-                        src={comment?.userAvatar}
-                      />
+                      <Avatar className='cursor-pointer'>
+                        <AvatarImage src={currentUser?.avatar} />
+                        <AvatarFallback>LV</AvatarFallback>
+                      </Avatar>
                     </Tooltip>
-                    <Box sx={{ width: 'inherit' }}>
-                      <Typography variant="span" sx={{ fontWeight: 'bold', mr: 1 }}>
+                    <div className=''>
+                      <span className='font-bold mr-2'>
                         {comment?.userDisplayName}
-                      </Typography>
+                      </span>
 
-                      <Typography variant="span" sx={{ fontSize: '12px' }}>
+                      <span className='text-xs'>
                         {moment(comment?.commentedAt).format('llll')}
-                      </Typography>
+                      </span>
 
-                      <Box sx={{
-                        display: 'block',
-                        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#33485D' : 'white',
-                        p: '8px 12px',
-                        mt: '4px',
-                        border: '0.5px solid rgba(0, 0, 0, 0.2)',
-                        borderRadius: '4px',
-                        wordBreak: 'break-word',
-                        boxShadow: '0 0 1px rgba(0, 0, 0, 0.2)'
-                      }}>
+                      <div className='block py-2 mt-1/2 break-words'>
                         {comment?.content}
-                      </Box>
-                    </Box>
-                  </Box>
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
           </div>
         </div>
 
