@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
-import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 
 import Rating from '@mui/material/Rating'
@@ -13,12 +12,13 @@ import { RiSubtractFill } from 'react-icons/ri'
 
 import { getProductDetailsAPI, updateProductDetailAPI } from '~/apis'
 import { selectCurrentUser } from '~/redux/user/userSlice'
-import TextField from '@mui/material/TextField'
 import Tooltip from '@mui/material/Tooltip'
 import moment from 'moment'
 import Loader from '~/components/Loader/Loader'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
+import { useForm } from 'react-hook-form'
+import { toast } from 'react-toastify'
 
 
 function ProductDetailPage() {
@@ -26,6 +26,12 @@ function ProductDetailPage() {
 
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
+
+  const { handleSubmit, register, resetField } = useForm({
+    defaultValues: {
+      comment: ''
+    }
+  })
 
   const currentUser = useSelector(selectCurrentUser)
 
@@ -77,22 +83,24 @@ function ProductDetailPage() {
   //     })
   // }
 
-  const handleAddCardComment = (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      if (!event.target?.value) return
+  const handleAddComment = (data) => {
+    const { comment } = data
+    resetField('comment')
 
-      const commentToAdd = {
-        userAvatar: currentUser?.avatar,
-        userDisplayName: currentUser?.displayName,
-        content: event.target.value.trim()
-      }
+    if (!comment) return
 
-      updateProductDetailAPI(product._id, { commentToAdd: commentToAdd }).then((data) => {
-        event.target.value = ''
-        setProduct(data)
-      })
+    const commentToAdd = {
+      userAvatar: currentUser?.avatar,
+      userDisplayName: currentUser?.displayName,
+      content: comment.trim()
     }
+
+    updateProductDetailAPI(product._id, { commentToAdd: commentToAdd }).then((data) => {
+      toast.success('Bình luận thành công!', { position: 'bottom-right' })
+      resetField('comment')
+      setProduct(data)
+    })
+
   }
 
   if (!product) {
@@ -104,8 +112,8 @@ function ProductDetailPage() {
       <div className='container mx-auto'>
         <div>Breadcrumb</div>
 
-        <div className='grid grid-cols-4 gap-6'>
-          <div className="bg-white flex items-center justify-center h-fit rounded-md p-4 pb-32">
+        <div className='grid grid-cols-4 gap-6 relative'>
+          <div className="bg-white flex items-center justify-center h-fit rounded-md p-4 pb-32 sticky top-2 left-0 max-h-full">
             <div className='rounded-2xl overflow-hidden border'>
               <img
                 src={product?.thumbnailUrl}
@@ -154,14 +162,20 @@ function ProductDetailPage() {
               </div>
             </div>
 
+            <div className='rounded-lg bg-white p-3 mb-4'>
+              <div className='text-lg font-semibold text-mainColor1-600 mb-1'>Thông tin vận chuyển</div>
+              <p className='text-sm'>Giao đến: {currentUser?.address || 'Q. 1, P. Bến Nghé, Hồ Chí Minh'}</p>
+              <div className='divider w-full h-px border border-t-0 border-gray-200 my-2'></div>
+              <div>GHTK</div>
+            </div>
 
             <div className='rounded-lg bg-white p-3 mb-4'>
-              <div className='text-xl font-semibold text-mainColor2-800'>Mô tả sản phẩm</div>
+              <div className='text-lg font-semibold text-mainColor2-800'>Mô tả sản phẩm</div>
               <div dangerouslySetInnerHTML={{ __html: product?.description }} style={{ textAlign: 'justify' }}/>
             </div>
           </div>
 
-          <div className="">
+          <div className="sticky top-2 left-0 max-h-full h-fit">
             <div className='rounded-lg bg-white p-3 mb-4'>
               <div className='flex items-center gap-3'>
                 <div className='font-semibold text-mainColor2-800'>Số lượng:</div>
@@ -208,20 +222,18 @@ function ProductDetailPage() {
             <div className='rounded-lg bg-white p-3 mb-4 relative h-fit'>
               <div className='text-xl font-semibold text-mainColor2-800'>Đánh giá sản phẩm</div>
               <div className='mt-4'>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <Avatar className='cursor-pointer'>
-                    <AvatarImage src={currentUser?.avatar} />
-                    <AvatarFallback>LV</AvatarFallback>
-                  </Avatar>
+                <form
+                  action=""
+                  onSubmit={handleSubmit(handleAddComment)}
+                  className='flex flex-col gap-3 mb-4'
+                >
                   <Textarea
-                    fullWidth
                     placeholder="Viết bình luận..."
                     type="text"
-                    variant="outlined"
-                    multiline
-                    onKeyDown={handleAddCardComment}
+                    {...register('comment')}
                   />
-                </Box>
+                  <Button className='bg-mainColor2-800 w-full'>Bình luận</Button>
+                </form>
 
                 {(!product?.comments || product?.comments?.length === 0) &&
                   <span className='pl-12 text-md font-medium text-gray-400'>Chưa có đánh giá!</span>
