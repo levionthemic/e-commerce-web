@@ -5,7 +5,7 @@ import { API_ROOT } from '~/utils/constants'
 export const fetchCurrentCartAPI = createAsyncThunk(
   'cart/fetchCurrentCartAPI',
   async () => {
-    const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/carts`)
+    const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/cart`)
     return response.data
   }
 )

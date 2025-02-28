@@ -81,12 +81,14 @@ function HeaderBuyer() {
 
           <div className='flex items-center gap-6'>
             <IoNotificationsOutline className='text-mainColor1-600 text-xl font-bold' />
-            <div className='relative'>
+
+            <div className='relative cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform' onClick={() => navigate('/buyer/cart')}>
               <LuShoppingCart className='text-mainColor1-600 text-xl' />
               <Badge className="w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-600">
-                {cart?.length || 0}
+                {cart?.products?.length || 0}
               </Badge>
             </div>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className='cursor-pointer'>

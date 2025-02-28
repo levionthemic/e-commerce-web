@@ -9,6 +9,7 @@ import ProductDetailPage from './pages/Buyer/ProductDetailPage/ProductDetailPage
 import BuyerLayout from './components/Layout/BuyerLayout'
 import LandingPage from './pages/LandingPage/LandingPage'
 import SearchPage from './pages/Buyer/SearchPage/SearchPage'
+import CartPage from '~/pages/Buyer/CartPage/CartPage'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -34,6 +35,7 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path='search' element={<SearchPage />} />
           <Route path='product/:productId' element={<ProductDetailPage />} />
+          <Route path='cart' element={<CartPage />} />
         </Route>
       </Route>
     </Routes>

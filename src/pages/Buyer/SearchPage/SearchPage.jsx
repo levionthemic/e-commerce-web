@@ -2,33 +2,24 @@
 import { useState, useEffect } from 'react'
 import Product from '~/components/Product/Product'
 import { createSearchParams, Link, useSearchParams } from 'react-router-dom'
-import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
 import Pagination from '@mui/material/Pagination'
-import Typography from '@mui/material/Typography'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import InputLabel from '@mui/material/InputLabel'
 import FormControl from '@mui/material/FormControl'
 import { getProductsAPI } from '~/apis'
 
-// import {
-//   Pagination,
-//   PaginationContent,
-//   PaginationEllipsis,
-//   PaginationItem,
-//   PaginationLink,
-//   PaginationNext,
-//   PaginationPrevious
-// } from '~/components/ui/pagination'
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
 import { PaginationItem } from '@mui/material'
+import Loader from '~/components/Loader/Loader'
+import Sider from '~/pages/Buyer/SearchPage/Sider/Sider'
 
 function SearchPage() {
   const [sortOption, setSortOption] = useState(0)
   const [products, setProducts] = useState([])
   const [totalProducts, setTotalProducts] = useState(1)
+  const [loading, setLoading] = useState(false)
 
   const [searchParams] = useSearchParams()
   const keyword = searchParams.get('keyword')
@@ -79,6 +70,8 @@ function SearchPage() {
 
   useEffect(() => {
     // const { sortKey, sortValue } = defineSort(sortOption)
+    window.scrollTo(top)
+    setLoading(true)
     const searchPath = `?${createSearchParams({
       'q[name]': keyword,
       'page': page
@@ -88,22 +81,27 @@ function SearchPage() {
         setProducts(data?.products || [])
         setTotalProducts(data?.totalProducts || 0)
       })
+      .finally(() => { setLoading(false) })
 
   }, [page, keyword])
 
-  return (
-    <Container disableGutters maxWidth='xl'>
-      <Grid container columnSpacing={5}>
-        <Grid item xl={2} sx={{ position: 'sticky', overflowY: 'scroll', top: '50px', left: 0, maxHeight: '100vh' }}>
-          Sider
-        </Grid>
+  if (loading) {
+    return <Loader caption={'Đang tải...'} />
+  }
 
-        <Grid item xl={10} sx={{ paddingTop: '20px' }}>
+  return (
+    <div className='container mx-auto my-6'>
+      <div className='grid grid-cols-6'>
+        <div className='col-span-1 sticky overflow-y-scroll top-[50px] left-0 max-h-[100vh]'>
+          Sider
+        </div>
+
+        <div className='col-span-5'>
           <Box>
-            <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', mb: 2 }}>
-              <Typography variant='h5'>Kết quả tìm kiếm cho &quot;{keyword}&quot;</Typography>
-              <Typography variant='span'>Trang {page}</Typography>
-            </Box>
+            <div className='flex items-end justify-between mb-4'>
+              <span className='font-medium text-xl text-mainColor2-800'>Kết quả tìm kiếm cho &quot;{keyword}&quot;</span>
+              <span>Trang {page}</span>
+            </div>
 
             <Box py={2}>
               <FormControl sx={{ width: 300 }}>
@@ -129,15 +127,11 @@ function SearchPage() {
               </FormControl>
             </Box>
 
-            <Box sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-              gap: '10px'
-            }}>
-              {!products ? (
+            <div className='grid grid-cols-4 gap-3'>
+              {loading ? (
                 <>
                   {Array.from({ length: 40 }).map((_, index) => (
-                    <Product product={null} loading={true} key={index} width={'minmax(250px, 1fr)'}/>
+                    <Product product={null} loading={true} key={index}/>
                   ))}
                 </>
               ) : (
@@ -163,9 +157,9 @@ function SearchPage() {
                   )}
                 </>
               )}
-            </Box>
+            </div>
 
-            <Box sx={{ display: 'flex', flexDirection: 'row-reverse', my: 3 }}>
+            <div className='flex flex-row-reverse my-6'>
               <Pagination
                 size="small"
                 color="secondary"
@@ -187,12 +181,12 @@ function SearchPage() {
                   />
                 )}
               />
-            </Box>
+            </div>
 
           </Box>
-        </Grid>
-      </Grid>
-    </Container>
+        </div>
+      </div>
+    </div>
   )
 }
 

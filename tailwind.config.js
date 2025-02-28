@@ -54,41 +54,74 @@ export default {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			},
-        'mainColor1': {
-          100:  '#9595C9',
-          200: '#8786C0',
-          400: '#6666AE',
-          600: '#464B9F',
-          800: '#2F2F89'
-        },
-        'mainColor2': {
-          100: '#CEACD1',
-          300: '#C29BC8',
-          800: '#854C9D'
-        },
-        'mainBg': { 100: '#FFFFFF' }
+  			mainColor1: {
+  				'100': '#9595C9',
+  				'200': '#8786C0',
+  				'400': '#6666AE',
+  				'600': '#464B9F',
+  				'800': '#2F2F89'
+  			},
+  			mainColor2: {
+  				'100': '#CEACD1',
+  				'300': '#C29BC8',
+  				'800': '#854C9D'
+  			},
+  			mainBg: {
+  				'100': '#FFFFFF'
+  			},
+  			sidebar: {
+  				DEFAULT: 'hsl(var(--sidebar-background))',
+  				foreground: 'hsl(var(--sidebar-foreground))',
+  				primary: 'hsl(var(--sidebar-primary))',
+  				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+  				accent: 'hsl(var(--sidebar-accent))',
+  				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+  				border: 'hsl(var(--sidebar-border))',
+  				ring: 'hsl(var(--sidebar-ring))'
+  			}
   		},
-      keyframes: {
-        fadeIn: {
-          from: { opacity: 0 },
-          to: { opacity: 1 }
-        },
-        fadeInTop: {
-          '0%': { transform: 'translateY(-30px)', opacity: 0 }, '100%': { transform: 'translateY(0)', opacity: 1 }
-        },
-        phoneShake: {
-          '0%': { transform: 'rotate(0deg)' },
-          '25%': { transform: 'rotate(-10deg)' },
-          '50%': { transform: 'rotate(10deg)' },
-          '75%': { transform: 'rotate(-5deg)' },
-          '100%': { transform: 'rotate(0deg)' }
-        }
-      },
-      animation: {
-        fadeIn: 'fadeIn .7s ease-in-out',
-        fadeInTop: 'fadeInTop 1.5s ease 0s normal none',
-        phoneShake: 'phoneShake 0.5s infinite ease-in-out'
-      }
+  		keyframes: {
+  			fadeIn: {
+  				from: {
+  					opacity: 0
+  				},
+  				to: {
+  					opacity: 1
+  				}
+  			},
+  			fadeInTop: {
+  				'0%': {
+  					transform: 'translateY(-30px)',
+  					opacity: 0
+  				},
+  				'100%': {
+  					transform: 'translateY(0)',
+  					opacity: 1
+  				}
+  			},
+  			phoneShake: {
+  				'0%': {
+  					transform: 'rotate(0deg)'
+  				},
+  				'25%': {
+  					transform: 'rotate(-10deg)'
+  				},
+  				'50%': {
+  					transform: 'rotate(10deg)'
+  				},
+  				'75%': {
+  					transform: 'rotate(-5deg)'
+  				},
+  				'100%': {
+  					transform: 'rotate(0deg)'
+  				}
+  			}
+  		},
+  		animation: {
+  			fadeIn: 'fadeIn .7s ease-in-out',
+  			fadeInTop: 'fadeInTop 1.5s ease 0s normal none',
+  			phoneShake: 'phoneShake 0.5s infinite ease-in-out'
+  		}
   	}
   },
   plugins: [tailwindcssAnimate]

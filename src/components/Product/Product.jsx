@@ -1,110 +1,79 @@
-/* eslint-disable react/prop-types */
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Rating from '@mui/material/Rating'
+import { clsx } from 'clsx'
 
-import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 
-import Card from '@mui/material/Card'
-import CardActions from '@mui/material/CardActions'
-import CardContent from '@mui/material/CardContent'
-import CardMedia from '@mui/material/CardMedia'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import { Divider } from '@mui/material'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '~/components/ui/card'
+import { Skeleton } from '~/components/ui/skeleton'
+import { Separator } from '~/components/ui/separator'
 
-function Product({ product, loading, width }) {
-  const navigate = useNavigate()
 
-  if (loading) {
-    // <Card className="product-card">
-    //   <Skeleton height={160} />
-    //   <Card.Body>
-    //     <Card.Title>
-    //       <Skeleton className="card-title" />
-    //     </Card.Title>
-    //     <Card.Text>
-    //       <Skeleton className="product-price" />
-    //     </Card.Text>
-    //     <Card.Text>
-    //       <Skeleton className="product-info" />
-    //     </Card.Text>
-    //     <Skeleton className="w-100 .btn" />
-    //   </Card.Body>
-    // </Card>
-  }
+function Product({ product, loading }) {
 
   return (
-    <Card
-      onClick={() => {
-        navigate(`/buyer/product/${product._id}`)
-      }}
-      sx={{ cursor: 'pointer', width: width }}
-    >
-      <CardMedia
-        component="img"
-        alt=""
-        height="160"
-        image={product?.thumbnailUrl || '/images/default/default-product.png'}
-      />
-      <CardContent>
-        <Typography
-          component='div'
-          sx={{
-            fontSize: '0.95em',
-            fontWeight: 500,
-            color: '#333',
-            marginBottom: '5px',
-            height: '35px',
-            lineHeight: '1.2',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}
-        >
-          {product?.name}
-        </Typography>
-        <Typography variant='p' sx={{
-          fontSize: '1.1em',
-          fontWeight: 'bold',
-          color: '#ff4d4f',
-          marginBottom: '5px',
-          textAlign: 'justify'
-        }}>
-          {(
-            product?.price *
-                  (1 - product?.discountPercentage / 100)
-          ).toLocaleString()}
-          <sup>đ</sup>
-        </Typography>
-        <Box sx={{
-          fontSize: '0.85em',
-          color: '#777',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          my: 1
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant='span'>{product?.rate || '0'}</Typography>
-            <Rating
-              size='small'
-              name="rate"
-              value={product?.rate || 0}
-              precision={0.1}
-              readOnly />
-          </Box>
+    <Card className={clsx({
+      'border-none shadow-none': loading,
+      'cursor-pointer border-mainColor2-100/60 border shadow hover:drop-shadow-xl': !loading
+    })}>
+      <CardContent className='p-2'>
+        {loading
+          ? <Skeleton className='w-full aspect-square'/>
+          : <img src={product?.thumbnailUrl} alt="" className='w-full aspect-square object-contain'/>
+        }
 
-          <Typography variant='span'>| Đã bán: {product?.quantitySold || 0}</Typography>
-        </Box>
       </CardContent>
-      <Divider />
-      <CardActions>
-        <Button size="small">Xem chi tiết</Button>
-      </CardActions>
+
+      <CardHeader className='px-4'>
+        {loading
+          ? <Skeleton className='h-[32px]'/>
+          : <CardTitle className='line-clamp-2 min-h-[32px] text-mainColor1-600'>{product?.name}</CardTitle>
+        }
+
+        {loading
+          ? <Skeleton className='h-[40px]'/>
+          : <CardDescription>
+            <div className='text-lg font-bold text-[#ff4d4f] mb-1 text-justify'>
+              {(
+                product?.price *
+                (1 - product?.discountPercentage / 100)
+              ).toLocaleString()}
+              <sup>đ</sup>
+            </div>
+            <div className='text-sm text-gray-400 flex justify-between items-center my-2'>
+              <div className='flex items-center gap-1'>
+                <span>{product?.rate || '0'}</span>
+                <Rating
+                  size='small'
+                  name="rate"
+                  value={product?.rate || 0}
+                  precision={0.1}
+                  readOnly />
+              </div>
+
+              <span>| Đã bán: {product?.quantitySold || 0}</span>
+            </div>
+          </CardDescription>
+        }
+
+      </CardHeader>
+
+      {!loading && <Separator className='bg-mainColor2-100/60'/>}
+
+      {loading
+        ? <Skeleton className='pl-4 py-2 h-4'/>
+        : <CardFooter className='pl-4 py-2 text-sm text-mainColor2-800 hover:text-mainColor1-800 cursor-pointer'>
+          <Link to={`/buyer/product/${product._id}`}>Xem chi tiết</Link>
+        </CardFooter>
+      }
     </Card>
-
-
   )
 }
 
