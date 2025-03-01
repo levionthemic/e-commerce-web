@@ -1,7 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import Box from '@mui/material/Box'
-// import LoginForm from './LoginForm'
-// import RegisterForm from './RegisterForm'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Login from './Login'
@@ -32,7 +30,6 @@ function Auth() {
       backgroundPosition: 'center',
       boxShadow: 'inset 0 0 0 2000px rgba(0, 0, 0, 0.2)'
     }}>
-      {/* {isLogin && <LoginForm />} */}
       {isLogin && <Login />}
       {isRegister && <Register />}
     </Box>

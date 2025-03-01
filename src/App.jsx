@@ -13,6 +13,7 @@ import CartPage from '~/pages/Buyer/CartPage/CartPage'
 import UserProfile from '~/pages/Buyer/User/UserProfile/UserProfile'
 import UserOrder from '~/pages/Buyer/User/UserOrder/UserOrder'
 import UserLayout from '~/components/Layout/UserLayout'
+import Page404 from '~/pages/Page404'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -47,6 +48,8 @@ function App() {
           <Route path='order' element={<UserOrder />} />
         </Route>
 
+        {/* 404 not found page */}
+        <Route path='*' element={<Page404 />} />
       </Route>
     </Routes>
   )

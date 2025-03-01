@@ -2,8 +2,6 @@ import { Link } from 'react-router-dom'
 import Rating from '@mui/material/Rating'
 import { clsx } from 'clsx'
 
-import 'react-loading-skeleton/dist/skeleton.css'
-
 import {
   Card,
   CardContent,
@@ -14,7 +12,6 @@ import {
 } from '~/components/ui/card'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Separator } from '~/components/ui/separator'
-
 
 function Product({ product, loading }) {
 

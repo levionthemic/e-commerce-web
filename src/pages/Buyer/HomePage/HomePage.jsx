@@ -1,16 +1,12 @@
-
 import { useEffect, useState } from 'react'
-import banner from '~/assets/images/banner.png'
-import 'react-multi-carousel/lib/styles.css'
 import Product from '~/components/Product/Product'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import LocalShippingIcon from '@mui/icons-material/LocalShipping'
-import SupportAgentIcon from '@mui/icons-material/SupportAgent'
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange'
-import HighQualityIcon from '@mui/icons-material/HighQuality'
 import CategoryBar from './CategoryBar/CategoryBar'
 import { getCategoriesAPI, getProductsAPI } from '~/apis'
+
+import { FaShippingFast } from 'react-icons/fa'
+import { MdSupportAgent } from 'react-icons/md'
+import { MdCurrencyExchange } from 'react-icons/md'
+import { MdHighQuality } from 'react-icons/md'
 
 import {
   Carousel,
@@ -59,7 +55,7 @@ function HomePage() {
           <div className="col-span-5">
             <div>
               <div>
-                <img src={banner} width="100%" height="auto" alt="" />
+                <img src={''} width="100%" height="auto" alt="" />
               </div>
 
               <div className='bg-white rounded-lg p-4 mt-4'>
@@ -94,22 +90,22 @@ function HomePage() {
               </div>
 
               <div className='bg-white rounded-lg p-4 my-4 flex justify-between items-center relative font-bold text-mainColor1-400'>
-                <Box sx={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                  <LocalShippingIcon style={{ fontSize: 40 }} />
-                  <Typography variant="span">Giao hàng nhanh chóng</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                  <SupportAgentIcon style={{ fontSize: 40 }} />
-                  <Typography variant="span">Hỗ trợ trực tuyến</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                  <CurrencyExchangeIcon style={{ fontSize: 40 }} />
-                  <Typography variant="span">Hoàn tiền nhanh chóng</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-                  <HighQualityIcon style={{ fontSize: 40 }} />
-                  <Typography variant="span">Sản phẩm chất lượng cao</Typography>
-                </Box>
+                <div className='flex gap-5 items-center'>
+                  <FaShippingFast className='text-2xl' />
+                  <span>Giao hàng nhanh chóng</span>
+                </div>
+                <div className='flex gap-5 items-center'>
+                  <MdSupportAgent className='text-2xl' />
+                  <span>Hỗ trợ trực tuyến</span>
+                </div>
+                <div className='flex gap-5 items-center'>
+                  <MdCurrencyExchange className='text-2xl'/>
+                  <span>Hoàn tiền nhanh chóng</span>
+                </div>
+                <div className='flex gap-5 items-center'>
+                  <MdHighQuality className='text-2xl'/>
+                  <span>Sản phẩm chất lượng cao</span>
+                </div>
               </div>
 
               <div className='bg-white rounded-lg p-4 mt-4'>

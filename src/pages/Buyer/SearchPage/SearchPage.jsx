@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react'
 import Product from '~/components/Product/Product'
 import { createSearchParams, Link, useSearchParams } from 'react-router-dom'
@@ -13,7 +12,6 @@ import { getProductsAPI } from '~/apis'
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
 import { PaginationItem } from '@mui/material'
 import Loader from '~/components/Loader/Loader'
-import Sider from '~/pages/Buyer/SearchPage/Sider/Sider'
 
 function SearchPage() {
   const [sortOption, setSortOption] = useState(0)
