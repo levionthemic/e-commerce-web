@@ -1,8 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 import { cartReducer } from './cart/cartSlice'
-import updatePasswordReducer from './slices/UpdatePasswordModalSlice'
-import updateEmailReducer from './slices/UpdateEmailModalSlice'
 import { userReducer } from './user/userSlice'
 
 import { combineReducers } from 'redux'
@@ -17,10 +15,7 @@ const rootPersistConfig = {
 
 const reducers = combineReducers({
   cart: cartReducer,
-  user: userReducer,
-
-  updatePasswordModal: updatePasswordReducer,
-  updateEmailModal: updateEmailReducer
+  user: userReducer
 })
 
 const persistedReducers = persistReducer(rootPersistConfig, reducers)

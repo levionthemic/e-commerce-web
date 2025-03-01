@@ -10,6 +10,9 @@ import BuyerLayout from './components/Layout/BuyerLayout'
 import LandingPage from './pages/LandingPage/LandingPage'
 import SearchPage from './pages/Buyer/SearchPage/SearchPage'
 import CartPage from '~/pages/Buyer/CartPage/CartPage'
+import UserProfile from '~/pages/Buyer/User/UserProfile/UserProfile'
+import UserOrder from '~/pages/Buyer/User/UserOrder/UserOrder'
+import UserLayout from '~/components/Layout/UserLayout'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -37,6 +40,13 @@ function App() {
           <Route path='product/:productId' element={<ProductDetailPage />} />
           <Route path='cart' element={<CartPage />} />
         </Route>
+
+        {/* User pages (Buyer Module) */}
+        <Route path='/user' element={<UserLayout />}>
+          <Route path='profile' element={<UserProfile />} />
+          <Route path='order' element={<UserOrder />} />
+        </Route>
+
       </Route>
     </Routes>
   )
