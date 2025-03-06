@@ -14,6 +14,7 @@ import UserProfile from '~/pages/Buyer/User/UserProfile/UserProfile'
 import UserOrder from '~/pages/Buyer/User/UserOrder/UserOrder'
 import UserLayout from '~/components/Layout/UserLayout'
 import Page404 from '~/pages/Page404'
+import CheckoutPage from '~/pages/Buyer/CheckoutPage/CheckoutPage'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -25,9 +26,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path='/' element={
-        <LandingPage />
-      } />
+      <Route path='/' element={<LandingPage />} />
 
       <Route path='/login' element={<Auth />} />
       <Route path='/register' element={<Auth />} />
@@ -40,6 +39,7 @@ function App() {
           <Route path='search' element={<SearchPage />} />
           <Route path='product/:productId' element={<ProductDetailPage />} />
           <Route path='cart' element={<CartPage />} />
+          <Route path='checkout' element={<CheckoutPage />} />
         </Route>
 
         {/* User pages (Buyer Module) */}

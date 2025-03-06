@@ -100,8 +100,8 @@ function HeaderBuyer() {
                 <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>Hồ sơ</DropdownMenuItem>
-                  <DropdownMenuItem>Đơn hàng</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/user/profile')} className='cursor-pointer'>Hồ sơ</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/user/order')} className='cursor-pointer'>Đơn hàng</DropdownMenuItem>
                   <DropdownMenuItem>Cài đặt</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

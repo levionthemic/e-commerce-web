@@ -1,435 +1,110 @@
-/* eslint-disable no-console */
-import { memo, useEffect, useState } from 'react'
-import icon from '~/assets/images/money-icon.svg'
-import icon1 from '~/assets/images/arrow-icon.svg'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { axiosApi } from '~/services/ApiService'
-import Swal from 'sweetalert2'
+import { useSearchParams } from 'react-router-dom'
+import { Button } from '~/components/ui/button'
+import { useSelector } from 'react-redux'
+import { selectCurrentCart } from '~/redux/cart/cartSlice'
+import TimelineComponent from '~/pages/Buyer/CheckoutPage/TimelineComponent'
+import { useEffect, useState } from 'react'
+import Information from '~/pages/Buyer/CheckoutPage/Information'
+import Shipping from '~/pages/Buyer/CheckoutPage/Shipping'
+import Confirmation from '~/pages/Buyer/CheckoutPage/Confirmation'
 
-import Container from '@mui/material/Container'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import Grid from '@mui/material/Grid'
-import Button from '@mui/material/Button'
+function CheckoutPage() {
+  const [step, setStep] = useState(1)
+  const [searchParams] = useSearchParams()
 
-function Checkout() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const cartList = location.state.cartList
+  const currentCart = useSelector(selectCurrentCart)
 
-  const totalPrice = cartList.reduce(
-    (sum, item) =>
+  const totalPrice = currentCart?.fullProducts.reduce(
+    (sum, item, index) =>
       sum +
-      item.quantity * item.original_price * (1 - item.discount_rate / 100),
+      currentCart.products[index].quantity * item.price,
     0
   )
 
-  const [user, setUser] = useState({})
-  const [isShow, setShow] = useState(false)
-
-  const handleToggleShow = () => {
-    const div = document.querySelector('.inner-products')
-    if (!isShow) {
-      div.classList.add('show')
-    } else {
-      div.classList.remove('show')
-    }
-    const img = document
-      .querySelector('.inner-quantity #icon-toggle-list')
-      .querySelector('img')
-
-    if (!isShow) {
-      img.classList.add('show')
-    } else {
-      img.classList.remove('show')
-    }
-
-    setShow(!isShow)
-  }
+  useEffect(() => {
+    setStep(searchParams.get('step') || 1)
+  }, [searchParams])
 
   const handleCheckout = () => {
-    axiosApi
-      .post('/api/v1/checkout/order', {
-        cartId: localStorage.getItem('cartId')
-      })
-      .then(() => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Đặt hàng thành công!',
-          text: 'Vui lòng kiểm tra hóa đơn điện tử trong email của bạn',
-          didClose: () => {
-            navigate('/')
-            window.location.reload()
-          }
-        })
-      })
-      .catch((error) => {
-        console.log(error)
-      })
+    //
   }
 
-  useEffect(() => {
-    axiosApi
-      .get('/api/v1/user/' + localStorage.getItem('token'))
-      .then((res) => {
-        setUser(res.data.user)
-      })
-      .catch((error) => {
-        console.log(error)
-      })
-  }, [])
-
-  const sectionStyles = {
-    bgcolor: '#ffffff',
-    boxShadow: '1px 2px 2px 1px rgba(0, 0, 0, 0.25)',
-    borderRadius: '5px',
-    p: '20px',
-    mb: '20px',
-    '& h4': {
-      fontWeight: 400,
-      fontSize: '20px',
-      color: 'black',
-      opacity: 0.7,
-      mb: '20px'
+  const timelineItems = [
+    {
+      id: 1,
+      title: 'Thông tin',
+      description: 'Điền thông tin đơn hàng'
+    },
+    {
+      id: 2,
+      title: 'Vận chuyển',
+      description: 'Chọn hình thức vận chuyển'
+    },
+    {
+      id: 3,
+      title: 'Xác nhận',
+      description: 'Hoàn tất thanh toán'
     }
-  }
+  ]
 
   return (
-    <Container disableGutters maxWidth='xl'>
-      <Typography variant='h4' my={3}>Thanh toán</Typography>
-      <Grid container columnSpacing={2}>
-        <Grid item xl={9}>
-          <Box sx={sectionStyles}>
-            <Typography variant='h4'>Chọn hình thức giao hàng</Typography>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
-              <Box sx={{
-                border: '2px solid black',
-                borderRadius: '5px',
-                p: '8px 100px 5px 35px',
-                width: '48%'
-              }}>
-                <input
-                  type="radio"
-                  name="transfer-type"
-                  id="type1"
-                  checked
-                />
-                <label htmlFor="type1">Giao hàng tiết kiệm</label>
-              </Box>
-              <Box sx={{
-                border: '2px solid black',
-                borderRadius: '5px',
-                p: '8px 100px 5px 35px',
-                width: '48%',
-                opacity: 0.5
-              }}>
-                <input
-                  type="radio"
-                  name="transfer-type"
-                  id="type2"
-                  disabled
-                />
-                <label htmlFor="type2">Giao hàng nhanh</label>
-              </Box>
-            </Box>
+    <div className='container mx-auto py-6'>
+      <div className='font-semibold text-3xl text-mainColor1-600 mb-8'>Thanh toán</div>
 
-            <Box sx={{ mt: 4 }}>
-              {cartList.map((product, index) => (
-                <Box key={index} sx={{
-                  border: '1px solid rgba(0, 0, 0, 0.3)',
-                  borderRadius: '10px',
-                  padding: '10px',
-                  marginBottom: '20px'
-                }}>
-                  <Typography variant='p' sx={{ fontWeight: 'bold' }}>
-                      Giao vào chủ nhật 17/11
-                  </Typography>
-                  <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    pr: 3,
-                    m: '15px 0'
-                  }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                      <Box sx={{ width: '100px', height: '80px', border: '1px solid #ddd' }}>
-                        <img src={product.thumbnail_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }}/>
-                      </Box>
-                      <Box sx={{
-                        color: 'black',
-                        opacity: 0.5,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        gap: 2
-                      }}>
-                        <Typography variant='p'>{product.name}</Typography>
-                        <Typography variant='p'>SL: x{product.quantity}</Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={{ color: 'red', fontWeight: 'bold' }}>
-                      <Typography variant='p'>
-                        {(
-                          product.quantity *
-                            product.original_price *
-                            (1 - product.discount_rate / 100)
-                        ).toLocaleString()}
-                        <sup>đ</sup>
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'end', pr: 3, gap: 5 }}>
-                    <Typography variant='p' fontWeight={'bold'}>Tiền vận chuyển: </Typography>
-                    <Typography variant='p' fontWeight={'bold'} color={'red'}>32,123đ</Typography>
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-          </Box>
-          <Box sx={sectionStyles}>
-            <Typography variant='h4'>Chọn hình thức thanh toán</Typography>
-            <Box sx={{
-              border: '2px solid black',
-              borderRadius: '10px',
-              padding: '8px 10px 5px 20px',
-              width: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}>
-              <input
-                type="radio"
-                readOnly
-                checked
-              />
-              <label htmlFor="pay-type" style={{
-                flex: 1,
-                fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <Typography variant='span'>Thanh toán tiền mặt</Typography>
-                <img src={icon} alt="" />
-              </label>
-            </Box>
-          </Box>
-        </Grid>
+      <div className='grid grid-cols-12 gap-4'>
+        <div className='col-span-9'>
+          <TimelineComponent items={timelineItems} />
 
-        <Grid item xl={3}>
-          <Box sx={{
-            position: 'sticky',
-            top: '100px',
-            left: '0',
-            height: 'fit-content',
-            mb: 2
-          }}>
-            <Box sx={sectionStyles}>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                mb: 3
-              }}>
-                <Typography variant='h4' sx={{ mb: '0 !important' }}>Giao tới</Typography>
-                <Typography
-                  variant='span'
-                  onClick={() => { navigate('/user/info') }}
-                  sx={{
-                    fontWeight: 400,
-                    fontSize: '15px',
-                    color: '#2368c3',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Thay đổi
-                </Typography>
-              </Box>
-              <Box>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  fontWeight: 'bold',
-                  marginBottom: '10px'
-                }}>
-                  <Typography variant='span'>{user.fullname}</Typography>
-                  <Typography variant='p'>{user.phoneNumber}</Typography>
-                </Box>
-                <Typography variant='p' fontSize={'0.875rem'}>{user.address}</Typography>
-              </Box>
-            </Box>
-            <Box sx={{ ...sectionStyles, '& .inner-products.show': {
-              maxHeight: '178px',
-              display: 'block',
-              overflow: 'hidden',
-              transition: 'max-height 0.5s ease-in-out'
-            } }}>
-              <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                mb: 3
-              }}>
-                <Typography variant='h4' sx={{ mb: '0 !important' }}>Giao tới</Typography>
-                <Typography
-                  variant='span'
-                  onClick={() => { navigate('/cart') }}
-                  sx={{
-                    fontWeight: 400,
-                    fontSize: '15px',
-                    color: '#2368c3',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Thay đổi
-                </Typography>
-              </Box>
+          {step == 1 && <Information />}
+          {step == 2 && <Shipping />}
+          {step == 3 && <Confirmation />}
+        </div>
 
-              <Box className="inner-quantity" sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-                borderBottom: '1px solid #ddd',
-                pb: 2
-              }}>
-                <Typography variant='span' sx={{ fontWeight: '500', color: 'rgba(0, 0, 0, 0.4)' }}>{cartList.length} sản phẩm</Typography>
-                <Box onClick={handleToggleShow} id='icon-toggle-list' sx={{
-                  fontWeight: '400',
-                  color: '#2368c3',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  cursor: 'pointer',
-                  '& img.show': {
-                    transform: 'rotate(180deg)',
-                    transition: 'transform 0.3s ease-in-out'
-                  },
-                  '& img': {
-                    transform: 'rotate(0deg)',
-                    transition: 'transform 0.3s ease-in-out'
-                  }
-                }}>
-                  <img src={icon1} alt="" />
-                  {isShow ? 'Thu gọn' : 'Xem thông tin'}
-                </Box>
-              </Box>
+        <div className='col-span-3'>
+          <div className='sticky top-7 left-0 h-fit mb-4'>
+            <div className="border border-b-[#ddd] rounded-md mb-4 p-4">
+              <div className='text-md text-mainColor1-800 font-medium'>Danh sách sản phẩm</div>
+            </div>
 
-              <Box className="inner-products" sx={{
-                display: 'block',
-                overflow: 'hidden',
-                maxHeight: '0px',
-                transition: 'max-height 0.5s ease-in-out'
-              }}>
-                <Box className="inner-products-list" sx={{
-                  borderBottom: '1px solid #ddd',
-                  padding: '7px 0',
-                  maxHeight: '178px',
-                  height: 'fit-content',
-                  overflow: 'scroll',
-                  scrollBehavior: 'smooth',
-                  scrollbarWidth: 'none'
-                }}>
-                  {cartList.map((product, index) => (
-                    <Box className="inner-product" key={index} sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '10px',
-                      fontSize: '14px',
-                      padding: '10px 0'
-                    }}>
-                      <Box>{product.quantity}</Box>
-                      <Box sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</Box>
-                      <Box sx={{ fontWeight: 'bold', color: '#f90606', opacity: 0.6 }}>
-                        {(
-                          product.quantity *
-                          product.original_price *
-                          (1 - product.discount_rate / 100)
-                        ).toLocaleString()}
-                        <sup>đ</sup>
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
+            <div className='border border-b-[#ddd] rounded-md p-4'>
+              <div className='text-md text-mainColor1-800 font-medium'>Chi tiết</div>
 
-              <Box sx={{
-                borderBottom: '1px solid #ddd',
-                p: '10px 0'
-              }}>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  fontSize: '.9rem',
-                  m: '5px 0'
-                }}>
-                  <Typography variant='span' sx={{ opacity: 0.4 }}>Tổng tiền hàng</Typography>
-                  <Typography variant='span' sx={{ fontWeight: 'bold', color: 'red' }}>
+              <div className='px-2'>
+                <div className='flex items-center justify-between text-sm my-2'>
+                  <span className='opacity-40'>Tổng tiền hàng</span>
+                  <span className='font-bold text-red-600'>
                     {totalPrice.toLocaleString()}
                     <sup>đ</sup>
-                  </Typography>
-                </Box>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  fontSize: '.9rem',
-                  m: '5px 0'
-                }}>
-                  <Typography variant='span' sx={{ opacity: 0.4 }}>Phí vận chuyển</Typography>
-                  <Typography variant='span' sx={{ fontWeight: 'bold', color: 'red' }}>64,246đ</Typography>
-                </Box>
-              </Box>
+                  </span>
+                </div>
+                <div className='flex items-center justify-between text-sm my-2'>
+                  <span className='opacity-40'>Phí vận chuyển</span>
+                  <span className='font-bold text-red-600'>0đ</span>
+                </div>
+              </div>
 
-              <Box>
-                <Box sx={{ fontWeight: 'bold', mt: 1 }}>Tổng tiền thanh toán</Box>
-                <Box sx={{
-                  color: 'red',
-                  textAlign: 'right',
-                  fontSize: '20px',
-                  fontWeight: 'bold'
-                }}>
-                  {(totalPrice + 64246).toLocaleString()}
+              <div>
+                <div className='font-medium text-mainColor1-800'>Tổng tiền thanh toán</div>
+                <div className='text-red-600 text-right text-xl font-bold'>
+                  {(totalPrice + 0).toLocaleString()}
                   <sup>đ</sup>
-                </Box>
-                <Typography variant='p' sx={{ fontSize: '.8rem' }}>
-                  (Giá này đã bao gồm thuế GTGT, phí đóng gói, phí vận chuyển và
-                  các chi phí phát sinh khác)
-                </Typography>
-              </Box>
+                </div>
+              </div>
+            </div>
 
-              <Box mt={3}>
-                <Button
-                  sx={{
-                    background: '#d9d9d9',
-                    border: '1px solid rgba(0, 0, 0, 0.1)',
-                    boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
-                    borderRadius: '10px',
-                    width: '100%',
-                    fontWeight: 'bold',
-                    color: 'black'
-                  }}
-                  onClick={handleCheckout}
-                >
-                  Đặt hàng
-                </Button>
-              </Box>
-            </Box>
-          </Box>
-
-        </Grid>
-      </Grid>
-      <Box>
-
-      </Box>
-    </Container>
+            <div className='mt-6'>
+              <Button
+                className='w-full bg-mainColor1-600 hover:bg-mainColor1-800 transition-all hover:ease-in-out hover:duration-300 text-white text-md rounded-full'
+                onClick={handleCheckout}
+              >
+                Đặt hàng
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 
-export default memo(Checkout)
+export default CheckoutPage
