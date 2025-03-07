@@ -15,6 +15,8 @@ import UserOrder from '~/pages/Buyer/User/UserOrder/UserOrder'
 import UserLayout from '~/components/Layout/UserLayout'
 import Page404 from '~/pages/Page404'
 import CheckoutPage from '~/pages/Buyer/CheckoutPage/CheckoutPage'
+import AdminLayout from '~/components/Layout/AdminLayout'
+import DashboardAdmin from '~/pages/Admin/Dashboard/Dashboard'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -46,6 +48,11 @@ function App() {
         <Route path='/user' element={<UserLayout />}>
           <Route path='profile' element={<UserProfile />} />
           <Route path='order' element={<UserOrder />} />
+        </Route>
+
+        {/* Admin pages */}
+        <Route path='/admin' element={<AdminLayout />}>
+          <Route index element={<DashboardAdmin />} />
         </Route>
 
         {/* 404 not found page */}
