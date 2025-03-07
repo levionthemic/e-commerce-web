@@ -8,6 +8,14 @@ import Information from '~/pages/Buyer/CheckoutPage/Information'
 import Shipping from '~/pages/Buyer/CheckoutPage/Shipping/Shipping'
 import Confirmation from '~/pages/Buyer/CheckoutPage/Confirmation'
 import Payment from './Payment/Payment'
+import { Badge } from '~/components/ui/badge'
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '~/components/ui/tooltip'
 
 function CheckoutPage() {
   const [step, setStep] = useState(1)
@@ -71,6 +79,27 @@ function CheckoutPage() {
           <div className='sticky top-7 left-0 h-fit mb-4'>
             <div className="border border-b-[#ddd] rounded-md mb-4 p-4 shadow-md">
               <div className='text-md text-mainColor1-800 font-medium'>Danh sách sản phẩm</div>
+              {currentCart?.fullProducts.map((product, index) => (
+                <div key={index} className='flex items-center gap-2 my-3 overflow-hidden'>
+                  <img src={product?.thumbnailUrl} alt="" width={40} height={40} />
+                  <div className='flex flex-col gap-1'>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className='text-sm line-clamp-1 text-mainColor2-800'>{product?.name}</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{product?.name}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
+                      <Badge className='bg-mainColor2-800/90'>{currentCart?.products[index].quantity} sản phẩm</Badge>
+                      <span className='text-[0.8rem] text-muted-foreground'>x {product?.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             <div className='border border-b-[#ddd] rounded-md p-4 shadow-md'>

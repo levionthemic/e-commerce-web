@@ -354,8 +354,8 @@ function CartPage() {
 
   return (
     <div className='container mx-auto'>
-      <div className="grid grid-cols-5 gap-5">
-        <div className="col-span-4 py-4 h-[100vh]">
+      <div className="grid grid-cols-4 gap-5">
+        <div className="col-span-3 py-4 h-[100vh]">
           <div className='font-semibold text-2xl text-mainColor2-800 mb-4'>Giỏ Hàng Của Bạn</div>
           {!cart || !cart?.products.length
             ? <p>Giỏ hàng của bạn đang trống.</p>
@@ -447,7 +447,7 @@ function CartPage() {
               <span className='font-bold text-xl text-mainColor1-800'>{totalPrice().toLocaleString('vi-VN')}<sup>đ</sup></span>
             </div>
 
-            <Link to='#' className='bg-mainColor1-800 w-full block text-white uppercase py-4 text-center rounded-xl font-bold hover:drop-shadow-xl hover:scale-[102%] hover:duration-300 hover:bg-mainColor1-600 transition-all'>Thanh toán</Link>
+            <Link to='/buyer/checkout' className='bg-mainColor1-800 w-full block text-white uppercase py-4 text-center rounded-xl font-bold hover:drop-shadow-xl hover:scale-[102%] hover:duration-300 hover:bg-mainColor1-600 transition-all'>Thanh toán</Link>
           </div>
         </div>
       </div>

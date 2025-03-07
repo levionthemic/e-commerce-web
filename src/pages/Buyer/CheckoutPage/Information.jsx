@@ -2,6 +2,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 import { useForm } from 'react-hook-form'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '~/components/ui/button'
 import {
   Form,
@@ -37,6 +38,7 @@ const formSchema = Joi.object({
 
 
 function Information() {
+  const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
   const form = useForm({
     resolver: joiResolver(formSchema),
@@ -74,7 +76,7 @@ function Information() {
                     />
                   </FormControl>
                   <FormDescription className=''>
-                  Họ và tên này sẽ được in trên đơn vận chuyển.
+                    Họ và tên này sẽ được in trên đơn vận chuyển.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -161,9 +163,8 @@ function Information() {
               </FormItem>
             )}
           />
-          <div className='grid grid-cols-2 gap-5'>
-            <Button type='submit' className='border bg-white text-mainColor1-600  border-mainColor1-600 hover:bg-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Quay lại</Button>
-            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Tiếp tục</Button>
+          <div className='grid grid-cols-1 gap-5'>
+            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={() => navigate('/buyer/checkout?step=2')}>Tiếp tục</Button>
           </div>
         </form>
       </Form>

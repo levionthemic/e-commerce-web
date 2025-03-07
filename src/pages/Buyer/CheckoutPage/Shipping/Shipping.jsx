@@ -24,6 +24,7 @@ import {
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
 import ShippingMethodRadio from '~/pages/Buyer/CheckoutPage/Shipping/ShippingMethodRadio'
+import { useNavigate } from 'react-router-dom'
 
 const formSchema = Joi.object({
   address: Joi.string().required().trim().strict().messages({
@@ -32,6 +33,7 @@ const formSchema = Joi.object({
 })
 
 function Shipping() {
+  const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
   const form = useForm({
     resolver: joiResolver(formSchema),
@@ -83,8 +85,8 @@ function Shipping() {
             <ShippingMethodRadio />
           </div>
           <div className='grid grid-cols-2 gap-5'>
-            <Button type='submit' className='border bg-white text-mainColor1-600  border-mainColor1-600 hover:bg-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Quay lại</Button>
-            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Tiếp tục</Button>
+            <Button type='submit' className='border bg-white text-mainColor1-600  border-mainColor1-600 hover:bg-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={() => navigate('/buyer/checkout?step=1')}>Quay lại</Button>
+            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={() => navigate('/buyer/checkout?step=3')}>Tiếp tục</Button>
           </div>
         </form>
       </Form>

@@ -2,9 +2,12 @@ import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import shippingMethodLogo from '~/assets/ghtk-logo.png'
 import { Separator } from '~/components/ui/separator'
+import { Button } from '~/components/ui/button'
+import { useNavigate } from 'react-router-dom'
 
 
 function Confirmation() {
+  const navigate = useNavigate()
   const currentUser = useSelector(selectCurrentUser)
   return (
     <div className="my-6 border border-b-[#ddd] rounded-md p-4 w-[95%]">
@@ -37,11 +40,14 @@ function Confirmation() {
         </div>
       </div>
 
-      <div className='flex items-center justify-between mx-20 mb-2'>
+      <div className='flex items-center justify-between mx-20 mb-8'>
         <span className='text-sm text-gray-400'>Phương thức thanh toán:</span>
         <span className='font-semibold text-mainColor1-600'>Thanh toán bằng tiền mặt</span>
       </div>
 
+      <div className='grid grid-cols-1 gap-5'>
+        <Button type='submit' className='border bg-white text-mainColor1-600  border-mainColor1-600 hover:bg-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={() => navigate('/buyer/checkout?step=3')}>Quay lại</Button>
+      </div>
     </div>
   )
 }
