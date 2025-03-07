@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import Information from '~/pages/Buyer/CheckoutPage/Information'
 import Shipping from '~/pages/Buyer/CheckoutPage/Shipping'
 import Confirmation from '~/pages/Buyer/CheckoutPage/Confirmation'
+import Payment from './Payment'
 
 function CheckoutPage() {
   const [step, setStep] = useState(1)
@@ -42,6 +43,11 @@ function CheckoutPage() {
     },
     {
       id: 3,
+      title: 'Thanh toán',
+      description: 'Chọn phương thức thanh toán'
+    },
+    {
+      id: 4,
       title: 'Xác nhận',
       description: 'Hoàn tất thanh toán'
     }
@@ -57,16 +63,17 @@ function CheckoutPage() {
 
           {step == 1 && <Information />}
           {step == 2 && <Shipping />}
-          {step == 3 && <Confirmation />}
+          {step == 3 && <Payment />}
+          {step == 4 && <Confirmation />}
         </div>
 
         <div className='col-span-3'>
           <div className='sticky top-7 left-0 h-fit mb-4'>
-            <div className="border border-b-[#ddd] rounded-md mb-4 p-4">
+            <div className="border border-b-[#ddd] rounded-md mb-4 p-4 shadow-md">
               <div className='text-md text-mainColor1-800 font-medium'>Danh sách sản phẩm</div>
             </div>
 
-            <div className='border border-b-[#ddd] rounded-md p-4'>
+            <div className='border border-b-[#ddd] rounded-md p-4 shadow-md'>
               <div className='text-md text-mainColor1-800 font-medium'>Chi tiết</div>
 
               <div className='px-2'>

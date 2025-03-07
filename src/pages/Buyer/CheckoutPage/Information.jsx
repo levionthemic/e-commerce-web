@@ -54,7 +54,7 @@ function Information() {
   }
 
   return (
-    <div className="my-6 border border-b-[#ddd] rounded-md p-4 w-[85%]">
+    <div className="my-6 border border-b-[#ddd] rounded-md p-4 w-[95%]">
       <div className="text-mainColor1-600 font-medium text-lg mb-4">Thông tin người nhận</div>
 
       <Form {...form}>
@@ -135,7 +135,7 @@ function Information() {
                   />
                 </FormControl>
                 <FormDescription className=''>
-                  Địa chỉ nhận hàng của bạn.
+                  Địa chỉ nơi bạn cư trú.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -161,8 +161,10 @@ function Information() {
               </FormItem>
             )}
           />
-
-          <Button type='submit' className='w-full bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg'>Xác nhận</Button>
+          <div className='grid grid-cols-2 gap-5'>
+            <Button type='submit' className='border bg-white text-mainColor1-600  border-mainColor1-600 hover:bg-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Quay lại</Button>
+            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Tiếp tục</Button>
+          </div>
         </form>
       </Form>
     </div>
