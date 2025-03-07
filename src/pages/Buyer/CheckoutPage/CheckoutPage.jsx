@@ -49,7 +49,7 @@ function CheckoutPage() {
     {
       id: 4,
       title: 'Xác nhận',
-      description: 'Hoàn tất thanh toán'
+      description: 'Xác nhận đơn hàng'
     }
   ]
 
