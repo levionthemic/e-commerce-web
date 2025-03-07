@@ -23,7 +23,7 @@ import {
 } from '~/components/ui/select'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
-import ShippingMethodRadio from '~/pages/Buyer/CheckoutPage/ShippingMethodRadio'
+import ShippingMethodRadio from '~/pages/Buyer/CheckoutPage/Shipping/ShippingMethodRadio'
 
 const formSchema = Joi.object({
   address: Joi.string().required().trim().strict().messages({

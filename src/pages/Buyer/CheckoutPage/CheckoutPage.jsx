@@ -5,9 +5,9 @@ import { selectCurrentCart } from '~/redux/cart/cartSlice'
 import TimelineComponent from '~/pages/Buyer/CheckoutPage/TimelineComponent'
 import { useEffect, useState } from 'react'
 import Information from '~/pages/Buyer/CheckoutPage/Information'
-import Shipping from '~/pages/Buyer/CheckoutPage/Shipping'
+import Shipping from '~/pages/Buyer/CheckoutPage/Shipping/Shipping'
 import Confirmation from '~/pages/Buyer/CheckoutPage/Confirmation'
-import Payment from './Payment'
+import Payment from './Payment/Payment'
 
 function CheckoutPage() {
   const [step, setStep] = useState(1)
