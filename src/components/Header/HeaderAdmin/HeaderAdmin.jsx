@@ -1,5 +1,4 @@
 import { SearchIcon } from 'lucide-react'
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { Input } from '~/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
