@@ -13,7 +13,7 @@ import UserOrder from '~/pages/Buyer/User/UserOrder/UserOrder'
 import Checkout from '~/pages/Buyer/CheckoutPage/CheckoutPage'
 
 import ShopOverview from '~/pages/Seller/Dashboard/Dashboard'
-import ShopProfle from '~/pages/Seller/Profile/Profile'
+import ShopProfle from '~/pages/Seller/Store/Store'
 import ManageOrders from '~/pages/Seller/Orders/Orders'
 import ManageProducts from '~/pages/Seller/Products/Products'
 import AddProduct from '~/pages/Seller/Products/CreateForm/CreateForm'

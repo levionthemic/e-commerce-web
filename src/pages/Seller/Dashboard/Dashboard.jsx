@@ -10,7 +10,7 @@ function Dashboard () {
     year: 'numeric'
   })
 
-  const [time, setTime] = useState()
+  const [time, setTime] = useState(new Date().toLocaleTimeString('vi-VN'))
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date()

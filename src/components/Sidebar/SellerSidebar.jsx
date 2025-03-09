@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Sidebar,
   SidebarContent,
@@ -38,19 +38,19 @@ function SellerSidebar() {
 
           <SidebarMenuItem>
             <SidebarMenuButton className='text-white hover:bg-white/15 hover:text-white hover:rounded-lg' asChild>
-              <a href='/seller/dashboard'>
+              <Link to='/seller'>
                 <House />
                 <span>Dashboard</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
 
           <SidebarMenuItem>
             <SidebarMenuButton className='text-white hover:bg-white/15 hover:text-white hover:rounded-lg' asChild>
-              <a href='/seller/store'>
+              <Link to='/seller/store'>
                 <Store />
                 <span>Cửa hàng</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
 
@@ -67,7 +67,7 @@ function SellerSidebar() {
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
                     <SidebarMenuButton asChild className='text-white hover:bg-white/15 hover:text-white hover:rounded-lg'>
-                      <a href='/seller/products'>Quản lí sản phẩm</a>
+                      <Link to='/seller/products'>Quản lí sản phẩm</Link>
                     </SidebarMenuButton>
                   </SidebarMenuSubItem>
                 </SidebarMenuSub>
@@ -88,7 +88,7 @@ function SellerSidebar() {
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
                     <SidebarMenuButton asChild className='text-white hover:bg-white/15 hover:text-white hover:rounded-lg'>
-                      <a href='/seller/orders'>Quản lí đơn hàng</a>
+                      <Link to='/seller/orders'>Quản lí đơn hàng</Link>
                     </SidebarMenuButton>
                   </SidebarMenuSubItem>
                 </SidebarMenuSub>
