@@ -1,20 +1,18 @@
-import React from 'react'
-import SiderSeller from '../Sider/SiderSeller'
 import { Outlet } from 'react-router-dom'
-import Box from '@mui/material/Box'
+import { SidebarProvider } from '~/components/ui/sidebar'
+import Header from '~/components/Header/Header'
+import { PAGE_TYPE } from '~/utils/constants'
+import SellerSidebar from '~/components/Sidebar/SellerSidebar'
 
 function SellerLayout() {
   return (
-    <Box>
-      <div className="row">
-        <div className="col-2 position-relative">
-          <SiderSeller />
-        </div>
-        <div className="col-10">
-          <Outlet />
-        </div>
+    <SidebarProvider>
+      <SellerSidebar />
+      <div className='flex-1 bg-[#F3F3F3]'>
+        <Header type={PAGE_TYPE.SELLER} />
+        <Outlet />
       </div>
-    </Box>
+    </SidebarProvider>
   )
 }
 
