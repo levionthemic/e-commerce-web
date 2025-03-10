@@ -28,7 +28,7 @@ import { PAGE_TYPE } from '~/utils/constants'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { loginUserAPI } from '~/redux/user/userSlice'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 
 const formSchema = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).messages({
@@ -62,11 +62,17 @@ function Login() {
   const submitLogIn = (data) => {
     const { email, password, role } = data
     toast.promise(
-      dispatch(loginUserAPI({ email, password, role })),
-      { pending: 'Đang đăng nhập...' }
-    ).then(res => {
-      if (!res.error) navigate('/buyer')
-    })
+      dispatch(loginUserAPI({ email, password, role })).unwrap(),
+      {
+        loading: 'Đang đăng nhập...',
+        success: (res) => {
+          if (!res.error) {
+            navigate('/buyer')
+            return 'Đăng nhập thành công!'
+          }
+        }
+      }
+    )
   }
 
   return (

@@ -1,5 +1,4 @@
 import { Navigate, useLocation } from 'react-router-dom'
-import Box from '@mui/material/Box'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Login from './Login'
@@ -17,22 +16,10 @@ function Auth() {
   }
 
   return (
-    <Box sx={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100vw',
-      height: '100vh',
-
-      backgroundImage: 'url("src/assets/background-login.gif")',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      boxShadow: 'inset 0 0 0 2000px rgba(0, 0, 0, 0.2)'
-    }}>
+    <div className='flex items-center justify-center w-[100vw] h-[100vh]'>
       {isLogin && <Login />}
       {isRegister && <Register />}
-    </Box>
+    </div>
   )
 }
 

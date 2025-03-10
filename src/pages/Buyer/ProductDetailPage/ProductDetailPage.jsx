@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-import Typography from '@mui/material/Typography'
-
 import Rating from '@mui/material/Rating'
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
@@ -12,13 +10,13 @@ import { RiSubtractFill } from 'react-icons/ri'
 
 import { getProductDetailsAPI, updateProductDetailAPI } from '~/apis'
 import { selectCurrentUser } from '~/redux/user/userSlice'
-import Tooltip from '@mui/material/Tooltip'
 import moment from 'moment'
 import Loader from '~/components/Loader/Loader'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
 import { useForm } from 'react-hook-form'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 
 
 function ProductDetailPage() {
@@ -96,7 +94,7 @@ function ProductDetailPage() {
     }
 
     updateProductDetailAPI(product._id, { commentToAdd: commentToAdd }).then((data) => {
-      toast.success('Bình luận thành công!', { position: 'bottom-right' })
+      toast.success('Bình luận thành công!')
       resetField('comment')
       setProduct(data)
     })
@@ -129,7 +127,7 @@ function ProductDetailPage() {
               <div className='font-bold text-mainColor1-600 text-2xl'>{product?.name}</div>
 
               <div className='flex items-center gap-2 text-sm mt-2'>
-                <Typography variant='span'>{product?.rate || 0}</Typography>
+                <span>{product?.rate || 0}</span>
                 <Rating
                   name="rate"
                   value={product?.rate || 0}
@@ -240,12 +238,19 @@ function ProductDetailPage() {
                 }
                 {product?.comments?.map((comment, index) =>
                   <div className='flex gap-3 w-full mb-1.5' key={index}>
-                    <Tooltip title={comment?.userDisplayName}>
-                      <Avatar className='cursor-pointer'>
-                        <AvatarImage src={currentUser?.avatar} />
-                        <AvatarFallback>LV</AvatarFallback>
-                      </Avatar>
-                    </Tooltip>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Avatar className='cursor-pointer'>
+                            <AvatarImage src={currentUser?.avatar} />
+                            <AvatarFallback>LV</AvatarFallback>
+                          </Avatar>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{comment?.userDisplayName}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <div className=''>
                       <span className='font-bold mr-2'>
                         {comment?.userDisplayName}
