@@ -10,6 +10,7 @@ import {
   BreadcrumbSeparator
 } from '~/components/ui/breadcrumb'
 import { Button } from '~/components/ui/button'
+import ProductTable from '~/pages/Seller/Products/ProductTable'
 
 
 function Products() {
@@ -60,7 +61,7 @@ function Products() {
         <span className="italic text-sm text-gray-500 text-right">{time}<br />{formatter.format(date)}</span>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div className="col-span-1 bg-white rounded-lg p-4 flex items-center justify-between">
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Tổng Sản phẩm trong kho</span>
@@ -110,6 +111,8 @@ function Products() {
           </div>
         </div>
       </div>
+
+      <ProductTable />
     </div>
 
   )
