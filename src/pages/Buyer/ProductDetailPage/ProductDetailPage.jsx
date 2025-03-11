@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
-import Rating from '@mui/material/Rating'
+import Rating from 'react-rating'
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { IoMdAdd } from 'react-icons/io'
+import { IoMdAdd, IoMdStar, IoMdStarOutline } from 'react-icons/io'
 import { RiSubtractFill } from 'react-icons/ri'
 
 import { getProductDetailsAPI, updateProductDetailAPI } from '~/apis'
@@ -129,10 +129,11 @@ function ProductDetailPage() {
               <div className='flex items-center gap-2 text-sm mt-2'>
                 <span>{product?.rate || 0}</span>
                 <Rating
-                  name="rate"
-                  value={product?.rate || 0}
-                  precision={0.1}
-                  readOnly
+                  emptySymbol={<IoMdStarOutline />}
+                  fullSymbol={<IoMdStar />}
+                  initialRating={product?.rate || 0}
+                  readonly
+                  className='text-[#FBCA04] text-xl leading-none'
                 />
                 <div style={{ border: '1px solid #ddd', height: '20px' }}></div>
                 <div>

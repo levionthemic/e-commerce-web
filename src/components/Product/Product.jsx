@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import Rating from '@mui/material/Rating'
+import Rating from 'react-rating'
 import { clsx } from 'clsx'
 
 import {
@@ -12,6 +12,9 @@ import {
 } from '~/components/ui/card'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Separator } from '~/components/ui/separator'
+
+import { IoMdStarOutline } from 'react-icons/io'
+import { IoMdStar } from 'react-icons/io'
 
 function Product({ product, loading }) {
 
@@ -48,11 +51,12 @@ function Product({ product, loading }) {
               <div className='flex items-center gap-1'>
                 <span>{product?.rate || '0'}</span>
                 <Rating
-                  size='small'
-                  name="rate"
-                  value={product?.rate || 0}
-                  precision={0.1}
-                  readOnly />
+                  emptySymbol={<IoMdStarOutline />}
+                  fullSymbol={<IoMdStar />}
+                  initialRating={product?.rate || 0}
+                  readonly
+                  className='text-[#FBCA04] text-xl leading-none'
+                />
               </div>
 
               <span>| Đã bán: {product?.quantitySold || 0}</span>

@@ -1,20 +1,11 @@
-import Box from '@mui/material/Box'
-import CircularProgress from '@mui/material/CircularProgress'
-import Typography from '@mui/material/Typography'
-
 function Loader({ caption }) {
   return (
-    <Box sx={{
-      width: '100vw',
-      height: 'calc(100vh - 36px - 40px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 2
-    }}>
-      <CircularProgress />
-      <Typography>{caption}</Typography>
-    </Box>
+    <div className='w-[98vw] h-[calc(90vh)] flex items-center justify-center'>
+      <div className="w-2 h-2 bg-mainColor1-600 mr-2 rounded-full animate-bounce"></div>
+      <div className="w-2 h-2 bg-mainColor1-600 mr-2 rounded-full animate-bounce [animation-delay:-0.2s]"></div>
+      <div className="w-2 h-2 bg-mainColor1-600 mr-2 rounded-full animate-bounce [animation-delay:-0.4s]"></div>
+      <span>{caption}</span>
+    </div>
   )
 }
 
