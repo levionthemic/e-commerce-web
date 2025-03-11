@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Sidebar,
   SidebarContent,
@@ -22,23 +22,23 @@ function UserSidebar() {
   const items = [
     {
       title: 'Hồ sơ',
-      url: '#',
-      icon: <CiUser className='text-4xl w-5 h-5 block m-2'/>
+      url: '/user/profile',
+      icon: <CiUser />
     },
     {
       title: 'Đơn hàng',
-      url: '#',
-      icon: <LuTruck className='text-4xl w-5 h-5 block m-2'/>
+      url: '/user/order',
+      icon: <LuTruck />
     },
     {
       title: 'Yêu thích',
       url: '#',
-      icon: <IoMdHeartEmpty className='text-4xl w-5 h-5 block m-2'/>
+      icon: <IoMdHeartEmpty />
     },
     {
       title: 'Cài đặt',
       url: '#',
-      icon: <IoSettingsOutline className='text-4xl w-5 h-5 block m-2'/>
+      icon: <IoSettingsOutline />
     }
   ]
   return (
@@ -58,11 +58,11 @@ function UserSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton className='h-fit py-3 mb-4 cursor-pointer text-white bg-mainColor1-800/90 rounded-full' asChild>
-                    <a href={item.url}>
+                  <SidebarMenuButton className='h-fit py-2 text-md mb-4 cursor-pointer text-white bg-mainColor1-800 hover:bg-mainColor1-800/90 hover:text-white rounded-lg' asChild>
+                    <Link to={item.url}>
                       {item.icon}
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

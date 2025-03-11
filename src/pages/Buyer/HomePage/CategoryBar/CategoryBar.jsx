@@ -1,24 +1,31 @@
-import { Avatar, AvatarImage } from '~/components/ui/avatar'
-import { Badge } from '~/components/ui/badge'
+import { CollapsibleTrigger } from '@radix-ui/react-collapsible'
+import { ChevronDown } from 'lucide-react'
+import { Collapsible, CollapsibleContent } from '~/components/ui/collapsible'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubItem } from '~/components/ui/sidebar'
 
 function CategoryBar({ categories = [], onClickCategory }) {
   return (
-    <div className='h-fit max-h-[100vh] sticky top-5 left-0 overflow-y-scroll scroll-smooth scroll-pr-3'>
+    <div className='flex-1 h-96 max-h-96 sticky top-5 left-0 overflow-y-scroll scroll-smooth scroll-pr-1'>
       <div className='font-semibold text-mainColor1-600 text-xl'>Danh mục:</div>
-      <div className='mt-2 flex flex-col gap-2 items-start'>
+      <SidebarMenu className='mt-2 flex flex-col gap-2 items-start'>
         {categories?.map((item) => (
-          <Badge
-            key={item._id}
-            className='border bg-white text-mainColor1-800 font-medium border-mainColor1-800 py-0.5 hover:bg-mainColor1-100 hover:text-white transition-all hover:ease-in-out hover:duration-300 cursor-pointer'
-            onClick={() => { onClickCategory(item._id) }}
-          >
-            <Avatar className='flex items-center justify-center h-7 w-7'>
-              <AvatarImage src={item.iconUrl} className='h-full w-full'/>
-            </Avatar>
-            <p className='text-ellipsis'>{item.name}</p>
-          </Badge>
+          <Collapsible key={item._id} className="group/collapsible w-full">
+            <SidebarMenuItem>
+              <CollapsibleTrigger className='w-full'>
+                <SidebarMenuButton className='flex items-center justify-between w-full'>
+                  {item.name}
+                  <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarMenuSub>
+                  <SidebarMenuSubItem>SubMenuItem</SidebarMenuSubItem>
+                </SidebarMenuSub>
+              </CollapsibleContent>
+            </SidebarMenuItem>
+          </Collapsible>
         ))}
-      </div>
+      </SidebarMenu>
     </div>
   )
 }

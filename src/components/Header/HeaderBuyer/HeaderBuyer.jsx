@@ -1,10 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
 
-import { useConfirm } from 'material-ui-confirm'
 import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
 import { Input } from '~/components/ui/input'
 
@@ -14,6 +13,7 @@ import MenuBar from './MenuBar'
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { ArrowRightIcon, SearchIcon } from 'lucide-react'
+import { toast } from 'sonner'
 
 import {
   DropdownMenu,
@@ -46,6 +46,18 @@ import {
   TooltipTrigger
 } from '~/components/ui/tooltip'
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '~/components/ui/alert-dialog'
+
 
 function HeaderBuyer() {
   const navigate = useNavigate()
@@ -69,16 +81,13 @@ function HeaderBuyer() {
     }
   }
 
-  const confirmLogout = useConfirm()
   const handleLogout = async () => {
-    confirmLogout({
-      title: 'Bạn có chắc chắn muốn đăng xuất?',
-      confirmationText: 'Xác nhận',
-      cancellationText: 'Hủy'
-    }).then(() => {
-      dispatch(logoutUserAPI())
-    }).catch(() => {})
+    toast.promise(dispatch(logoutUserAPI()), {
+      loading: 'Đang đăng xuất...'
+    })
   }
+
+  const [open, setOpen] = useState(false)
 
   return (
     <>
@@ -170,7 +179,7 @@ function HeaderBuyer() {
 
             </Sheet>
 
-            <DropdownMenu>
+            <DropdownMenu open={open} onOpenChange={setOpen}>
               <DropdownMenuTrigger asChild>
                 <div className='flex items-center gap-3 cursor-pointer'>
                   <Avatar>
@@ -190,10 +199,29 @@ function HeaderBuyer() {
                   <DropdownMenuItem>Cài đặt</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className='text-red-600 font-medium'
-                  onClick={handleLogout}
-                >Log out</DropdownMenuItem>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem
+                      className='text-red-600 font-medium hover:bg-red-100 hover:text-red-600 cursor-pointer'
+                      onSelect={(event) => {event.preventDefault()}}
+                    >
+                      Đăng xuất
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Bạn có chắc chắn muốn đăng xuất?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Bạn sẽ cần phải đăng nhập lại trước khi truy cập vào hệ thống.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel onClick={() => setOpen(false)}>Hủy</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleLogout}>Đăng xuất</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

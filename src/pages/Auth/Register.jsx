@@ -18,7 +18,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE, FIELD_REQUIRED_MESSAGE, PASSWORD_RULE, PASSWORD_RULE_MESSAGE } from '~/utils/validators'
 import { PAGE_TYPE } from '~/utils/constants'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify'
+import { toast } from 'sonner'
 import { registerUserAPI } from '~/apis'
 
 const formSchema = Joi.object({
@@ -55,10 +55,14 @@ function Register() {
     const { email, password, role } = data
     toast.promise(
       registerUserAPI({ email, password, role }),
-      { pending: 'Đang đăng ký...' }
-    ).then(user => {
-      navigate(`/login?registeredEmail=${user.email}`)
-    })
+      {
+        loading: 'Đang đăng ký...',
+        success: (user) => {
+          navigate(`/login?registeredEmail=${user.email}`)
+          return 'Đăng ký thành công!'
+        }
+      }
+    )
   }
 
   return (
