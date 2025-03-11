@@ -49,15 +49,31 @@ function HomePage() {
   const handleClickCategory = (categoryId) => {
     //
   }
+  const targetTime = new Date().setHours(23, 59, 59, 999)
+  const [timeLeft, setTimeLeft] = useState(targetTime - Date.now())
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(targetTime - Date.now())
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [targetTime])
+
+  if (timeLeft <= 0) return <span>Hết giờ!</span>
+
+  const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24)
+  const minutes = Math.floor((timeLeft / (1000 * 60)) % 60)
+  const seconds = Math.floor((timeLeft / 1000) % 60)
 
   return (
     <div className="bg-[#F5F5FA]">
       <div className='container mx-auto py-6'>
-        <div className="grid grid-cols-6 gap-4">
-          <SidebarProvider className="col-span-1 bg-white rounded-lg pl-3 py-4 pr-0.5 min-h-96">
+        <div className="grid grid-cols-5 gap-4">
+          <SidebarProvider className="col-span-1 bg-white rounded-lg px-3 py-4 min-h-96">
             <CategoryBar categories={categories} onClickCategory={handleClickCategory}/>
           </SidebarProvider>
-          <div className="col-span-5">
+          <div className="col-span-4">
             <img src={banner} alt="" className='h-[416px] w-full object-cover rounded-md' />
           </div>
         </div>
@@ -74,22 +90,22 @@ function HomePage() {
             <ul className='flex items-center gap-8'>
               <li className='flex flex-col items-start font-semibold'>
                 <span className='text-xs'>Ngày</span>
-                <span className='text-3xl'>03</span>
+                <span className='text-3xl'>00</span>
               </li>
               <li className='text-bold text-2xl text-red-500'>:</li>
               <li className='flex flex-col items-start font-semibold'>
                 <span className='text-xs'>Giờ</span>
-                <span className='text-3xl'>23</span>
+                <span className='text-3xl'>{hours < 10 ? `0${hours}` : hours}</span>
               </li>
               <li className='text-bold text-2xl text-red-500'>:</li>
               <li className='flex flex-col items-start font-semibold'>
                 <span className='text-xs'>Phút</span>
-                <span className='text-3xl'>19</span>
+                <span className='text-3xl'>{minutes}</span>
               </li>
               <li className='text-bold text-2xl text-red-500'>:</li>
               <li className='flex flex-col items-start font-semibold'>
                 <span className='text-xs'>Giây</span>
-                <span className='text-3xl'>56</span>
+                <span className='text-3xl'>{seconds}</span>
               </li>
             </ul>
           </div>

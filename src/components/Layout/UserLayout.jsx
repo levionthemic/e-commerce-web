@@ -4,7 +4,7 @@ import UserSidebar from '~/pages/Buyer/User/UserSidebar'
 
 function UserLayout() {
   return (
-    <SidebarProvider>
+    <SidebarProvider className='font-nunitoSans'>
       <UserSidebar />
       <main className='flex-1'>
         {/* <SidebarTrigger /> */}

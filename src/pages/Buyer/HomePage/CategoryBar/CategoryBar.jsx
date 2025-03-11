@@ -5,7 +5,7 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, Sideba
 
 function CategoryBar({ categories = [], onClickCategory }) {
   return (
-    <div className='h-96 max-h-96 sticky top-5 left-0 overflow-y-scroll scroll-smooth scroll-pr-3'>
+    <div className='flex-1 h-96 max-h-96 sticky top-5 left-0 overflow-y-scroll scroll-smooth scroll-pr-1'>
       <div className='font-semibold text-mainColor1-600 text-xl'>Danh mục:</div>
       <SidebarMenu className='mt-2 flex flex-col gap-2 items-start'>
         {categories?.map((item) => (
