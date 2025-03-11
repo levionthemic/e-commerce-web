@@ -1,6 +1,8 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Rating from 'react-rating'
 import { clsx } from 'clsx'
+import { MdAddShoppingCart } from 'react-icons/md'
+import { BsHandbag } from 'react-icons/bs'
 
 import {
   Card,
@@ -17,21 +19,20 @@ import { IoMdStarOutline } from 'react-icons/io'
 import { IoMdStar } from 'react-icons/io'
 
 function Product({ product, loading }) {
-
+  const navigate = useNavigate()
   return (
     <Card className={clsx({
       'border-none shadow-none': loading,
-      'cursor-pointer border-mainColor2-100/60 border shadow hover:drop-shadow-xl': !loading
+      'cursor-pointer border-gray-200 hover:border-[2px] border shadow hover:shadow-xl overflow-hidden': !loading
     })}>
-      <CardContent className='p-2'>
+      <CardContent className='p-2' onClick={() => navigate(`/buyer/product/${product._id}`)}>
         {loading
           ? <Skeleton className='w-full aspect-square'/>
           : <img src={product?.thumbnailUrl} alt="" className='w-full aspect-square object-contain'/>
         }
-
       </CardContent>
 
-      <CardHeader className='px-4'>
+      <CardHeader className='px-4' onClick={() => navigate(`/buyer/product/${product._id}`)}>
         {loading
           ? <Skeleton className='h-[32px]'/>
           : <CardTitle className='line-clamp-2 min-h-[32px] text-mainColor1-600'>{product?.name}</CardTitle>
@@ -48,7 +49,7 @@ function Product({ product, loading }) {
               <sup>đ</sup>
             </div>
             <div className='text-sm text-gray-400 flex justify-between items-center my-2'>
-              <div className='flex items-center gap-1'>
+              <div className='flex items-center gap-2'>
                 <span>{product?.rate || '0'}</span>
                 <Rating
                   emptySymbol={<IoMdStarOutline />}
@@ -63,15 +64,19 @@ function Product({ product, loading }) {
             </div>
           </CardDescription>
         }
-
       </CardHeader>
 
-      {!loading && <Separator className='bg-mainColor2-100/60'/>}
+      {!loading && <Separator className='border-gray-200'/>}
 
       {loading
         ? <Skeleton className='pl-4 py-2 h-4'/>
-        : <CardFooter className='pl-4 py-2 text-sm text-mainColor2-800 hover:text-mainColor1-800 cursor-pointer'>
-          <Link to={`/buyer/product/${product._id}`}>Xem chi tiết</Link>
+        : <CardFooter className='p-0 text-sm cursor-pointer grid grid-cols-2 text-center'>
+          <div className='hover:bg-mainColor2-800 text-mainColor2-800 hover:text-white flex items-center justify-center p-2 border-r border-r-gray-200'>
+            <MdAddShoppingCart className='text-2xl' />
+          </div>
+          <div className='hover:bg-mainColor1-800 p-2 text-mainColor1-800 hover:text-white flex items-center justify-center'>
+            <BsHandbag className='text-2xl' />
+          </div>
         </CardFooter>
       }
     </Card>
