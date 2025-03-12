@@ -41,7 +41,7 @@ function SellerHeader() {
           </Avatar>
           <div>
             <div className='text-sm font-semibold'>Hồ Trần Ngọc Liêm</div>
-            <div className='text-xs text-gray-400'>Quản trị viên</div>
+            <div className='text-xs text-gray-400'>Người bán</div>
           </div>
         </div>
       </div>
