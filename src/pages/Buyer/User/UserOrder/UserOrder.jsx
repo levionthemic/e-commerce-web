@@ -44,8 +44,8 @@ function UserOrder() {
           <OrderTable />
         </div>
 
-        <div className="flex-1 p-6 sticky top-0 right-0 min-h-full">
-          <div className='bg-gray-100/80 rounded-3xl pb-16'>
+        <div className="flex-1 px-6 flex items-center sticky top-0 right-0 min-h-[100vh] w-full">
+          <div className='bg-gray-100/80 h-[95vh] rounded-3xl flex-1'>
             <div className="text-center relative py-32">
               <AlertDialog>
                 <AlertDialogTrigger asChild>

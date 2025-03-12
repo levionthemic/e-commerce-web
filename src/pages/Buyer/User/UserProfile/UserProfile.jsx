@@ -4,7 +4,7 @@ import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
 import { useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
-
+import productImg from '~/assets/logo.png'
 import {
   Form,
   FormControl,
@@ -18,7 +18,7 @@ import UploadAvatar from '~/components/UploadAvatar'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE } from '~/utils/validators'
-import { IoIosLogOut } from 'react-icons/io'
+import { IoIosLogOut, IoMdStar, IoMdStarOutline } from 'react-icons/io'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import UserHeader from '~/pages/Buyer/User/UserHeader'
 import {
@@ -33,6 +33,10 @@ import {
   AlertDialogTrigger
 } from '~/components/ui/alert-dialog'
 import { toast } from 'sonner'
+import Rating from 'react-rating'
+import { useId, useState } from 'react'
+import { Switch } from '~/components/ui/switch'
+import { Label } from '~/components/ui/label'
 
 function UserProfile() {
   const dispatch = useDispatch()
@@ -59,10 +63,13 @@ function UserProfile() {
     }
   })
 
+  const id = useId()
+  const [checked, setChecked] = useState(true)
+
   return (
     <div className='px-4'>
-      <div className="grid grid-cols-4 items-center bg-white rounded-lg">
-        <div className="col-span-3 px-2 h-full">
+      <div className="flex items-center bg-white rounded-lg h-[100vh] overflow-auto relative">
+        <div className="px-2 h-full w-[75%]">
           {/* Header */}
           <UserHeader />
 
@@ -72,7 +79,7 @@ function UserProfile() {
             <p className='text-gray-500 text-sm'>Chào mừng bạn trở về nhà! Đây là nơi bạn có thể kiểm tra các hoạt động đã làm của mình.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-8">
             <div className='my-4'>
               <div className='text-lg font-medium text-mainColor2-800'>Thông tin cá nhân</div>
               <Form {...form}>
@@ -82,7 +89,7 @@ function UserProfile() {
                     control={form.control}
                     name="fullName"
                     render={({ field }) => (
-                      <FormItem className='my-2'>
+                      <FormItem className='mb-4 mt-2'>
                         <FormLabel className='text-base'>Họ và tên</FormLabel>
                         <FormControl>
                           <Input
@@ -98,7 +105,7 @@ function UserProfile() {
                     )}
                   />
 
-                  <div className="grid grid-cols-2">
+                  <div className="grid grid-cols-2 my-4">
                     <FormField
                       control={form.control}
                       name="gender"
@@ -165,7 +172,7 @@ function UserProfile() {
                     control={form.control}
                     name="address"
                     render={({ field }) => (
-                      <FormItem className='my-3'>
+                      <FormItem className='my-4'>
                         <FormLabel className='text-base'>Địa chỉ</FormLabel>
                         <FormControl>
                           <Input
@@ -186,7 +193,7 @@ function UserProfile() {
                     control={form.control}
                     name="email"
                     render={({ field }) => (
-                      <FormItem className='my-3'>
+                      <FormItem className='my-4'>
                         <FormLabel className='text-base'>Email</FormLabel>
                         <FormControl>
                           <Input
@@ -217,7 +224,7 @@ function UserProfile() {
                     control={form.control}
                     name="username"
                     render={({ field }) => (
-                      <FormItem className='my-2'>
+                      <FormItem className='mb-4 mt-2'>
                         <FormLabel className='text-base'>Tên tài khoản</FormLabel>
                         <FormControl>
                           <Input
@@ -238,7 +245,7 @@ function UserProfile() {
                     control={form.control}
                     name="password"
                     render={({ field }) => (
-                      <FormItem className='my-2'>
+                      <FormItem className='my-4'>
                         <FormLabel className='text-base'>Mật khẩu</FormLabel>
                         <FormControl>
                           <Input
@@ -256,7 +263,25 @@ function UserProfile() {
                     )}
                   />
 
-                  <div className="flex justify-center">
+                  <div className='flex items-center gap-4 my-4'>
+                    <FormLabel className='text-base'>Trạng thái tài khoản</FormLabel>
+                    <div className="relative inline-grid h-9 grid-cols-[1fr_1fr] items-center text-sm font-medium">
+                      <Switch
+                        id={id}
+                        checked={checked}
+                        onCheckedChange={setChecked}
+                        className="peer data-[state=unchecked]:bg-input/50 absolute inset-0 h-[inherit] w-auto rounded-lg [&_span]:z-10 [&_span]:h-full [&_span]:w-1/2 [&_span]:rounded-sm [&_span]:transition-transform [&_span]:duration-300 [&_span]:[transition-timing-function:cubic-bezier(0.16,1,0.3,1)] [&_span]:data-[state=checked]:translate-x-full [&_span]:data-[state=checked]:rtl:-translate-x-full"
+                      />
+                      <span className="min-w-78flex pointer-events-none relative ms-0.5 items-center justify-center px-2 text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] peer-data-[state=checked]:invisible peer-data-[state=unchecked]:translate-x-full peer-data-[state=unchecked]:rtl:-translate-x-full">
+                        <span className="text-[10px] font-medium uppercase">Tạm khóa</span>
+                      </span>
+                      <span className="min-w-78flex peer-data-[state=checked]:text-background pointer-events-none relative me-0.5 items-center justify-center px-2 text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] peer-data-[state=checked]:-translate-x-full peer-data-[state=unchecked]:invisible peer-data-[state=checked]:rtl:translate-x-full">
+                        <span className="text-[10px] font-medium uppercase">Bình thường</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center mt-6">
                     <Button type="submit" className="w-[70%] rounded-full bg-mainColor2-800 text-white tex-lg uppercase">Cập nhật</Button>
                   </div>
                 </form>
@@ -265,27 +290,99 @@ function UserProfile() {
           </div>
 
 
-          <div className="grid grid-cols-2 mt-8">
+          <div className="grid grid-cols-2 gap-4 mt-8">
             <div className="">
-              <div className='text-lg font-medium text-mainColor2-800'>Sản phẩm đã xem gần đây</div>
+              <div className='text-lg font-medium text-mainColor2-800 mb-1/2'>Sản phẩm đã xem gần đây</div>
+              <p className='text-sm text-muted-foreground mb-3'>Hãy xem tuần vừa rồi bạn đã xem các sản phẩm nào!</p>
               <ul>
-                <li className='flex items-center justify-between bg-gray-300'>
-                  <img src="" alt="" />
-                  <div>Sản phẩm A</div>
-                  <button className='text-mainColor2-800 bg-mainColor2-300/50 border border-mainColor2-800 px-4 py-1 rounded-lg'>Chi tiết</button>
+                <li className='flex items-center gap-4 mb-4'>
+                  <div className="flex items-center gap-3 flex-1">
+                    <img src={productImg} alt="" className='w-10 h-10 rounded-lg'/>
+                    <div className="flex flex-col">
+                      <span className='line-clamp-1 font-medium'>Tên sản phẩm</span>
+                      <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+                        <span>{4.5}</span>
+                        <Rating
+                          emptySymbol={<IoMdStarOutline />}
+                          fullSymbol={<IoMdStar />}
+                          initialRating={4.5}
+                          readonly
+                          className='text-[#FBCA04] text-lg leading-none'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='border rounded-lg py-1.5 px-2 text-sm font-semibold'>Xem chi tiết</div>
+                </li>
+                <li className='flex items-center gap-4 mb-4'>
+                  <div className="flex items-center gap-3 flex-1">
+                    <img src={productImg} alt="" className='w-10 h-10 rounded-lg'/>
+                    <div className="flex flex-col">
+                      <span className='line-clamp-1 font-medium'>Tên sản phẩm</span>
+                      <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+                        <span>{4.5}</span>
+                        <Rating
+                          emptySymbol={<IoMdStarOutline />}
+                          fullSymbol={<IoMdStar />}
+                          initialRating={4.5}
+                          readonly
+                          className='text-[#FBCA04] text-lg leading-none'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='border rounded-lg py-1.5 px-2 text-sm font-semibold'>Xem chi tiết</div>
+                </li>
+                <li className='flex items-center gap-4 mb-4'>
+                  <div className="flex items-center gap-3 flex-1">
+                    <img src={productImg} alt="" className='w-10 h-10 rounded-lg'/>
+                    <div className="flex flex-col">
+                      <span className='line-clamp-1 font-medium'>Tên sản phẩm</span>
+                      <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+                        <span>{4.5}</span>
+                        <Rating
+                          emptySymbol={<IoMdStarOutline />}
+                          fullSymbol={<IoMdStar />}
+                          initialRating={4.5}
+                          readonly
+                          className='text-[#FBCA04] text-lg leading-none'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='border rounded-lg py-1.5 px-2 text-sm font-semibold'>Xem chi tiết</div>
+                </li>
+                <li className='flex items-center gap-4 mb-4'>
+                  <div className="flex items-center gap-3 flex-1">
+                    <img src={productImg} alt="" className='w-10 h-10 rounded-lg'/>
+                    <div className="flex flex-col">
+                      <span className='line-clamp-1 font-medium'>Tên sản phẩm</span>
+                      <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+                        <span>{4.5}</span>
+                        <Rating
+                          emptySymbol={<IoMdStarOutline />}
+                          fullSymbol={<IoMdStar />}
+                          initialRating={4.5}
+                          readonly
+                          className='text-[#FBCA04] text-lg leading-none'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='border rounded-lg py-1.5 px-2 text-sm font-semibold'>Xem chi tiết</div>
                 </li>
               </ul>
             </div>
             <div className="">
               <div className='text-lg font-medium text-mainColor2-800 text-right'>Đánh giá của bạn</div>
-
+              <p className='text-sm text-muted-foreground mb-3 text-right'>Hãy xem tuần vừa rồi bạn đã tương tác như thế nào!</p>
             </div>
           </div>
 
         </div>
 
-        <div className="col-span-1 h-[100vh] p-6">
-          <div className='bg-gray-100/80 h-full rounded-3xl'>
+        <div className="flex-1 px-6 flex items-center sticky top-0 right-0 min-h-[100vh]">
+          <div className='bg-gray-100/80 h-[95vh] rounded-3xl flex-1'>
             <div className="text-center relative py-32">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -307,9 +404,6 @@ function UserProfile() {
               <UploadAvatar previewUrl={currentUser?.avatar} />
               <div className='text-xl mt-2 text-mainColor2-800 font-medium'>{currentUser.displayName}</div>
               <div className='text-xs text-mainColor2-800/90'>{currentUser.email}</div>
-            </div>
-            <div className="">
-
             </div>
             <div className="bg-white rounded-xl grid grid-cols-2 mx-6 py-4 gap-y-3">
               <div className="mx-2 py-2">
