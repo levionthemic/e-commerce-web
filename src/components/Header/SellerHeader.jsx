@@ -34,7 +34,7 @@ function SellerHeader() {
         <div className='bg-[#ECEEF6] p-2 rounded-lg'>
           <TbBellRinging2 className='text-xl text-gray-500'/>
         </div>
-        <div className="flex items-center gap-1 cursor-pointer">
+        <div className="flex items-center gap-2 cursor-pointer">
           <Avatar>
             <AvatarImage src={currentUser?.avatar} />
             <AvatarFallback>LV</AvatarFallback>

@@ -2,6 +2,9 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 import { useId } from 'react'
 import { useForm } from 'react-hook-form'
+import { BsTiktok } from 'react-icons/bs'
+import { FaFacebookF } from 'react-icons/fa'
+import { FaInstagram } from 'react-icons/fa6'
 import coverImg from '~/assets/banner.jpg'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
@@ -22,6 +25,7 @@ function Store() {
       'string.empty': FIELD_REQUIRED_MESSAGE
     })
   })
+
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
@@ -33,9 +37,11 @@ Chào mừng bạn đến với LEVI Store, nơi mang đến những sản phẩ
 ✔ Sản phẩm chính hãng, chất lượng cao <br />
 ✔ Chính sách đổi trả linh hoạt, bảo hành uy tín <br />
 ✔ Giao hàng nhanh chóng, tiện lợi
-      `
+      `,
+      socialNetworks: ['', '', '']
     }
   })
+
   const handleUpdateStoreGeneralInformation = (data) => {
 
   }
@@ -47,23 +53,23 @@ Chào mừng bạn đến với LEVI Store, nơi mang đến những sản phẩ
   ]
   return (
     <div className=''>
-      <div className="h-52 w-full relative">
-        <img src={coverImg} alt="" className='h-52 w-full object-cover'/>
+      <div className="h-32 xl:h-52 w-full relative">
+        <img src={coverImg} alt="" className='h-full w-full object-cover'/>
 
-        <Avatar className='w-32 h-32 absolute -bottom-[50%] left-16 border-[5px] border-[#F3F3F3]'>
+        <Avatar className='w-24 h-24 xl:w-32 xl:h-32 absolute -bottom-[50%] left-16 border-[5px] border-[#F3F3F3]'>
           <AvatarImage src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
 
-        <div className="absolute -bottom-[34%] left-52">
-          <div className="text-2xl font-semibold mb-1">Tên cửa hàng</div>
-          <div className='line-clamp-1 text-muted-foreground text-sm'>Mô tả ngắn của cửa hàng</div>
+        <div className="absolute -bottom-[40%] xl:-bottom-[34%] left-44 xl:left-52">
+          <div className="text-xl xl:text-2xl font-semibold mb-1">Tên cửa hàng</div>
+          <div className='line-clamp-1 text-muted-foreground text-xs xl:text-sm'>Mô tả ngắn của cửa hàng</div>
         </div>
       </div>
 
 
       {/* Content */}
-      <div className="p-4 mt-24 h-full">
+      <div className="p-4 mt-14 xl:mt-24 h-full">
         <Tabs defaultValue="1" className="w-full">
           <TabsList className='w-full grid grid-cols-4'>
             <TabsTrigger value="1">Tổng quan</TabsTrigger>
@@ -169,8 +175,150 @@ Chào mừng bạn đến với LEVI Store, nơi mang đến những sản phẩ
               </Form>
             </div>
           </TabsContent>
-          <TabsContent value="2">Change your password here.</TabsContent>
+
+          <TabsContent value="2">
+            <div className="bg-white p-4 rounded-lg">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleUpdateStoreGeneralInformation)}>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-4 mb-4">
+                      <FormField
+                        control={form.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="grid grid-cols-3">
+                              <div className="col-span-1">
+                                <FormLabel className='text-base whitespace-nowrap'>Số điện thoại</FormLabel>
+                                <FormDescription className=''>
+                                  Chỉ dùng 1 số.
+                                </FormDescription>
+                              </div>
+                              <FormControl className='col-span-2'>
+                                <Input
+                                  placeholder="Vd: 0123456789"
+                                  className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['phoneNumber'] && 'border-red-500'}`}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </div>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='email'
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="grid grid-cols-3">
+                              <div className="col-span-1">
+                                <FormLabel classame='text-base'>Email</FormLabel>
+                                <FormDescription className=''>
+                                  Chỉ dùng 1 email.
+                                </FormDescription>
+                              </div>
+
+                              <FormControl className='col-span-2'>
+                                <Input placeholder='Vd: abc@example.com' className='placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px]' {...field} />
+                              </FormControl>
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='address'
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="grid grid-cols-3">
+                              <div className="">
+                                <FormLabel className='text-base'>Địa chỉ cửa hàng</FormLabel>
+                                <FormDescription className=''>
+                                  Dùng địa chỉ vật lý của bạn.
+                                </FormDescription>
+                              </div>
+
+                              <FormControl className='col-span-2'>
+                                <Input className='placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px]' {...field} />
+                              </FormControl>
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="">
+                      <div className="flex items-end gap-4 mb-3.5">
+                        <FormLabel className='text-base'>Liên kết mạng xã hội</FormLabel>
+                        <FormDescription>Điền các liên kết mạng xã hội (nếu có).</FormDescription>
+                      </div>
+                      <FormField
+                        control={form.control}
+                        name='socialNetworks.0'
+                        render={({ field }) => (
+                          <FormItem className='mb-1'>
+                            <FormControl>
+                              <div className='relative'>
+                                <Input placeholder='Facebook' className='peer ps-9 placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px]' {...field} />
+                                <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                                  <FaFacebookF size={16} />
+                                </div>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='socialNetworks.1'
+                        render={({ field }) => (
+                          <FormItem className='mb-1'>
+                            <FormControl>
+                              <div className='relative'>
+                                <Input placeholder='Instagram' className='peer ps-9 placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px]' {...field} />
+                                <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                                  <FaInstagram size={16} />
+                                </div>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name='socialNetworks.2'
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <div className='relative'>
+                                <Input placeholder='Tiktok' className='peer ps-9 placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px]' {...field} />
+                                <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                                  <BsTiktok size={16} />
+                                </div>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+
+                  <Button type="submit" className='bg-mainColor1-800/85 rounded-lg w-full py-3 text-md mt-8'>Cập nhật chỉnh sửa</Button>
+                </form>
+              </Form>
+            </div>
+          </TabsContent>
+
           <TabsContent value="3">Change your password here.</TabsContent>
+
           <TabsContent value="4">Change your password here.</TabsContent>
         </Tabs>
       </div>
