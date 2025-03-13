@@ -21,10 +21,10 @@ import DashboardSeller from '~/pages/Seller/Dashboard/Dashboard'
 import SellerLayout from '~/components/Layout/SellerLayout'
 import ProductsSeller from '~/pages/Seller/Products/Products'
 import OrdersSeller from '~/pages/Seller/Orders/Orders'
-import Store from '~/pages/Seller/Store/Store'
 import Promotion from '~/pages/Seller/Promotion/Promotion'
 import Comments from '~/pages/Seller/Comments/Comments'
-import Inventory from '~/pages/Seller/Store/Inventory'
+import Inventory from '~/pages/Seller/Store/Inventory/Inventory'
+import StoreProfile from './pages/Seller/Store/Profile/Profile'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -68,7 +68,7 @@ function App() {
           <Route index element={<DashboardSeller />} />
           <Route path='products' element={<ProductsSeller />} />
           <Route path='orders' element={<OrdersSeller />} />
-          <Route path='store/profile' element={<Store />} />
+          <Route path='store/profile' element={<StoreProfile />} />
           <Route path='store/inventory' element={<Inventory />} />
           <Route path='promotion' element={<Promotion />} />
           <Route path='comment' element={<Comments />} />
