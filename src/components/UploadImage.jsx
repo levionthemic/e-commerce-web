@@ -16,7 +16,7 @@ export default function UploadImage() {
 
   return (
     <div>
-      <div className="inline-flex items-center gap-2 align-top">
+      <div className="inline-flex items-center gap-2 align-top w-full">
         <div
           className="border-input relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-md border"
           aria-label={previewUrl ? 'Preview of uploaded image' : 'Default user avatar'}>
@@ -33,9 +33,9 @@ export default function UploadImage() {
             </div>
           )}
         </div>
-        <div className="relative inline-block">
-          <Button onClick={handleButtonClick} aria-haspopup="dialog">
-            {fileName ? 'Change image' : 'Upload image'}
+        <div className="relative inline-block flex-1">
+          <Button onClick={(event) => {event.preventDefault(); handleButtonClick()}} aria-haspopup="dialog" className='w-full'>
+            {fileName ? 'Thay đổi' : 'Chọn'}
           </Button>
           <input
             type="file"
@@ -49,14 +49,14 @@ export default function UploadImage() {
       {fileName && (
         <div className="mt-2">
           <div className="inline-flex gap-2 text-xs">
-            <p className="text-muted-foreground truncate" aria-live="polite">
+            <p className="text-muted-foreground truncate max-w-32" aria-live="polite">
               {fileName}
             </p>{' '}
             <button
               onClick={handleRemove}
               className="font-medium text-red-500 hover:underline"
               aria-label={`Remove ${fileName}`}>
-              Remove
+              Xóa
             </button>
           </div>
         </div>
