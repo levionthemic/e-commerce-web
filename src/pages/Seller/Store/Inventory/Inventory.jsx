@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '~/components/ui/breadcrumb'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import GeneralTab from './GeneralTab'
+import ImportTab from '~/pages/Seller/Store/Inventory/ImportTab'
+import ExportTab from '~/pages/Seller/Store/Inventory/ExportTab'
 
 function Inventory() {
   const date = new Date(Date.now())
@@ -38,7 +40,7 @@ function Inventory() {
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbLink>
-                    <Link to='/seller/store/profile'>Đơn hàng</Link>
+                    <Link to='/seller/store/profile'>Cửa hàng</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
@@ -65,8 +67,14 @@ function Inventory() {
           <TabsContent value="1">
             <GeneralTab />
           </TabsContent>
-          <TabsContent value="2">Nhập kho</TabsContent>
-          <TabsContent value="3">Xuất kho</TabsContent>
+
+          <TabsContent value="2">
+            <ImportTab />
+          </TabsContent>
+
+          <TabsContent value="3">
+            <ExportTab />
+          </TabsContent>
           <TabsContent value="4">Kiểm kê</TabsContent>
           <TabsContent value="5">Cảnh báo</TabsContent>
           <TabsContent value="6">Báo cáo</TabsContent>
