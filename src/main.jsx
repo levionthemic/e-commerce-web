@@ -13,6 +13,7 @@ import { persistStore } from 'redux-persist'
 import { injectStore } from './utils/authorizedAxios.js'
 
 import { Toaster } from 'sonner'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 const persistor = persistStore(store)
 injectStore(store)
@@ -22,7 +23,9 @@ root.render(
   <BrowserRouter>
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        <App />
+        <GoogleOAuthProvider clientId={'33163557037-0qrg8fben6cr2gp9hpef8s77den9vh9c.apps.googleusercontent.com'}>
+          <App />
+        </GoogleOAuthProvider>
         <Toaster />
       </PersistGate>
     </Provider>

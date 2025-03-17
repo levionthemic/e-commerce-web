@@ -29,6 +29,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { loginUserAPI } from '~/redux/user/userSlice'
 import { toast } from 'sonner'
+import { useGoogleLogin } from '@react-oauth/google'
+import { FaGoogle } from 'react-icons/fa'
 
 const formSchema = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).messages({
@@ -60,9 +62,8 @@ function Login() {
   const verifiedEmail = searchParams.get('verifiedEmail')
 
   const submitLogIn = (data) => {
-    const { email, password, role } = data
     toast.promise(
-      dispatch(loginUserAPI({ email, password, role })).unwrap(),
+      dispatch(loginUserAPI(data)).unwrap(),
       {
         loading: 'Đang đăng nhập...',
         success: (res) => {
@@ -74,6 +75,11 @@ function Login() {
       }
     )
   }
+
+  const handleLoginWithGoogle = useGoogleLogin({
+    onSuccess: (codeResponse) => { submitLogIn(codeResponse) },
+    onError: (error) => toast.error(error)
+  })
 
   return (
     <div className='w-[100vw] h-[100vh] bg-[url("~/assets/background-auth.jpg")] bg-cover bg-no-repeat bg-center'>
@@ -189,6 +195,13 @@ function Login() {
               <Button type="submit" className='bg-mainColor2-800/85 rounded-full w-full animate-fadeInTop py-5 text-md'>Đăng nhập</Button>
             </form>
           </Form>
+
+          <div className='text-white mt-6 text-sm flex items-center justify-center gap-6'>
+            <span>hoặc đăng nhập bằng: </span>
+            <div onClick={handleLoginWithGoogle} className='border border-white rounded-full p-1.5 cursor-pointer hover:bg-mainColor1-600 hover:border-[2px] hover:scale-105 hover:duration-300 hover:ease-in-out transition-transform'>
+              <FaGoogle />
+            </div>
+          </div>
 
           <div className='mt-8 text-xs text-center text-white'>Chưa có tài khoản? <div className='underline cursor-pointer scale-100 font-semibold hover:scale-110 hover:transition-transform hover:ease-in-out hover:duration-200' onClick={() => navigate('/register')}>Đăng kí</div></div>
 

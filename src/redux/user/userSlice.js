@@ -6,7 +6,12 @@ import { API_ROOT } from '~/utils/constants'
 export const loginUserAPI = createAsyncThunk(
   'user/loginUserAPI',
   async (userData) => {
-    const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/auth/login`, userData)
+    let response = {}
+    if (userData.access_token) {
+      response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/auth/login/google/callback`, userData)
+    } else {
+      response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/auth/login`, userData)
+    }
     return response.data
   }
 )
