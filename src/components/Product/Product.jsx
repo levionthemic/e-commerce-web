@@ -17,6 +17,7 @@ import { Separator } from '~/components/ui/separator'
 
 import { IoMdStarOutline } from 'react-icons/io'
 import { IoMdStar } from 'react-icons/io'
+import { FaRegStar, FaStar } from 'react-icons/fa'
 
 function Product({ product, loading }) {
   const navigate = useNavigate()
@@ -52,11 +53,11 @@ function Product({ product, loading }) {
               <div className='flex items-center gap-2'>
                 <span>{product?.rate || '0'}</span>
                 <Rating
-                  emptySymbol={<IoMdStarOutline />}
-                  fullSymbol={<IoMdStar />}
+                  emptySymbol={<FaRegStar />}
+                  fullSymbol={<FaStar />}
                   initialRating={product?.rate || 0}
                   readonly
-                  className='text-[#FBCA04] text-xl leading-none'
+                  className='text-[#FBCA04] text-md leading-none'
                 />
               </div>
 

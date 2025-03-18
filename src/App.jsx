@@ -25,6 +25,7 @@ import Promotion from '~/pages/Seller/Promotion/Promotion'
 import Comments from '~/pages/Seller/Comments/Comments'
 import Inventory from '~/pages/Seller/Store/Inventory/Inventory'
 import StoreProfile from './pages/Seller/Store/Profile/Profile'
+import Completion from './pages/Buyer/CheckoutPage/Completion'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -50,6 +51,7 @@ function App() {
           <Route path='product/:productId' element={<ProductDetailPage />} />
           <Route path='cart' element={<CartPage />} />
           <Route path='checkout' element={<CheckoutPage />} />
+          <Route path='checkout/complete' element={<Completion />} />
         </Route>
 
         {/* User pages (Buyer Module) */}

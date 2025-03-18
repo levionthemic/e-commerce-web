@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Button } from '~/components/ui/button'
 import { useSelector } from 'react-redux'
 import { selectCurrentCart } from '~/redux/cart/cartSlice'
@@ -16,10 +16,13 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '~/components/ui/tooltip'
+import clsx from 'clsx'
 
 function CheckoutPage() {
   const [step, setStep] = useState(1)
   const [searchParams] = useSearchParams()
+
+  const navigate = useNavigate()
 
   const currentCart = useSelector(selectCurrentCart)
 
@@ -35,7 +38,7 @@ function CheckoutPage() {
   }, [searchParams])
 
   const handleCheckout = () => {
-    //
+    navigate('/buyer/checkout/complete')
   }
 
   const timelineItems = [
@@ -128,7 +131,7 @@ function CheckoutPage() {
               </div>
             </div>
 
-            <div className='mt-6'>
+            <div className={clsx({ 'mt-6': true, 'hidden': step < 4 })}>
               <Button
                 className='w-full bg-mainColor1-600 hover:bg-mainColor1-800 transition-all hover:ease-in-out hover:duration-300 text-white text-md rounded-full'
                 onClick={handleCheckout}

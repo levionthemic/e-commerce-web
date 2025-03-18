@@ -114,7 +114,7 @@ function HomePage() {
             <CarouselContent>
               {bestSellingProducts.length > 0
                 ? bestSellingProducts.map((product) => (
-                  <CarouselItem className='basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5' key={product._id}>
+                  <CarouselItem className='basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 2xl:basis-1/6' key={product._id}>
                     <Product
                       product={product}
                       loading={false}
@@ -188,7 +188,7 @@ function HomePage() {
             <CarouselContent>
               {bestSellingProducts.length > 0
                 ? bestSellingProducts.map((product) => (
-                  <CarouselItem className='basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5' key={product._id}>
+                  <CarouselItem className='basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 2xl:basis-1/6' key={product._id}>
                     <Product
                       product={product}
                       loading={false}
@@ -250,7 +250,7 @@ function HomePage() {
 
           <Separator className='my-4 h-[2px]' />
 
-          <div className='list-recommended-products grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5'>
+          <div className='list-recommended-products grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5'>
             {recommendedProducts.length > 0
               ? recommendedProducts
                 .slice(0, productsDisplayed)
