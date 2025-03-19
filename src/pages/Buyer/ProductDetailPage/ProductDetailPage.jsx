@@ -31,7 +31,7 @@ import { FaRegCommentDots, FaRegStar, FaRegThumbsUp, FaStar } from 'react-icons/
 import { IoShareSocialOutline } from 'react-icons/io5'
 import { DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
 import Product from '~/components/Product/Product'
-import { addToCartAPI } from '~/redux/cart/cartSlice'
+import { addToCartAPI, fetchCurrentCartAPI } from '~/redux/cart/cartSlice'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Label } from '~/components/ui/label'
 
@@ -76,17 +76,27 @@ function ProductDetailPage() {
   }, [productId])
 
   const handleAddToCart = () => {
+    if (!typeId) {
+      toast.error('Bạn chưa chọn loại sản phẩm!')
+      return
+    }
     const data = {
       productId,
       typeId,
       quantity
     }
     toast.promise(
-      dispatch(addToCartAPI(data)),
-      { pending: 'Đang xử lý...' }
-    ).then(res => {
-      if (!res.error) toast.success('Thêm vào giỏ hàng thành công!')
-    })
+      dispatch(addToCartAPI(data)).unwrap(),
+      {
+        loading: 'Đang đăng nhập...',
+        success: (res) => {
+          if (!res.error) {
+            dispatch(fetchCurrentCartAPI(data))
+            toast.success('Thêm vào giỏ hàng thành công!')
+          }
+        }
+      }
+    )
   }
 
   const handleAddComment = (data) => {
@@ -180,7 +190,7 @@ function ProductDetailPage() {
                     </div>
 
                     <div className='text-gray-500 line-through text-sm'>
-                      {product?.avgPrice.toLocaleString()}
+                      {productEndPrice.toLocaleString()}
                       <sup>đ</sup>
                     </div>
                   </div>

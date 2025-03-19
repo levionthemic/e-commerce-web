@@ -10,7 +10,7 @@ import storage from 'redux-persist/lib/storage'
 const rootPersistConfig = {
   key: 'root', // key của persist do chúng ta chỉ định, cứ để mặc định là root
   storage: storage, // Biến storage ở trên - lưu vào localStorage
-  whiteList: ['user'] // định nghĩa các slice dữ liệu được phép duy trì qua mỗi lần F5 trình duyệt
+  whiteList: ['user', 'cart'] // định nghĩa các slice dữ liệu được phép duy trì qua mỗi lần F5 trình duyệt
 }
 
 const reducers = combineReducers({

@@ -31,10 +31,10 @@ function CartPage() {
     dispatch(fetchCurrentCartAPI())
   }, [dispatch])
 
-  const handleDecreaseQuantity = (productId) => {
+  const handleDecreaseQuantity = (productId, typeId) => {
     const cloneCart = cloneDeep(cart)
-    cloneCart.products.forEach((product) => {
-      if (product.productId === productId) {
+    cloneCart.itemList.forEach((product) => {
+      if (product.productId === productId && product.typeId === typeId) {
         if (product.quantity > 1) {
           product.quantity = product.quantity - 1
         }
@@ -44,10 +44,10 @@ function CartPage() {
     dispatch(setCart(cloneCart))
   }
 
-  const handleIncreaseQuantity = (productId) => {
+  const handleIncreaseQuantity = (productId, typeId) => {
     const cloneCart = cloneDeep(cart)
-    cloneCart.products.forEach((product) => {
-      if (product.productId === productId) {
+    cloneCart.itemList.forEach((product) => {
+      if (product.productId === productId && product.typeId === typeId) {
         product.quantity = product.quantity + 1
       }
     })
@@ -77,9 +77,9 @@ function CartPage() {
     },
     {
       header: 'Ảnh sản phẩm',
-      accessorKey: 'thumbnailUrl',
+      accessorKey: 'avatar',
       cell: ({ row }) => <img
-        src={row.getValue('thumbnailUrl')}
+        src={row.getValue('avatar')}
         alt={row.getValue('name')}
         className='w-20 h-20'
       />
@@ -94,7 +94,16 @@ function CartPage() {
       accessorKey: 'price',
       cell: ({ row }) => (
         <div>
-          {row.getValue('price').toLocaleString('vi-VN')}<sup>đ</sup>
+          {row.original.type.price.toLocaleString('vi-VN')}<sup>đ</sup>
+        </div>
+      )
+    },
+    {
+      header: 'Loại sản phẩm',
+      accessorKey: 'type',
+      cell: ({ row }) => (
+        <div>
+          {row.original.type.name}<sup>đ</sup>
         </div>
       )
     },
@@ -106,16 +115,16 @@ function CartPage() {
           <div className='flex items-center justify-between rounded-lg p-1'>
             <RiSubtractFill
               className='cursor-pointer text-xl hover:bg-mainColor2-800/40 rounded-md'
-              onClick={() => { handleDecreaseQuantity(row.original._id) }}
+              onClick={() => { handleDecreaseQuantity(row.original._id, row.original.type.typeId) }}
             />
             <input
-              value={cart?.products.find((product) => product.productId === row.original._id)?.quantity}
+              value={cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId)?.quantity}
               readOnly
               className='w-[30px] text-center mx-1.5 border-none outline-none text-md'
             />
             <IoMdAdd
               className='cursor-pointer text-xl hover:bg-mainColor2-800/40 rounded-md'
-              onClick={() => { handleIncreaseQuantity(row.original._id) }}
+              onClick={() => { handleIncreaseQuantity(row.original._id, row.original.type.typeId) }}
             />
           </div>
         )
@@ -125,7 +134,7 @@ function CartPage() {
       header: () => <div className="text-right">Thành tiền</div>,
       accessorKey: 'totalPrice',
       cell: ({ row }) => {
-        return <div className="text-right">{(row.getValue('price') * cart?.products.find((product) => product.productId === row.original._id)?.quantity).toLocaleString('vi-VN')}
+        return <div className="text-right">{(row.original.type.price * cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId)?.quantity).toLocaleString('vi-VN')}
           <sup>đ</sup></div>
       }
     }
@@ -141,10 +150,12 @@ function CartPage() {
 
   const totalPrice = () => {
     const rows = table.getRowModel().rows
-    const result = rows.reduce((sum, row, index) => {
+    const result = rows.reduce((sum, row) => {
+      let temp = 0
       if (row.getIsSelected()) {
-        return sum + row.original.price * cart.products[index].quantity
+        temp += row.original.type.price * cart.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId).quantity
       }
+      return sum + temp
     }, 0)
     return result
   }
@@ -154,7 +165,7 @@ function CartPage() {
       <div className="grid grid-cols-4 gap-5">
         <div className="col-span-3 py-4 h-[100vh]">
           <div className='font-semibold text-2xl text-mainColor2-800 mb-4'>Giỏ Hàng Của Bạn</div>
-          {!cart || !cart?.products.length
+          {!cart || !cart?.itemList.length
             ? <p>Giỏ hàng của bạn đang trống.</p>
             : <div>
               <Table>
@@ -194,7 +205,7 @@ function CartPage() {
                 </TableBody>
                 <TableFooter className="bg-transparent">
                   <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={5}>Tổng thành tiền</TableCell>
+                    <TableCell colSpan={6}>Tổng thành tiền</TableCell>
                     <TableCell className="text-right">
                       <div className="total-price text-right">{totalPrice()?.toLocaleString('vi-VN') || 0}
                         <sup>đ</sup></div>

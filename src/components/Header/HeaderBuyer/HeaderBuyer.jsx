@@ -62,7 +62,6 @@ import {
 function HeaderBuyer() {
   const navigate = useNavigate()
 
-  const cart = useSelector(selectCurrentCart)
   const currentUser = useSelector(selectCurrentUser)
   const currentCart = useSelector(selectCurrentCart)
   const dispatch = useDispatch()
@@ -127,7 +126,7 @@ function HeaderBuyer() {
                 <div className='relative cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform'>
                   <LuShoppingCart className='text-mainColor1-600 text-xl' />
                   <Badge className="w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-600">
-                    {cart?.products?.length || 0}
+                    {currentCart?.itemList?.length || 0}
                   </Badge>
                 </div>
               </SheetTrigger>
@@ -136,7 +135,7 @@ function HeaderBuyer() {
                   <SheetTitle className='flex items-center justify-between'>
                     <div>
                       Giỏ hàng của bạn {' '}
-                      <span className='text-sm text-gray-700'>(4)</span>
+                      <span className='text-sm text-gray-700'>({currentCart?.itemList.length})</span>
                     </div>
                     <SheetClose asChild>
                       <Link to='/buyer/cart' className='text-mainColor1-400 font-normal text-sm'>Xem tất cả</Link>
@@ -148,9 +147,9 @@ function HeaderBuyer() {
                   </SheetDescription>
                 </SheetHeader>
                 <div className="py-4">
-                  {currentCart?.fullProducts.map((product, index) => (
+                  {currentCart?.fullProducts?.map((product, index) => (
                     <div key={index} className='flex items-center gap-2 my-3 overflow-hidden'>
-                      <img src={product?.thumbnailUrl} alt="" width={40} height={40} />
+                      <img src={product?.avatar} alt="" width={40} height={40} />
                       <div className='flex flex-col gap-1'>
                         <TooltipProvider>
                           <Tooltip>
@@ -163,8 +162,8 @@ function HeaderBuyer() {
                           </Tooltip>
                         </TooltipProvider>
                         <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
-                          <Badge className='bg-mainColor2-800/90'>{currentCart?.products[index].quantity} sản phẩm</Badge>
-                          <span className='text-[0.8rem] text-muted-foreground'>x {product?.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
+                          <Badge className='bg-mainColor2-800/90'>{currentCart?.itemList[index].quantity} sản phẩm</Badge>
+                          <span className='text-[0.8rem] text-muted-foreground'>x {product?.type.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
                         </div>
                       </div>
                     </div>
