@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import Rating from 'react-rating'
 
@@ -31,13 +31,16 @@ import { FaRegCommentDots, FaRegStar, FaRegThumbsUp, FaStar } from 'react-icons/
 import { IoShareSocialOutline } from 'react-icons/io5'
 import { DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
 import Product from '~/components/Product/Product'
+import { addToCartAPI } from '~/redux/cart/cartSlice'
 
 
 function ProductDetailPage() {
+  const dispatch = useDispatch()
   const { productId } = useParams()
 
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
+  const [typeId, setTypeId] = useState()
   const [recommendedProducts, setRecommendedProducts] = useState([])
 
   useEffect(() => {
@@ -62,46 +65,19 @@ function ProductDetailPage() {
       })
   }, [productId])
 
-  // const handleAddToCart = () => {
-  //   axiosApi
-  //     .post('api/v1/cart/add', {
-  //       cartId: localStorage.getItem('cartId'),
-  //       productId: productId,
-  //       quantity: quantity
-  //     })
-  //     .then((res) => {
-  //       Swal.fire({
-  //         toast: true,
-  //         position: 'top-end',
-  //         showConfirmButton: false,
-  //         timer: 1500,
-  //         timerProgressBar: true,
-  //         didOpen: (toast) => {
-  //           toast.onmouseenter = Swal.stopTimer
-  //           toast.onmouseleave = Swal.resumeTimer
-  //         },
-  //         icon: 'success',
-  //         title: 'Thêm vào giỏ hàng thành công!'
-  //       })
-  //       if (res.data.hasQuantityUpdated)
-  //         dispatch(increaseCartQuantity(1))
-  //     })
-  //     .catch(() => {
-  //       Swal.fire({
-  //         toast: true,
-  //         position: 'top-end',
-  //         showConfirmButton: false,
-  //         timer: 1500,
-  //         timerProgressBar: true,
-  //         didOpen: (toast) => {
-  //           toast.onmouseenter = Swal.stopTimer
-  //           toast.onmouseleave = Swal.resumeTimer
-  //         },
-  //         icon: 'error',
-  //         title: 'Không thể thêm sản phẩm vào giỏ hàng!'
-  //       })
-  //     })
-  // }
+  const handleAddToCart = () => {
+    const data = {
+      productId,
+      typeId,
+      quantity
+    }
+    toast.promise(
+      dispatch(addToCartAPI(data)),
+      { pending: 'Đang xử lý...' }
+    ).then(res => {
+      if (!res.error) toast.success('Thêm vào giỏ hàng thành công!')
+    })
+  }
 
   const handleAddComment = (data) => {
     const { comment } = data
@@ -356,7 +332,7 @@ function ProductDetailPage() {
 
               <div className='flex flex-col gap-2 mt-4 mb-2'>
                 <Button className='w-full bg-mainColor1-800 hover:bg-mainColor1-600 hover:drop-shadow-xl text-lg'>Mua ngay</Button>
-                <Button className='w-full bg-white border-mainColor2-800 text-mainColor2-800 border hover:bg-mainColor2-800/90 hover:text-white'>Thêm vào giỏ hàng</Button>
+                <Button className='w-full bg-white border-mainColor2-800 text-mainColor2-800 border hover:bg-mainColor2-800/90 hover:text-white' onClick={handleAddToCart}>Thêm vào giỏ hàng</Button>
               </div>
             </div>
 

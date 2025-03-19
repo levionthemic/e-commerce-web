@@ -9,6 +9,15 @@ export const fetchCurrentCartAPI = createAsyncThunk(
     return response.data
   }
 )
+
+export const addToCartAPI = createAsyncThunk(
+  'cart/addToCartAPI',
+  async (data) => {
+    const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/cart/add`, data)
+    return response.data
+  }
+)
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
@@ -23,8 +32,10 @@ const cartSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchCurrentCartAPI.fulfilled, (state, action) => {
       state.currentCart = action.payload
+    }),
+    builder.addCase(addToCartAPI.fulfilled, (state, action) => {
+      state.currentCart = action.payload
     })
-
   }
 })
 
