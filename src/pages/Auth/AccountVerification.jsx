@@ -7,14 +7,14 @@ function AccountVerification() {
   const [isVerified, setVerified] = useState(false)
 
   const [searchParams] = useSearchParams()
-  const { email, token } = Object.fromEntries([...searchParams])
+  const { email, token, role } = Object.fromEntries([...searchParams])
 
   useEffect(() => {
-    if (email && token) {
-      verifyUserAPI({ email, token })
+    if (email && token && role) {
+      verifyUserAPI({ email, token, role })
         .then(() => setVerified(true))
     }
-  }, [email, token])
+  }, [email, token, role])
 
   if (!email || !token) {
     return <Navigate to='/404' />
