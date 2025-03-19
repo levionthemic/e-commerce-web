@@ -26,6 +26,7 @@ import Comments from '~/pages/Seller/Comments/Comments'
 import Inventory from '~/pages/Seller/Store/Inventory/Inventory'
 import StoreProfile from './pages/Seller/Store/Profile/Profile'
 import Completion from './pages/Buyer/CheckoutPage/Completion'
+import CreateForm from './pages/Seller/Products/CreateForm/CreateForm'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -69,6 +70,7 @@ function App() {
         <Route path='/seller' element={<SellerLayout />}>
           <Route index element={<DashboardSeller />} />
           <Route path='products' element={<ProductsSeller />} />
+          <Route path='products/add' element={<CreateForm />} />
           <Route path='orders' element={<OrdersSeller />} />
           <Route path='store/profile' element={<StoreProfile />} />
           <Route path='store/inventory' element={<Inventory />} />

@@ -73,6 +73,7 @@ import {
   TrashIcon
 } from 'lucide-react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 
 // Custom filter function for multi-column searching
@@ -109,73 +110,60 @@ const columns = [
     ),
     size: 28,
     enableSorting: false,
-    enableHiding: false
+    enableHiding: false,
+    enableResizing: false
   },
   {
-    header: 'Name',
-    accessorKey: 'name',
-    cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>,
-    size: 180,
-    filterFn: multiColumnFilterFn,
-    enableHiding: false
+    id: 'name',
+    header: 'Tên sản phẩm',
+    accessorKey: 'name'
   },
   {
-    header: 'Email',
-    accessorKey: 'email',
-    size: 220
+    id: 'category',
+    header: 'Danh mục',
+    accessorKey: 'category'
   },
   {
-    header: 'Location',
-    accessorKey: 'location',
-    cell: ({ row }) => (
-      <div>
-        <span className="text-lg leading-none">{row.original.flag}</span> {row.getValue('location')}
-      </div>
-    ),
-    size: 180
+    id: 'discount',
+    header: 'Giảm giá',
+    accessorKey: 'discount'
   },
   {
-    header: 'Status',
-    accessorKey: 'status',
-    cell: ({ row }) => (
-      <Badge
-        className={cn(
-          row.getValue('status') === 'Inactive' && 'bg-muted-foreground/60 text-primary-foreground'
-        )}
-      >
-        {row.getValue('status')}
-      </Badge>
-    ),
-    size: 100,
-    filterFn: statusFilterFn
+    id: 'avgPrice',
+    header: 'Giá trung bình',
+    accessorKey: 'avgPrice'
   },
   {
-    header: 'Performance',
-    accessorKey: 'performance'
+    id: 'avatar',
+    header: 'Hình ảnh',
+    accessorKey: 'avatar'
   },
   {
-    header: 'Balance',
-    accessorKey: 'balance',
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('balance'))
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(amount)
-      return formatted
-    },
-    size: 120
+    id: 'rating',
+    header: 'Đánh giá',
+    accessorKey: 'rating'
+  },
+  {
+    id: 'sold',
+    header: 'Đã bán',
+    accessorKey: 'sold'
+  },
+  {
+    id: 'deleted',
+    header: 'Trạng thái',
+    accessorKey: 'deleted'
   },
   {
     id: 'actions',
-    header: () => <span className="sr-only">Actions</span>,
     cell: ({ row }) => <RowActions row={row} />,
-    size: 60,
+    size: 50,
+    enableResizing: false,
     enableHiding: false
   }
 ]
 
 export default function ProductTable() {
+  const navigate = useNavigate()
   const id = useId()
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
@@ -216,6 +204,7 @@ export default function ProductTable() {
   const table = useReactTable({
     data,
     columns,
+    columnResizeMode: 'onChange',
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
@@ -253,7 +242,7 @@ export default function ProductTable() {
   }, [table])
 
   const selectedStatuses = useMemo(() => {
-    const filterValue = table.getColumn('status')?.getFilterValue()
+    const filterValue = table.getColumn('deleted')?.getFilterValue()
     return filterValue ?? []
   }, [table])
 
@@ -361,7 +350,7 @@ export default function ProductTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+              <DropdownMenuLabel>Hiển thị cột</DropdownMenuLabel>
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -369,7 +358,6 @@ export default function ProductTable() {
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                       onSelect={(event) => event.preventDefault()}
@@ -404,23 +392,22 @@ export default function ProductTable() {
                     <CircleAlertIcon className="opacity-80" size={16} />
                   </div>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete{' '}
-                      {table.getSelectedRowModel().rows.length} selected{' '}
-                      {table.getSelectedRowModel().rows.length === 1 ? 'row' : 'rows'}.
+                      Hành động này không thể khôi phục. Hệ thống sẽ xóa vĩnh viễn{' '}
+                      {table.getSelectedRowModel().rows.length} {' '} hàng đã chọn.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                 </div>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteRows}>Delete</AlertDialogAction>
+                  <AlertDialogCancel>Hủy</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDeleteRows}>Xóa vĩnh viễn</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
           )}
           {/* Add user button */}
-          <Button className="ml-auto" variant="outline">
+          <Button className="ml-auto" variant="outline" onClick={() => {navigate('/seller/products/add')}}>
             <PlusIcon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
               Thêm sản phẩm
           </Button>
@@ -428,38 +415,54 @@ export default function ProductTable() {
       </div>
 
       {/* Table */}
-      <div className="bg-background overflow-hidden rounded-md border">
-        <Table className="table-fixed">
+      <div className='bg-white overflow-hidden border rounded-lg'>
+        <Table
+          className="table-fixed"
+          style={{
+            width: table.getCenterTotalSize()
+          }}
+        >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              <TableRow key={headerGroup.id} className="bg-muted/50">
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
                       key={header.id}
-                      style={{ width: `${header.getSize()}px` }}
-                      className="h-11"
+                      className="relative h-10 border-t select-none last:[&>.cursor-col-resize]:opacity-0"
+                      aria-sort={
+                        header.column.getIsSorted() === 'asc'
+                          ? 'ascending'
+                          : header.column.getIsSorted() === 'desc'
+                            ? 'descending'
+                            : 'none'
+                      }
+                      {...{
+                        colSpan: header.colSpan,
+                        style: {
+                          width: header.getSize()
+                        }
+                      }}
                     >
-                      {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                      {header.isPlaceholder ? null : (
                         <div
                           className={cn(
                             header.column.getCanSort() &&
-                              'flex h-full cursor-pointer items-center justify-between gap-2 select-none'
+                            'flex h-full cursor-pointer items-center justify-between gap-2 select-none'
                           )}
                           onClick={header.column.getToggleSortingHandler()}
                           onKeyDown={(e) => {
-                            // Enhanced keyboard handling for sorting
-                            if (
-                              header.column.getCanSort() &&
-                              (e.key === 'Enter' || e.key === ' ')
-                            ) {
+                          // Enhanced keyboard handling for sorting
+                            if (header.column.getCanSort() && (e.key === 'Enter' || e.key === ' ')) {
                               e.preventDefault()
                               header.column.getToggleSortingHandler()?.(e)
                             }
                           }}
                           tabIndex={header.column.getCanSort() ? 0 : undefined}
                         >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <span className="truncate">
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </span>
                           {{
                             asc: (
                               <ChevronUpIcon
@@ -477,8 +480,17 @@ export default function ProductTable() {
                             )
                           }[header.column.getIsSorted()] ?? null}
                         </div>
-                      ) : (
-                        flexRender(header.column.columnDef.header, header.getContext())
+                      )}
+                      {header.column.getCanResize() && (
+                        <div
+                          {...{
+                            onDoubleClick: () => header.column.resetSize(),
+                            onMouseDown: header.getResizeHandler(),
+                            onTouchStart: header.getResizeHandler(),
+                            className:
+                            'absolute top-0 h-full w-4 cursor-col-resize user-select-none touch-none -right-2 z-10 flex justify-center before:absolute before:w-px before:inset-y-0 before:!bg-gray-800 before:translate-x-px'
+                          }}
+                        />
                       )}
                     </TableHead>
                   )
@@ -491,7 +503,7 @@ export default function ProductTable() {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="last:py-0">
+                    <TableCell key={cell.id} className="truncate">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -500,7 +512,7 @@ export default function ProductTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                No results.
                 </TableCell>
               </TableRow>
             )}
@@ -513,7 +525,7 @@ export default function ProductTable() {
         {/* Results per page */}
         <div className="flex items-center gap-3">
           <Label htmlFor={id} className="max-sm:sr-only">
-            Rows per page
+            Số dòng / trang
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
@@ -547,7 +559,7 @@ export default function ProductTable() {
                 table.getRowCount()
               )}
             </span>{' '}
-            of <span className="text-foreground">{table.getRowCount().toString()}</span>
+            của <span className="text-foreground">{table.getRowCount().toString()}</span>
           </p>
         </div>
 
@@ -611,18 +623,6 @@ export default function ProductTable() {
           </Pagination>
         </div>
       </div>
-
-      <p className="text-muted-foreground mt-4 text-center text-sm">
-        Example of a more complex table made with{' '}
-        <a
-          className="hover:text-foreground underline"
-          href="https://tanstack.com/table"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          TanStack Table
-        </a>
-      </p>
     </div>
   )
 }
