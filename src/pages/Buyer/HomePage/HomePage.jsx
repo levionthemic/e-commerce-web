@@ -30,12 +30,7 @@ function HomePage() {
   useEffect(() => {
     getProductsAPI().then((data) => {
       const bestSellingProducts = data.products
-        .filter((product) => product.quantitySold > 0 )
-        .sort((a, b) => b.quantitySold - a.quantitySold)
-        .slice(0, 50)
       const recommendedProducts = data.products
-        .filter((product) => product.rate !== null && product.rate !== undefined)
-        .sort((a, b) => b.rate - a.rate)
       setBestSellingProducts(bestSellingProducts)
       setRecommendedProducts(recommendedProducts)
     })
@@ -154,7 +149,7 @@ function HomePage() {
                 ? categories.map((category) => (
                   <CarouselItem className='basis-1/3 sm:basis-1/4 md:basis-1/5 lg:basis-1/6' key={category._id}>
                     <div className='border border-mainColor2-100 rounded-md flex flex-col items-center p-1 cursor-pointer hover:border-[3px] hover:shadow-md'>
-                      <img src={category.iconUrl} alt="" className='w-24 h-24 mb-1'/>
+                      <img src={category.avatar} alt="" className='w-24 h-24 mb-1 object-cover'/>
                       <div className='text-mainColor2-800 font-medium line-clamp-1 text-center'>{category.name}</div>
                     </div>
                   </CarouselItem>

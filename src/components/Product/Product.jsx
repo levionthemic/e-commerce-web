@@ -15,8 +15,6 @@ import {
 import { Skeleton } from '~/components/ui/skeleton'
 import { Separator } from '~/components/ui/separator'
 
-import { IoMdStarOutline } from 'react-icons/io'
-import { IoMdStar } from 'react-icons/io'
 import { FaRegStar, FaStar } from 'react-icons/fa'
 
 function Product({ product, loading }) {
@@ -29,7 +27,7 @@ function Product({ product, loading }) {
       <CardContent className='p-2' onClick={() => navigate(`/buyer/product/${product._id}`)}>
         {loading
           ? <Skeleton className='w-full aspect-square'/>
-          : <img src={product?.thumbnailUrl} alt="" className='w-full aspect-square object-contain'/>
+          : <img src={product?.avatar} alt="" className='w-full aspect-square object-contain'/>
         }
       </CardContent>
 
@@ -44,24 +42,24 @@ function Product({ product, loading }) {
           : <CardDescription>
             <div className='text-lg font-bold text-[#ff4d4f] mb-1 text-justify'>
               {(
-                product?.price *
-                (1 - product?.discountPercentage / 100)
+                product?.avgPrice *
+                (1 - product?.discount / 100)
               ).toLocaleString()}
               <sup>đ</sup>
             </div>
             <div className='text-sm text-gray-400 flex justify-between items-center my-2'>
               <div className='flex items-center gap-2'>
-                <span>{product?.rate || '0'}</span>
+                <span>{product?.rating || '0'}</span>
                 <Rating
                   emptySymbol={<FaRegStar />}
                   fullSymbol={<FaStar />}
-                  initialRating={product?.rate || 0}
+                  initialRating={product?.rating || 0}
                   readonly
                   className='text-[#FBCA04] text-md leading-none'
                 />
               </div>
 
-              <span>| Đã bán: {product?.quantitySold || 0}</span>
+              <span>| Đã bán: {product?.sold || 0}</span>
             </div>
           </CardDescription>
         }

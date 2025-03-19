@@ -43,8 +43,6 @@ function ProductDetailPage() {
   useEffect(() => {
     getProductsAPI().then((data) => {
       const recommendedProducts = data.products
-        .filter((product) => product.rate !== null && product.rate !== undefined)
-        .sort((a, b) => b.rate - a.rate)
       setRecommendedProducts(recommendedProducts)
     })
   }, [])
@@ -154,7 +152,7 @@ function ProductDetailPage() {
               <div className="bg-white flex items-center justify-center h-fit rounded-md p-4 pb-32 sticky top-3 left-0 max-h-fit">
                 <div className='rounded-2xl overflow-hidden border'>
                   <img
-                    src={product?.thumbnailUrl}
+                    src={product?.avatar}
                     alt={product?.name}
                     className='h-[350px] w-[350px] scale-105 object-cover'
                   />
@@ -167,7 +165,7 @@ function ProductDetailPage() {
                   <div className='font-bold text-mainColor1-600 text-2xl'>{product?.name}</div>
 
                   <div className='flex items-center gap-2 text-sm mt-2'>
-                    <span>{product?.rate || 0}</span>
+                    <span>{product?.rating || 0}</span>
                     <Rating
                       emptySymbol={<IoMdStarOutline />}
                       fullSymbol={<IoMdStar />}
@@ -178,24 +176,24 @@ function ProductDetailPage() {
                     <div style={{ border: '1px solid #ddd', height: '20px' }}></div>
                     <div>
                   Đã bán:{' '}
-                      {product?.quantitySold || '0'}
+                      {product?.sold || '0'}
                     </div>
                   </div>
 
                   <div className='flex items-center gap-2 mt-2'>
                     <div className='text-[#f90606] font-bold text-2xl tracking-wide'>
                       {(
-                        product?.price * (1 - product?.discountPercentage / 100)
+                        product?.avgPrice * (1 - product?.discount / 100)
                       ).toLocaleString()}
                       <sup>đ</sup>
                     </div>
 
                     <div className='bg-[#ddd] rounded-xl px-1 text-xs'>
-                      {`-${product?.discountPercentage}%`}
+                      {`-${product?.discount}%`}
                     </div>
 
                     <div className='text-gray-500 line-through text-sm'>
-                      {product?.price.toLocaleString()}
+                      {product?.avgPrice.toLocaleString()}
                       <sup>đ</sup>
                     </div>
                   </div>
@@ -277,7 +275,7 @@ function ProductDetailPage() {
                             <Rating
                               emptySymbol={<FaRegStar />}
                               fullSymbol={<FaStar />}
-                              initialRating={product?.rate || 0}
+                              initialRating={product?.rating || 0}
                               readonly
                               className='text-[#FBCA04] text-xl leading-none'
                             />
@@ -315,7 +313,7 @@ function ProductDetailPage() {
 
               <div className='flex items-center justify-between text-sm'>
                 <span>Số sản phẩm còn lại:</span>
-                <span>{product?.quantityInStock}</span>
+                <span>{product?.quantityInStock || 0}</span>
               </div>
 
               <Separator className='my-3' />
@@ -350,7 +348,7 @@ function ProductDetailPage() {
                 <div className='mb-1 text-mainColor1-800/90'>Tạm tính</div>
                 <div className='text-gray-700 font-bold text-2xl tracking-normal'>
                   {(
-                    product?.price * (1 - product?.discountPercentage / 100)
+                    product?.avgPrice * (1 - product?.discount / 100)
                   ).toLocaleString()}
                   <sup>đ</sup>
                 </div>
