@@ -32,6 +32,8 @@ import { IoShareSocialOutline } from 'react-icons/io5'
 import { DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
 import Product from '~/components/Product/Product'
 import { addToCartAPI } from '~/redux/cart/cartSlice'
+import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
+import { Label } from '~/components/ui/label'
 
 
 function ProductDetailPage() {
@@ -41,6 +43,8 @@ function ProductDetailPage() {
   const [product, setProduct] = useState(null)
   const [quantity, setQuantity] = useState(1)
   const [typeId, setTypeId] = useState()
+  const [productTypes, setProductTypes] = useState([])
+  const [productEndPrice, setProductEndPrice] = useState()
   const [recommendedProducts, setRecommendedProducts] = useState([])
 
   useEffect(() => {
@@ -49,6 +53,10 @@ function ProductDetailPage() {
       setRecommendedProducts(recommendedProducts)
     })
   }, [])
+
+  useEffect(() => {
+    if (typeId) setProductEndPrice(productTypes.find(type => type.typeId === typeId)?.price)
+  }, [productTypes, typeId])
 
   const { handleSubmit, register, resetField } = useForm({
     defaultValues: {
@@ -62,6 +70,8 @@ function ProductDetailPage() {
     getProductDetailsAPI(productId)
       .then((data) => {
         setProduct(data)
+        setProductEndPrice(data?.avgPrice)
+        setProductTypes(data?.productTypes[0]?.types)
       })
   }, [productId])
 
@@ -98,6 +108,7 @@ function ProductDetailPage() {
     })
 
   }
+
 
   if (!product) {
     return <Loader caption={'Đang tải...'} />
@@ -151,7 +162,7 @@ function ProductDetailPage() {
                     />
                     <div style={{ border: '1px solid #ddd', height: '20px' }}></div>
                     <div>
-                  Đã bán:{' '}
+                      Đã bán:{' '}
                       {product?.sold || '0'}
                     </div>
                   </div>
@@ -159,7 +170,7 @@ function ProductDetailPage() {
                   <div className='flex items-center gap-2 mt-2'>
                     <div className='text-[#f90606] font-bold text-2xl tracking-wide'>
                       {(
-                        product?.avgPrice * (1 - product?.discount / 100)
+                        productEndPrice * (1 - product?.discount / 100)
                       ).toLocaleString()}
                       <sup>đ</sup>
                     </div>
@@ -172,6 +183,34 @@ function ProductDetailPage() {
                       {product?.avgPrice.toLocaleString()}
                       <sup>đ</sup>
                     </div>
+                  </div>
+
+                  <div className='mt-5'>
+                    <div className="text-mainColor1-600 font-medium mb-2">Loại sản phẩm</div>
+                    <fieldset className="space-y-4">
+                      <RadioGroup className="gap-0 -space-y-px rounded-md shadow-xs" onValueChange={setTypeId}>
+                        {productTypes.map((type) => (
+                          <div
+                            key={type.typeId}
+                            className="border-input has-data-[state=checked]:border-ring has-data-[state=checked]:bg-accent relative flex flex-col gap-4 border px-4 py-3 outline-none first:rounded-t-md last:rounded-b-md has-data-[state=checked]:z-10"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <RadioGroupItem
+                                  id={type.typeId}
+                                  value={type.typeId}
+                                  className="after:absolute after:inset-0"
+                                />
+                                <Label className="inline-flex items-start" htmlFor={type.typeId}>
+                                  {type.name}
+                                </Label>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </fieldset>
+
                   </div>
                 </div>
 
@@ -324,7 +363,7 @@ function ProductDetailPage() {
                 <div className='mb-1 text-mainColor1-800/90'>Tạm tính</div>
                 <div className='text-gray-700 font-bold text-2xl tracking-normal'>
                   {(
-                    product?.avgPrice * (1 - product?.discount / 100)
+                    productEndPrice * (1 - product?.discount / 100)
                   ).toLocaleString()}
                   <sup>đ</sup>
                 </div>
