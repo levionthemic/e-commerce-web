@@ -8,3 +8,11 @@ export const PAGE_TYPE = {
 
 export const DEFAULT_ITEMS_PER_PAGE = 40
 export const DEFAULT_PAGE = 1
+
+export const COMMENTS = ['Rất không hài lòng', 'Không hài lòng', 'Bình thường', 'Hài lòng', 'Cực kì hài lòng']
+
+export const GENDER = {
+  MALE: 'male',
+  FEMALE: 'female',
+  OTHER: 'other'
+}

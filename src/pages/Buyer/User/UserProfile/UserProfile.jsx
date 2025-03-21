@@ -17,7 +17,7 @@ import {
 import UploadAvatar from '~/components/UploadAvatar'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
-import { EMAIL_RULE, EMAIL_RULE_MESSAGE } from '~/utils/validators'
+import { EMAIL_RULE, EMAIL_RULE_MESSAGE, FIELD_REQUIRED_MESSAGE, PHONE_NUMBER_RULE, PHONE_NUMBER_RULE_MESSAGE } from '~/utils/validators'
 import { IoIosLogOut, IoMdStar, IoMdStarOutline } from 'react-icons/io'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import UserHeader from '~/pages/Buyer/User/UserHeader'
@@ -36,6 +36,7 @@ import { toast } from 'sonner'
 import Rating from 'react-rating'
 import { useId, useState } from 'react'
 import { Switch } from '~/components/ui/switch'
+import { GENDER } from '~/utils/constants'
 
 function UserProfile() {
   const dispatch = useDispatch()
@@ -49,27 +50,46 @@ function UserProfile() {
   const currentUser = useSelector(selectCurrentUser)
 
   const joiSchema = Joi.object({
-    email: Joi.string().pattern(EMAIL_RULE).message(EMAIL_RULE_MESSAGE),
-    address: Joi.string(),
-    phoneNumber: Joi.string(),
-    username: Joi.string()
+    email: Joi.string().pattern(EMAIL_RULE).messages({
+      'string.empty': FIELD_REQUIRED_MESSAGE,
+      'string.pattern.base': EMAIL_RULE_MESSAGE
+    }),
+    address: Joi.string().messages({
+      'string.empty': FIELD_REQUIRED_MESSAGE
+    }),
+    phone: Joi.string().pattern(PHONE_NUMBER_RULE).message(PHONE_NUMBER_RULE_MESSAGE).messages({
+      'string.empty': FIELD_REQUIRED_MESSAGE
+    }),
+    username: Joi.string(),
+    name: Joi.string().messages({
+      'string.empty': FIELD_REQUIRED_MESSAGE
+    }),
+    gender: Joi.string().valid(...Object.values(GENDER)).messages({
+      'string.empty': FIELD_REQUIRED_MESSAGE
+    })
   })
 
   const leftForm = useForm({
     resolver: joiResolver(joiSchema),
     defaultValues: {
-      email: currentUser.email,
-      address: '',
-      phoneNumber: ''
+      address: currentUser?.address || '',
+      phone: currentUser?.phone || '',
+      name: currentUser?.name || '',
+      gender: currentUser?.gender || 'male'
     }
   })
 
   const rightForm = useForm({
     resolver: joiResolver(joiSchema),
     defaultValues: {
-      username: currentUser?.username || ''
+      username: currentUser?.username,
+      email: currentUser?.email
     }
   })
+
+  const handleLeftFormSubmit = (data) => {
+    console.log(data);
+  }
 
   const id = useId()
   const [checked, setChecked] = useState(true)
@@ -91,7 +111,7 @@ function UserProfile() {
             <div className='my-4'>
               <div className='text-lg font-medium text-mainColor2-800'>Thông tin cá nhân</div>
               <Form {...leftForm}>
-                <form action="#" onSubmit={leftForm.handleSubmit()}>
+                <form action="#" onSubmit={leftForm.handleSubmit(handleLeftFormSubmit)}>
 
                   <FormField
                     control={leftForm.control}
@@ -113,7 +133,7 @@ function UserProfile() {
                     )}
                   />
 
-                  <div className="grid grid-cols-2 my-4">
+                  <div className="grid grid-cols-2 my-4 gap-4">
                     <FormField
                       control={leftForm.control}
                       name="gender"
@@ -197,26 +217,6 @@ function UserProfile() {
                     )}
                   />
 
-                  <FormField
-                    control={leftForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem className='my-4'>
-                        <FormLabel className='text-base'>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['email'] && 'border-red-500'}`}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormDescription>
-                          Email của bạn
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <div className="flex justify-center">
                     <Button type="submit" className="w-[70%] rounded-full bg-mainColor2-800 text-white tex-lg uppercase">Cập nhật</Button>
                   </div>
@@ -242,6 +242,26 @@ function UserProfile() {
                         </FormControl>
                         <FormDescription>
                           Tên tài khoản của bạn.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={rightForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem className='my-4'>
+                        <FormLabel className='text-base'>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['email'] && 'border-red-500'}`}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Mỗi tài khoản chỉ có duy nhất 1 email.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -408,7 +428,7 @@ function UserProfile() {
                 </AlertDialogContent>
               </AlertDialog>
               <UploadAvatar previewUrl={currentUser?.avatar} />
-              <div className='text-xl mt-2 text-mainColor2-800 font-medium'>{currentUser.name}</div>
+              <div className='text-xl mt-2 text-mainColor2-800 font-medium'>{currentUser.username}</div>
               <div className='text-xs text-mainColor2-800/90'>{currentUser.email}</div>
             </div>
             <div className="bg-white rounded-xl grid grid-cols-2 mx-6 py-4 gap-y-3">

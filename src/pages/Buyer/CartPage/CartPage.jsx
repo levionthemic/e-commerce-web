@@ -42,13 +42,16 @@ function CartPage() {
 
   const handleIncreaseQuantity = (productId, typeId) => {
     const cloneCart = cloneDeep(cart)
+    let newQuantity = 0
     cloneCart.itemList.forEach((product) => {
       if (product.productId === productId && product.typeId === typeId) {
         product.quantity = product.quantity + 1
+        newQuantity = product.quantity
       }
     })
 
     dispatch(setCart(cloneCart))
+    dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
   }
 
   const columns = [

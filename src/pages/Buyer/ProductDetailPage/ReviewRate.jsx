@@ -1,7 +1,18 @@
 import { Label } from '~/components/ui/label'
 import { FaStar } from 'react-icons/fa'
+import { useEffect, useState } from 'react'
+import { cloneDeep } from 'lodash'
 
-export default function ReviewRate() {
+export default function ReviewRate({ comments }) {
+  const [stats, setStats] = useState([0, 0, 0, 0, 0])
+  useEffect(() => {
+    const newStats = cloneDeep(stats)
+    comments?.forEach((comment) => {
+      newStats[comment.rating - 1]++
+    })
+    setStats(newStats)
+  }, [])
+
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center gap-2">
@@ -15,7 +26,7 @@ export default function ReviewRate() {
           </span>
           <span className="sr-only">5 stars</span>{' '}
           <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
-            (5,168)
+            ({stats[4]})
           </span>
         </Label>
       </div>
@@ -30,7 +41,7 @@ export default function ReviewRate() {
           </span>
           <span className="sr-only">4 stars</span>{' '}
           <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
-            (4,726)
+          ({stats[3]})
           </span>
         </Label>
       </div>
@@ -45,7 +56,7 @@ export default function ReviewRate() {
           </span>
           <span className="sr-only">3 stars</span>{' '}
           <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
-            (3,234)
+          ({stats[2]})
           </span>
         </Label>
       </div>
@@ -60,7 +71,7 @@ export default function ReviewRate() {
           </span>
           <span className="sr-only">2 stars</span>{' '}
           <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
-            (1,842)
+          ({stats[1]})
           </span>
         </Label>
       </div>
@@ -74,7 +85,7 @@ export default function ReviewRate() {
             <FaStar size={16} className="opacity-30" />
           </span>
           <span className="sr-only">1 star</span>{' '}
-          <span className="text-muted-foreground text-xs leading-[inherit] font-normal">(452)</span>
+          <span className="text-muted-foreground text-xs leading-[inherit] font-normal">({stats[0]})</span>
         </Label>
       </div>
     </div>

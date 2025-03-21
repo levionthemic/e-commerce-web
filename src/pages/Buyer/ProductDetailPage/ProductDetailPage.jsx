@@ -8,12 +8,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { IoMdAdd, IoMdStar, IoMdStarOutline } from 'react-icons/io'
 import { RiSubtractFill } from 'react-icons/ri'
 
-import { getProductDetailsAPI, getProductsAPI, updateProductDetailAPI } from '~/apis'
+import { getProductDetailsAPI, getProductsAPI } from '~/apis'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Loader from '~/components/Loader/Loader'
 import { Button } from '~/components/ui/button'
-import { Textarea } from '~/components/ui/textarea'
-import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 
@@ -28,12 +26,13 @@ import {
 import { Separator } from '~/components/ui/separator'
 import ReviewRate from '~/pages/Buyer/ProductDetailPage/ReviewRate'
 import { FaRegCommentDots, FaRegStar, FaRegThumbsUp, FaStar } from 'react-icons/fa'
-import { IoShareSocialOutline } from 'react-icons/io5'
-import { DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
+import { IoBagCheckOutline, IoShareSocialOutline } from 'react-icons/io5'
+import { COMMENTS, DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
 import Product from '~/components/Product/Product'
 import { addToCartAPI, fetchCurrentCartAPI } from '~/redux/cart/cartSlice'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Label } from '~/components/ui/label'
+import { MdAddShoppingCart } from 'react-icons/md'
 
 
 function ProductDetailPage() {
@@ -62,12 +61,6 @@ function ProductDetailPage() {
     }
   }, [product?.types, typeId])
 
-  const { handleSubmit, register, resetField } = useForm({
-    defaultValues: {
-      comment: ''
-    }
-  })
-
   const currentUser = useSelector(selectCurrentUser)
 
   useEffect(() => {
@@ -80,14 +73,10 @@ function ProductDetailPage() {
 
   const handleAddToCart = () => {
     if (!typeId) {
-      toast.error('Bạn chưa chọn loại sản phẩm!')
+      toast.error('Bạn chưa chọn loại sản phẩm!', { position: 'top-right' })
       return
     }
-    const data = {
-      productId,
-      typeId,
-      quantity
-    }
+    const data = { productId, typeId, quantity }
     toast.promise(
       dispatch(addToCartAPI(data)).unwrap(),
       {
@@ -101,27 +90,6 @@ function ProductDetailPage() {
       }
     )
   }
-
-  const handleAddComment = (data) => {
-    const { comment } = data
-    resetField('comment')
-
-    if (!comment) return
-
-    const commentToAdd = {
-      userAvatar: currentUser?.avatar,
-      userDisplayName: currentUser?.displayName,
-      content: comment.trim()
-    }
-
-    updateProductDetailAPI(product._id, { commentToAdd: commentToAdd }).then((data) => {
-      toast.success('Bình luận thành công!')
-      resetField('comment')
-      setProduct(data)
-    })
-
-  }
-
 
   if (!product) {
     return <Loader caption={'Đang tải...'} />
@@ -149,7 +117,7 @@ function ProductDetailPage() {
         <div className='grid grid-cols-4 gap-6 relative'>
           <div className="col-span-3">
             <div className="grid grid-cols-3 gap-6 h-fit relative mb-6">
-              <div className="bg-white flex items-center justify-center h-fit rounded-md p-4 pb-32 sticky top-3 left-0 max-h-fit">
+              <div className="bg-white flex items-center justify-center h-fit rounded-lg p-4 pb-32 sticky top-3 left-0 max-h-fit">
                 <div className='rounded-2xl overflow-hidden border'>
                   <img
                     src={product?.avatar}
@@ -160,7 +128,7 @@ function ProductDetailPage() {
               </div>
 
               <div className="col-span-2">
-                <div className='rounded-lg bg-white p-3 mb-4'>
+                <div className='rounded-lg bg-white p-4 mb-6'>
                   <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset mb-2">Còn hàng!</span>
                   <div className='font-bold text-mainColor1-600 text-2xl'>{product?.name}</div>
 
@@ -169,7 +137,7 @@ function ProductDetailPage() {
                     <Rating
                       emptySymbol={<IoMdStarOutline />}
                       fullSymbol={<IoMdStar />}
-                      initialRating={product?.rate || 0}
+                      initialRating={product?.rating || 0}
                       readonly
                       className='text-[#FBCA04] text-xl leading-none'
                     />
@@ -198,7 +166,7 @@ function ProductDetailPage() {
                     </div>
                   </div>
 
-                  <div className='mt-5'>
+                  <div className='mt-10'>
                     <div className="text-mainColor1-600 font-medium mb-2">Loại sản phẩm</div>
                     <fieldset className="space-y-4">
                       <RadioGroup className="gap-0 -space-y-px rounded-md shadow-xs" onValueChange={setTypeId}>
@@ -227,39 +195,38 @@ function ProductDetailPage() {
                   </div>
                 </div>
 
-                <div className='rounded-lg bg-white p-3 mb-4'>
+                <div className='rounded-lg bg-white p-4 mb-6'>
                   <div className='text-lg font-semibold text-mainColor1-600 mb-1'>Thông tin vận chuyển</div>
                   <p className='text-sm'>Giao đến: {currentUser?.address || 'Q. 1, P. Bến Nghé, Hồ Chí Minh'}</p>
                   <div className='divider w-full h-px border border-t-0 border-gray-200 my-2'></div>
                   <div>GHTK</div>
                 </div>
 
-                <div className='rounded-lg bg-white p-3'>
+                <div className='rounded-lg bg-white p-4 mb-6'>
+                  <div className='text-lg font-semibold text-mainColor1-600 mb-3'>Thông tin chi tiết</div>
+                  {product?.features?.map((feature, index) => (
+                    <div key={index} className='mx-4'>
+                      <div className='flex items-center justify-between my-1.5'>
+                        <span className='text-sm text-gray-400'>{feature.field}</span>
+                        <span className=''>{feature.content}</span>
+                      </div>
+                      {index != product?.features?.length - 1 && <Separator />}
+                    </div>
+                  ))}
+                </div>
+
+                <div className='rounded-lg bg-white p-4'>
                   <div className='text-lg font-semibold text-mainColor1-800 mb-2'>Mô tả sản phẩm</div>
                   <div dangerouslySetInnerHTML={{ __html: product?.description }} style={{ textAlign: 'justify' }}/>
                 </div>
               </div>
             </div>
 
-
             <div className="col-span-3">
-              <div className='rounded-lg bg-white p-3 mb-4 relative h-fit'>
+              <div className='rounded-lg bg-white p-4 mb-6 relative h-fit'>
                 <div className='text-xl font-semibold text-mainColor2-800'>Bình luận sản phẩm</div>
-                <p className='text-sm text-muted-foreground'>Bạn chỉ có thể bình luận nếu đã đăng nhập!</p>
+                <p className='text-sm text-muted-foreground'>Bạn có thể xem các đánh giá từ các khách hàng khác.</p>
                 <div className='mt-4'>
-                  <form
-                    action=""
-                    onSubmit={handleSubmit(handleAddComment)}
-                    className='flex flex-col gap-3 mb-8'
-                  >
-                    <Textarea
-                      placeholder="Viết bình luận..."
-                      type="text"
-                      {...register('comment')}
-                    />
-                    <Button className='bg-mainColor2-800 w-full hover:bg-mainColor2-800/90 font-semibold text-lg'>Bình luận</Button>
-                  </form>
-
                   {(!product?.comments || product?.comments?.length === 0) &&
                   <span className='pl-12 text-md font-medium text-gray-400'>Chưa có đánh giá!</span>
                   }
@@ -276,17 +243,17 @@ function ProductDetailPage() {
                                 </Avatar>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>{comment?.userDisplayName}</p>
+                                <p>{comment?.buyerName}</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                           <div className='flex flex-col'>
                             <span className='font-bold mr-2'>
-                              {comment?.userDisplayName}
+                              {comment?.buyerName}
                             </span>
 
                             <span className='text-xs text-gray-400'>
-                              {new Date(comment?.commentedAt).toLocaleDateString('vi-VN', {
+                              {new Date(comment?.createdAt).toLocaleDateString('vi-VN', {
                                 weekday: 'long',
                                 year: 'numeric',
                                 month: 'long',
@@ -303,11 +270,11 @@ function ProductDetailPage() {
                             <Rating
                               emptySymbol={<FaRegStar />}
                               fullSymbol={<FaStar />}
-                              initialRating={product?.rating || 0}
+                              initialRating={comment?.rating || 0}
                               readonly
                               className='text-[#FBCA04] text-xl leading-none'
                             />
-                            <span className='text-xl font-semibold'>Cực kì hài lòng</span>
+                            <span className='text-xl font-semibold'>{COMMENTS[comment?.rating - 1]}</span>
                           </div>
 
                           <div className='block py-2 mt-1/2 mb-2 break-words'>
@@ -331,20 +298,20 @@ function ProductDetailPage() {
 
 
           <div className="sticky top-3 left-0 max-h-full h-fit">
-            <div className='rounded-lg bg-white p-3 mb-4'>
-              <div className='text-xl font-semibold text-mainColor1-600'>Tóm tắt</div>
+            <div className='rounded-lg bg-white p-4 mb-6'>
+              <div className='text-xl font-semibold text-mainColor1-600 mb-2'>Tóm tắt</div>
 
               <div className='flex items-center justify-between text-sm mb-2'>
-                <span className='w-[35%]'>Tên sản phẩm:</span>
+                <span className='w-[35%] text-gray-500'>Tên hàng:</span>
                 <span className='flex-1 text-right'>{product?.name}</span>
               </div>
 
               <div className='flex items-center justify-between text-sm'>
-                <span>Số sản phẩm còn lại:</span>
-                <span>{product?.quantityInStock || 0}</span>
+                <span className='text-gray-500'>Số lượng còn lại:</span>
+                <span>{product?.types.find(t => t.typeId.toString() === typeId)?.stock || 0}</span>
               </div>
 
-              <Separator className='my-3' />
+              <Separator className='my-4' />
 
               <div className='flex items-center gap-3'>
                 <div className='font-semibold text-mainColor1-800'>Số lượng:</div>
@@ -383,12 +350,15 @@ function ProductDetailPage() {
               </div>
 
               <div className='flex flex-col gap-2 mt-4 mb-2'>
-                <Button className='w-full bg-mainColor1-800 hover:bg-mainColor1-600 hover:drop-shadow-xl text-lg'>Mua ngay</Button>
-                <Button className='w-full bg-white border-mainColor2-800 text-mainColor2-800 border hover:bg-mainColor2-800/90 hover:text-white' onClick={handleAddToCart}>Thêm vào giỏ hàng</Button>
+                <Button className='w-full py-5 bg-mainColor1-800 hover:bg-mainColor1-600 hover:drop-shadow-xl text-lg'> <IoBagCheckOutline /> Mua ngay</Button>
+                <Button className='w-full bg-white border-mainColor2-800 text-mainColor2-800 border hover:bg-mainColor2-800/90 hover:text-white' onClick={handleAddToCart}>
+                  <MdAddShoppingCart />
+                  Thêm vào giỏ hàng
+                </Button>
               </div>
             </div>
 
-            <div className='rounded-lg bg-white p-3 mb-4'>
+            <div className='rounded-lg bg-white p-4 mb-6'>
               <div className='text-xl font-semibold text-mainColor1-600 mb-2'>
                 Đánh giá
               </div>
@@ -396,19 +366,19 @@ function ProductDetailPage() {
 
               <div className="my-3">
                 <div className='flex items-center gap-4 mt-3'>
-                  <span className='text-3xl font-semibold'>{product?.rate || 0}</span>
+                  <span className='text-3xl font-semibold'>{product?.rating || 0}</span>
                   <Rating
                     emptySymbol={<FaRegStar />}
                     fullSymbol={<FaStar />}
-                    initialRating={product?.rate || 0}
+                    initialRating={product?.rating || 0}
                     readonly
                     className='text-[#FBCA04] text-4xl leading-none'
                   />
                 </div>
-                <span className='text-gray-400 text-sm'>(128 đánh giá)</span>
+                <span className='text-gray-400 text-sm'>({product.comments?.length} đánh giá)</span>
               </div>
 
-              <ReviewRate />
+              <ReviewRate comments={product?.comments} />
             </div>
           </div>
         </div>
