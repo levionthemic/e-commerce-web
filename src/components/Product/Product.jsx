@@ -41,10 +41,7 @@ function Product({ product, loading }) {
           ? <Skeleton className='h-[40px]'/>
           : <CardDescription>
             <div className='text-lg font-bold text-[#ff4d4f] mb-1 text-justify'>
-              {(
-                product?.avgPrice *
-                (1 - product?.discount / 100)
-              ).toLocaleString()}
+              {product?.avgPrice.toLocaleString()}
               <sup>đ</sup>
             </div>
             <div className='text-sm text-gray-400 flex justify-between items-center my-2'>

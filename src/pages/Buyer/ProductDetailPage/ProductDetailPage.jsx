@@ -41,9 +41,9 @@ function ProductDetailPage() {
   const { productId } = useParams()
 
   const [product, setProduct] = useState(null)
+  const [discount, setDiscount] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [typeId, setTypeId] = useState()
-  const [productTypes, setProductTypes] = useState([])
   const [productEndPrice, setProductEndPrice] = useState()
   const [recommendedProducts, setRecommendedProducts] = useState([])
 
@@ -55,8 +55,12 @@ function ProductDetailPage() {
   }, [])
 
   useEffect(() => {
-    if (typeId) setProductEndPrice(productTypes.find(type => type.typeId === typeId)?.price)
-  }, [productTypes, typeId])
+    if (typeId) {
+      const type = product.types.find(type => type.typeId === typeId)
+      setProductEndPrice(type?.price)
+      setDiscount(type?.discount)
+    }
+  }, [product?.types, typeId])
 
   const { handleSubmit, register, resetField } = useForm({
     defaultValues: {
@@ -71,7 +75,6 @@ function ProductDetailPage() {
       .then((data) => {
         setProduct(data)
         setProductEndPrice(data?.avgPrice)
-        setProductTypes(data?.productTypes[0]?.types)
       })
   }, [productId])
 
@@ -180,13 +183,13 @@ function ProductDetailPage() {
                   <div className='flex items-center gap-2 mt-2'>
                     <div className='text-[#f90606] font-bold text-2xl tracking-wide'>
                       {(
-                        productEndPrice * (1 - product?.discount / 100)
+                        productEndPrice * (1 - discount / 100)
                       ).toLocaleString()}
                       <sup>đ</sup>
                     </div>
 
                     <div className='bg-[#ddd] rounded-xl px-1 text-xs'>
-                      {`-${product?.discount}%`}
+                      {`-${discount}%`}
                     </div>
 
                     <div className='text-gray-500 line-through text-sm'>
@@ -199,7 +202,7 @@ function ProductDetailPage() {
                     <div className="text-mainColor1-600 font-medium mb-2">Loại sản phẩm</div>
                     <fieldset className="space-y-4">
                       <RadioGroup className="gap-0 -space-y-px rounded-md shadow-xs" onValueChange={setTypeId}>
-                        {productTypes.map((type) => (
+                        {product?.types?.map((type) => (
                           <div
                             key={type.typeId}
                             className="border-input has-data-[state=checked]:border-ring has-data-[state=checked]:bg-accent relative flex flex-col gap-4 border px-4 py-3 outline-none first:rounded-t-md last:rounded-b-md has-data-[state=checked]:z-10"
@@ -212,7 +215,7 @@ function ProductDetailPage() {
                                   className="after:absolute after:inset-0"
                                 />
                                 <Label className="inline-flex items-start" htmlFor={type.typeId}>
-                                  {type.name}
+                                  {type.typeName}
                                 </Label>
                               </div>
                             </div>
@@ -373,7 +376,7 @@ function ProductDetailPage() {
                 <div className='mb-1 text-mainColor1-800/90'>Tạm tính</div>
                 <div className='text-gray-700 font-bold text-2xl tracking-normal'>
                   {(
-                    productEndPrice * (1 - product?.discount / 100)
+                    productEndPrice * (1 - discount / 100)
                   ).toLocaleString()}
                   <sup>đ</sup>
                 </div>

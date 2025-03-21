@@ -36,7 +36,6 @@ import { toast } from 'sonner'
 import Rating from 'react-rating'
 import { useId, useState } from 'react'
 import { Switch } from '~/components/ui/switch'
-import { Label } from '~/components/ui/label'
 
 function UserProfile() {
   const dispatch = useDispatch()
@@ -48,18 +47,27 @@ function UserProfile() {
   }
 
   const currentUser = useSelector(selectCurrentUser)
+
   const joiSchema = Joi.object({
     email: Joi.string().pattern(EMAIL_RULE).message(EMAIL_RULE_MESSAGE),
     address: Joi.string(),
-    phoneNumber: Joi.string()
+    phoneNumber: Joi.string(),
+    username: Joi.string()
   })
 
-  const form = useForm({
+  const leftForm = useForm({
     resolver: joiResolver(joiSchema),
     defaultValues: {
       email: currentUser.email,
       address: '',
       phoneNumber: ''
+    }
+  })
+
+  const rightForm = useForm({
+    resolver: joiResolver(joiSchema),
+    defaultValues: {
+      username: currentUser?.username || ''
     }
   })
 
@@ -82,18 +90,18 @@ function UserProfile() {
           <div className="grid grid-cols-2 gap-8">
             <div className='my-4'>
               <div className='text-lg font-medium text-mainColor2-800'>Thông tin cá nhân</div>
-              <Form {...form}>
-                <form action="#" onSubmit={form.handleSubmit()}>
+              <Form {...leftForm}>
+                <form action="#" onSubmit={leftForm.handleSubmit()}>
 
                   <FormField
-                    control={form.control}
-                    name="fullName"
+                    control={leftForm.control}
+                    name="name"
                     render={({ field }) => (
                       <FormItem className='mb-4 mt-2'>
                         <FormLabel className='text-base'>Họ và tên</FormLabel>
                         <FormControl>
                           <Input
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['fullName'] && 'border-red-500'}`}
+                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['name'] && 'border-red-500'}`}
                             {...field}
                           />
                         </FormControl>
@@ -107,7 +115,7 @@ function UserProfile() {
 
                   <div className="grid grid-cols-2 my-4">
                     <FormField
-                      control={form.control}
+                      control={leftForm.control}
                       name="gender"
                       render={({ field }) => (
                         <FormItem className="my-3">
@@ -116,7 +124,7 @@ function UserProfile() {
                             <RadioGroup
                               onValueChange={field.onChange}
                               defaultValue={field.value}
-                              className="flex items-center gap-10"
+                              className="flex items-center gap-10 md:flex-col md:gap-4 md:items-start"
                             >
                               <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
@@ -147,15 +155,15 @@ function UserProfile() {
                       )}
                     />
                     <FormField
-                      control={form.control}
-                      name="phoneNumber"
+                      control={leftForm.control}
+                      name="phone"
                       render={({ field }) => (
                         <FormItem className='my-2'>
                           <FormLabel className='text-base'>Số điện thoại</FormLabel>
                           <FormControl>
                             <Input
                               placeholder='VD: 0123456789'
-                              className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 text-white rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['phoneNumber'] && 'border-red-500'}`}
+                              className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-5 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['phone'] && 'border-red-500'}`}
                               {...field}
                             />
                           </FormControl>
@@ -169,7 +177,7 @@ function UserProfile() {
                   </div>
 
                   <FormField
-                    control={form.control}
+                    control={leftForm.control}
                     name="address"
                     render={({ field }) => (
                       <FormItem className='my-4'>
@@ -177,12 +185,12 @@ function UserProfile() {
                         <FormControl>
                           <Input
                             placeholder='Vd: 123 đường XYZ'
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 text-white rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['address'] && 'border-red-500'}`}
+                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['address'] && 'border-red-500'}`}
                             {...field}
                           />
                         </FormControl>
                         <FormDescription>
-                          Đia chỉ nhận hàng của bạn
+                          Đia chỉ mặc định của bạn
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -190,14 +198,14 @@ function UserProfile() {
                   />
 
                   <FormField
-                    control={form.control}
+                    control={leftForm.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem className='my-4'>
                         <FormLabel className='text-base'>Email</FormLabel>
                         <FormControl>
                           <Input
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['email'] && 'border-red-500'}`}
+                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['email'] && 'border-red-500'}`}
                             {...field}
                           />
                         </FormControl>
@@ -217,24 +225,23 @@ function UserProfile() {
             </div>
             <div className='my-4'>
               <div className='text-lg font-medium text-mainColor2-800'>Thông tin tài khoản</div>
-              <Form {...form}>
-                <form action="#" onSubmit={form.handleSubmit()}>
+              <Form {...rightForm}>
+                <form action="#" onSubmit={rightForm.handleSubmit()}>
 
                   <FormField
-                    control={form.control}
+                    control={rightForm.control}
                     name="username"
                     render={({ field }) => (
                       <FormItem className='mb-4 mt-2'>
                         <FormLabel className='text-base'>Tên tài khoản</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder='Vd: 123 đường XYZ'
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 text-white rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['username'] && 'border-red-500'}`}
+                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!rightForm.formState.errors['username'] && 'border-red-500'}`}
                             {...field}
                           />
                         </FormControl>
                         <FormDescription>
-                          Đia chỉ nhận hàng của bạn
+                          Tên tài khoản của bạn.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -242,7 +249,7 @@ function UserProfile() {
                   />
 
                   <FormField
-                    control={form.control}
+                    control={rightForm.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem className='my-4'>
@@ -250,13 +257,12 @@ function UserProfile() {
                         <FormControl>
                           <Input
                             type='password'
-                            placeholder='VD: 0123456789'
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['password'] && 'border-red-500'}`}
+                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!rightForm.formState.errors['password'] && 'border-red-500'}`}
                             {...field}
                           />
                         </FormControl>
                         <FormDescription>
-                        Số điện thoại này được dùng để liên lạc với người vận chuyển.
+                          Bạn có thể thay đổi mật khẩu.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -402,7 +408,7 @@ function UserProfile() {
                 </AlertDialogContent>
               </AlertDialog>
               <UploadAvatar previewUrl={currentUser?.avatar} />
-              <div className='text-xl mt-2 text-mainColor2-800 font-medium'>{currentUser.displayName}</div>
+              <div className='text-xl mt-2 text-mainColor2-800 font-medium'>{currentUser.name}</div>
               <div className='text-xs text-mainColor2-800/90'>{currentUser.email}</div>
             </div>
             <div className="bg-white rounded-xl grid grid-cols-2 mx-6 py-4 gap-y-3">

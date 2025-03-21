@@ -163,7 +163,7 @@ function HeaderBuyer() {
                         </TooltipProvider>
                         <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
                           <Badge className='bg-mainColor2-800/90'>{currentCart?.itemList[index].quantity} sản phẩm</Badge>
-                          <span className='text-[0.8rem] text-muted-foreground'>x {product?.type.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
+                          <span className='text-[0.8rem] text-muted-foreground'>x {product?.type?.price?.toLocaleString('vi-VN')}<sup>đ</sup></span>
                         </div>
                       </div>
                     </div>
@@ -185,7 +185,7 @@ function HeaderBuyer() {
                     <AvatarImage src={currentUser?.avatar} />
                     <AvatarFallback>LV</AvatarFallback>
                   </Avatar>
-                  <div className='text-sm text-gray-500'>Xin chào, <br></br><b className='text-gray-900'>{currentUser?.displayName}</b></div>
+                  <div className='text-sm text-gray-500'>Xin chào, <br></br><b className='text-gray-900'>{currentUser?.username}</b></div>
                 </div>
 
               </DropdownMenuTrigger>

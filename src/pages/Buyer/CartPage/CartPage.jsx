@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchCurrentCartAPI, selectCurrentCart, setCart } from '~/redux/cart/cartSlice'
+import { selectCurrentCart, setCart, updateCartQuantityAPI } from '~/redux/cart/cartSlice'
 
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
@@ -17,31 +16,28 @@ import { Separator } from '~/components/ui/separator'
 import { RiSubtractFill } from 'react-icons/ri'
 import { IoMdAdd } from 'react-icons/io'
 import { Checkbox } from '~/components/ui/checkbox'
-import { Badge } from '~/components/ui/badge'
-import { cn } from '~/lib/utils'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { useDebounceFn } from '~/hooks/useDebounceFn'
 import { cloneDeep } from 'lodash'
 
 function CartPage() {
   const dispatch = useDispatch()
   const cart = useSelector(selectCurrentCart)
 
-  useEffect(() => {
-    dispatch(fetchCurrentCartAPI())
-  }, [dispatch])
-
   const handleDecreaseQuantity = (productId, typeId) => {
     const cloneCart = cloneDeep(cart)
+    let newQuantity = 0
     cloneCart.itemList.forEach((product) => {
       if (product.productId === productId && product.typeId === typeId) {
         if (product.quantity > 1) {
           product.quantity = product.quantity - 1
+          newQuantity = product.quantity
         }
       }
     })
 
     dispatch(setCart(cloneCart))
+
+    dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
   }
 
   const handleIncreaseQuantity = (productId, typeId) => {
@@ -103,7 +99,7 @@ function CartPage() {
       accessorKey: 'type',
       cell: ({ row }) => (
         <div>
-          {row.original.type.name}<sup>đ</sup>
+          {row.original.type.typeName}
         </div>
       )
     },

@@ -24,7 +24,7 @@ function UserHeader() {
         <div className='relative cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform'>
           <BsHandbag className='text-mainColor1-600 text-xl' />
           <Badge className="w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-400">
-            {currentCart?.products?.length || 0}
+            {currentCart?.itemList?.length || 0}
           </Badge>
         </div>
         <div className='flex items-center justify-between gap-2'>
@@ -32,7 +32,7 @@ function UserHeader() {
             <AvatarImage src={currentUser?.avatar} />
             <AvatarFallback>LV</AvatarFallback>
           </Avatar>
-          <div className='text-sm text-mainColor1-800'>Xin chào, <b>{currentUser?.displayName}</b>!</div>
+          <div className='text-sm text-mainColor1-800'>Xin chào, <b>{currentUser?.username}</b>!</div>
         </div>
       </div>
     </div>
