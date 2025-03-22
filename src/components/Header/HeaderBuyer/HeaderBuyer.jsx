@@ -89,8 +89,8 @@ function HeaderBuyer() {
   const [open, setOpen] = useState(false)
 
   return (
-    <>
-      <div className='container mx-auto mt-6 mb-4'>
+    <div className='sticky top-0 left-0 bg-white z-50'>
+      <div className='container mx-auto pt-6 pb-4'>
         <div className="flex items-center justify-between">
           <div
             className='text-4xl font-medium text-mainColor1-600 cursor-pointer hover:scale-105 transition-transform hover:duration-500'
@@ -227,7 +227,7 @@ function HeaderBuyer() {
         </div>
       </div>
       <MenuBar />
-    </>
+    </div>
 
   )
 }

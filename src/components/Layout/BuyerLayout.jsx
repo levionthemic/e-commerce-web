@@ -5,7 +5,7 @@ import { PAGE_TYPE } from '~/utils/constants'
 
 function BuyerLayout() {
   return (
-    <div className='font-nunitoSans'>
+    <div className='font-nunitoSans relative max-h-full'>
       <Header type={PAGE_TYPE.BUYER} />
       <Outlet />
       <Footer />
