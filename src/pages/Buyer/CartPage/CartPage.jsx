@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectCurrentCart, setCart, updateCartQuantityAPI } from '~/redux/cart/cartSlice'
 
@@ -18,8 +18,11 @@ import { IoMdAdd } from 'react-icons/io'
 import { Checkbox } from '~/components/ui/checkbox'
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { cloneDeep } from 'lodash'
+import { Button } from '~/components/ui/button'
+import { toast } from 'sonner'
 
 function CartPage() {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const cart = useSelector(selectCurrentCart)
 
@@ -107,6 +110,7 @@ function CartPage() {
       )
     },
     {
+      id: 'quantity',
       header: 'Số lượng',
       accessorKey: 'quantity',
       cell: ({ row }) => {
@@ -159,10 +163,23 @@ function CartPage() {
     return result
   }
 
+  const handleCheckout = () => {
+    const rows = table.getRowModel().rows
+    const selectedRows = rows.filter(row => row.getIsSelected()).map(row => ({
+      ...row.original,
+      quantity: cart.itemList[row.index].quantity
+    }))
+    if (!selectedRows.length) {
+      toast.error('Bạn chưa chọn sản phẩm!')
+      return
+    }
+    navigate('/buyer/checkout', { state: { selectedRows: selectedRows } })
+  }
+
   return (
     <div className='container mx-auto'>
       <div className="grid grid-cols-4 gap-5">
-        <div className="col-span-3 py-4 h-[100vh]">
+        <div className="col-span-3 py-4 h-fit">
           <div className='font-semibold text-2xl text-mainColor2-800 mb-4'>Giỏ Hàng Của Bạn</div>
           {!cart || !cart?.itemList.length
             ? <p>Giỏ hàng của bạn đang trống.</p>
@@ -241,7 +258,7 @@ function CartPage() {
               <span className='font-bold text-xl text-mainColor1-800'>{totalPrice()?.toLocaleString('vi-VN') || 0}<sup>đ</sup></span>
             </div>
 
-            <Link to='/buyer/checkout' className='bg-mainColor1-800 w-full block text-white uppercase py-4 text-center rounded-xl font-bold hover:drop-shadow-xl hover:scale-[102%] hover:duration-300 hover:bg-mainColor1-600 transition-all'>Thanh toán</Link>
+            <Button onClick={handleCheckout} className='bg-mainColor1-800 w-full text-white uppercase py-4 text-center rounded-xl font-bold hover:drop-shadow-xl hover:scale-[102%] hover:duration-300 hover:bg-mainColor1-600 transition-all'>Thanh toán</Button>
           </div>
         </div>
       </div>

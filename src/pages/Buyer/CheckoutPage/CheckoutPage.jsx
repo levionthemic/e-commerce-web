@@ -1,7 +1,5 @@
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button } from '~/components/ui/button'
-import { useSelector } from 'react-redux'
-import { selectCurrentCart } from '~/redux/cart/cartSlice'
 import TimelineComponent from '~/pages/Buyer/CheckoutPage/TimelineComponent'
 import { useEffect, useState } from 'react'
 import Information from '~/pages/Buyer/CheckoutPage/Information'
@@ -23,13 +21,12 @@ function CheckoutPage() {
   const [searchParams] = useSearchParams()
 
   const navigate = useNavigate()
+  const listCheckoutProducts = useLocation().state.selectedRows
 
-  const currentCart = useSelector(selectCurrentCart)
-
-  const totalPrice = currentCart?.fullProducts.reduce(
-    (sum, item, index) =>
+  const totalPrice = listCheckoutProducts.reduce(
+    (sum, item) =>
       sum +
-      currentCart.itemList[index].quantity * item.type.price,
+      item.quantity * item.type.price,
     0
   )
 
@@ -68,7 +65,7 @@ function CheckoutPage() {
     <div className='container mx-auto py-6'>
       <div className='font-semibold text-3xl text-mainColor1-600 mb-8'>Thanh toán</div>
 
-      <div className='grid grid-cols-12 gap-4'>
+      <div className='grid grid-cols-12 gap-2'>
         <div className='col-span-9'>
           <TimelineComponent items={timelineItems} />
 
@@ -82,22 +79,23 @@ function CheckoutPage() {
           <div className='sticky top-7 left-0 h-fit mb-4'>
             <div className="border border-b-[#ddd] rounded-md mb-4 p-4 shadow-md">
               <div className='text-md text-mainColor1-800 font-medium'>Danh sách sản phẩm</div>
-              {currentCart?.fullProducts.map((product, index) => (
-                <div key={index} className='flex items-center gap-2 my-3 overflow-hidden'>
+              {listCheckoutProducts?.map((product, index) => (
+                <div key={index} className='flex items-center gap-2 my-6 overflow-hidden'>
                   <img src={product?.avatar} alt="" width={40} height={40} />
                   <div className='flex flex-col gap-1'>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className='text-sm line-clamp-1 text-mainColor2-800'>{product?.name}</span>
+                          <span className='text-sm line-clamp-1 text-mainColor2-800 leading-none'>{product?.name}</span>
                         </TooltipTrigger>
                         <TooltipContent>
                           <p>{product?.name}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+                    <p className='line-clamp-1 text-xs text-gray-400 mb-0.5'>Loại: {product.type.typeName}</p>
                     <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
-                      <Badge className='bg-mainColor2-800/90'>{currentCart?.itemList[index].quantity} sản phẩm</Badge>
+                      <Badge className='bg-mainColor2-800/90'>{product.quantity} sản phẩm</Badge>
                       <span className='text-[0.8rem] text-muted-foreground'>x {product?.type.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
                     </div>
                   </div>
