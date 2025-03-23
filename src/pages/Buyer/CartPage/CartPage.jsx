@@ -115,7 +115,7 @@ function CartPage() {
       accessorKey: 'quantity',
       cell: ({ row }) => {
         return (
-          <div className='flex items-center justify-between rounded-lg p-1'>
+          <div className='flex items-center justify-between rounded-lg p-1 border border-gray-300'>
             <RiSubtractFill
               className='cursor-pointer text-xl hover:bg-mainColor2-800/40 rounded-md'
               onClick={() => { handleDecreaseQuantity(row.original._id, row.original.type.typeId) }}
@@ -123,7 +123,7 @@ function CartPage() {
             <input
               value={cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId)?.quantity}
               readOnly
-              className='w-[30px] text-center mx-1.5 border-none outline-none text-md'
+              className='w-[30px] text-center mx-1.5 border-none outline-none text-md bg-transparent'
             />
             <IoMdAdd
               className='cursor-pointer text-xl hover:bg-mainColor2-800/40 rounded-md'
@@ -180,7 +180,7 @@ function CartPage() {
     <div className='container mx-auto'>
       <div className="grid grid-cols-4 gap-5">
         <div className="col-span-3 py-4 h-fit">
-          <div className='font-semibold text-2xl text-mainColor2-800 mb-4'>Giỏ Hàng Của Bạn</div>
+          <div className='font-semibold text-2xl text-mainColor2-800 mb-6'>Giỏ Hàng Của Bạn</div>
           {!cart || !cart?.itemList.length
             ? <p>Giỏ hàng của bạn đang trống.</p>
             : <div>

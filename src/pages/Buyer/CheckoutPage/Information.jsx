@@ -1,8 +1,8 @@
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import Autocomplete from '~/components/Autocomplete'
 import { Button } from '~/components/ui/button'
 import {
   Form,
@@ -15,44 +15,127 @@ import {
 } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
-import { selectCurrentUser } from '~/redux/user/userSlice'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE, FIELD_REQUIRED_MESSAGE, PHONE_NUMBER_RULE, PHONE_NUMBER_RULE_MESSAGE } from '~/utils/validators'
 
 const formSchema = Joi.object({
-  fullName: Joi.string().required().trim().strict().messages({
+  name: Joi.string().required().trim().strict().messages({
     'string.empty': FIELD_REQUIRED_MESSAGE
   }),
   email: Joi.string().required().pattern(EMAIL_RULE).messages({
     'string.empty': FIELD_REQUIRED_MESSAGE,
     'string.pattern.base': EMAIL_RULE_MESSAGE
   }),
-  phoneNumber: Joi.string().pattern(PHONE_NUMBER_RULE).messages({
+  phone: Joi.string().pattern(PHONE_NUMBER_RULE).messages({
     'string.empty': FIELD_REQUIRED_MESSAGE,
     'string.pattern.base': PHONE_NUMBER_RULE_MESSAGE
   }),
-  address: Joi.string().required().trim().strict().messages({
-    'string.empty': FIELD_REQUIRED_MESSAGE
+  address: Joi.object({
+    province: Joi.number().required().messages({
+      'any.required': FIELD_REQUIRED_MESSAGE
+    }),
+    district: Joi.number().required().messages({
+      'any.required': FIELD_REQUIRED_MESSAGE
+    }),
+    ward: Joi.string().required().trim().strict().messages({
+      'any.required': FIELD_REQUIRED_MESSAGE
+    }),
+    detail: Joi.string().required().trim().strict().messages({
+      'any.required': FIELD_REQUIRED_MESSAGE
+    })
+
   }),
   note: Joi.string().empty('')
 })
 
 
-function Information() {
-  const navigate = useNavigate()
-  const currentUser = useSelector(selectCurrentUser)
+function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
+  const [listProvinces, setListProvinces] = useState([])
+  const [listDistricts, setListDistricts] = useState([])
+  const [listWards, setListWards] = useState([])
+
+  const [provinceId, setProvinceId] = useState()
+  const [districtId, setDistrictId] = useState()
+  const [wardId, setWardId] = useState()
+
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
-      fullName: currentUser?.fullName || '',
-      email: currentUser?.email || '',
-      phoneNumber: currentUser?.phoneNumber || '',
-      address: currentUser?.address || '',
-      note: ''
+      address: checkoutInfo?.address,
+      email: checkoutInfo?.email,
+      name: checkoutInfo?.name,
+      phone: checkoutInfo?.phone
     }
   })
 
+  useEffect(() => {
+    fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+      headers: { token: import.meta.env.VITE_GHN_TOKEN_API }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setListProvinces(data.data)
+      })
+  }, [])
+
+  useEffect(() => {
+    setListWards([])
+    if (provinceId) {
+      fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district', {
+        method: 'POST',
+        headers: { token: import.meta.env.VITE_GHN_TOKEN_API, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          province_id: provinceId
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.data?.length) setListDistricts(data.data)
+        })
+    }
+  }, [provinceId])
+
+  useEffect(() => {
+    if (districtId) {
+      fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id', {
+        method: 'POST',
+        headers: { token: import.meta.env.VITE_GHN_TOKEN_API, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          district_id: districtId
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.data?.length) setListWards(data.data)
+        })
+    }
+  }, [districtId])
+
+  useEffect(() => {
+    form.setValue('address', {
+      province: provinceId,
+      district: districtId,
+      ward: wardId,
+      detail: form.watch('address.detail')
+    })
+  }, [provinceId, districtId, wardId, form, listProvinces, listDistricts, listWards])
+
+  const getDetails = (data) => {
+    if (data.type === 'province') setProvinceId(data.id)
+    else if (data.type === 'district') setDistrictId(data.id)
+    else setWardId(data.id)
+  }
+
   const handleUpdateUser = (data) => {
-    console.log((data))
+    const address = data.address
+
+    const wardName = listWards.find(i => i.WardCode === address.ward).WardName
+    const districtName = listDistricts.find(i => i.DistrictID === address.district).DistrictName
+    const provinceName = listProvinces.find(i => i.ProvinceID === address.province).ProvinceName
+
+    const shortAddress = `${address.detail}, ${wardName}, ${districtName}, ${provinceName}`
+
+    setCheckoutInfo({ ...data, shortAddress: shortAddress })
+    setStep(2)
   }
 
   return (
@@ -64,14 +147,14 @@ function Information() {
           <div className='grid grid-cols-3 gap-14'>
             <FormField
               control={form.control}
-              name="fullName"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='text-base'>Họ và tên</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Vd: Nguyễn Văn A"
-                      className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!form.formState.errors['fullName'] && 'border-red-500'}`}
+                      className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!form.formState.errors['name'] && 'border-red-500'}`}
                       {...field}
                     />
                   </FormControl>
@@ -104,14 +187,14 @@ function Information() {
             />
             <FormField
               control={form.control}
-              name="phoneNumber"
+              name="phone"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='text-base'>Số điện thoại</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Vd: 0123456789"
-                      className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!form.formState.errors['phoneNumber'] && 'border-red-500'}`}
+                      className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!form.formState.errors['phone'] && 'border-red-500'}`}
                       {...field}
                     />
                   </FormControl>
@@ -125,16 +208,91 @@ function Information() {
           </div>
           <FormField
             control={form.control}
-            name="address"
-            render={({ field }) => (
+            name=""
+            render={() => (
               <FormItem>
                 <FormLabel className='text-base'>Địa chỉ</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Vd: 123 đường ABC, phường X, quận Y, TPHCM"
-                    className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!form.formState.errors['address'] && 'border-red-500'}`}
-                    {...field}
-                  />
+                  <div className="">
+                    <div className="grid grid-cols-3 gap-10 mb-4">
+                      <FormField
+                        control={form.control}
+                        name="address.province"
+                        render={() => (
+                          <FormItem>
+                            <FormControl>
+                              <Autocomplete
+                                data={listProvinces?.map(i => ({ value: i.ProvinceName, label: i.ProvinceName, id: i.ProvinceID }))}
+                                title={'Tỉnh/thành'}
+                                getDetails={getDetails}
+                                flag={'province'}
+                                error={!!form.formState.errors['address.province']}
+                                // defaultValue={field.value}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="address.district"
+                        render={() => (
+                          <FormItem>
+                            <FormControl>
+                              <Autocomplete
+                                data={listDistricts?.map(i => ({ value: i.DistrictName, label: i.DistrictName, id: i.DistrictID }))}
+                                title={'Quận/huyện'}
+                                getDetails={getDetails}
+                                flag={'district'}
+                                error={!!form.formState.errors['address.district']}
+                                // defaultValue={field.value}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="address.ward"
+                        render={() => (
+                          <FormItem>
+                            <FormControl>
+                              <Autocomplete
+                                data={listWards?.map(i => ({ value: i.WardName, label: i.WardName, id: i.WardCode }))}
+                                title={'Phường/xã'}
+                                getDetails={getDetails}
+                                flag={'ward'}
+                                error={!!form.formState.errors['address.ward']}
+                                // defaultValue={field.value}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="address.detail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Vd: 123 đường ABC, phường X, quận Y, TPHCM"
+                              className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!form.formState.errors['address.detail'] && 'border-red-500'}`}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                 </FormControl>
                 <FormDescription className=''>
                   Địa chỉ nơi bạn cư trú.
@@ -143,6 +301,7 @@ function Information() {
               </FormItem>
             )}
           />
+
 
           <FormField
             control={form.control}
@@ -164,7 +323,7 @@ function Information() {
             )}
           />
           <div className='grid grid-cols-1 gap-5'>
-            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={() => navigate('/buyer/checkout?step=2')}>Tiếp tục</Button>
+            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Tiếp tục</Button>
           </div>
         </form>
       </Form>

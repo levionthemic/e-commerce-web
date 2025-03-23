@@ -6,10 +6,10 @@ import momoLogo from '~/assets/momo-logo.png'
 import vnpayLogo from '~/assets/vnpay-logo.png'
 import { FaMoneyBillAlt } from 'react-icons/fa'
 
-export default function PaymentMethodRadio() {
+export default function PaymentMethodRadio({ handleChoosePaymentMethod }) {
   const id = useId()
   return (
-    <RadioGroup className="gap-2" defaultValue="1">
+    <RadioGroup className="gap-2" defaultValue="4" onValueChange={(value) => {handleChoosePaymentMethod(value)}}>
       <div
         className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
         <RadioGroupItem

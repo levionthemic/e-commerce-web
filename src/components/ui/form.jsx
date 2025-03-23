@@ -124,7 +124,7 @@ const FormMessage = React.forwardRef(({ className, children, ...props }, ref) =>
       {...props}>
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
+        <AlertTitle className='font-bold'>Lỗi!</AlertTitle>
         <AlertDescription>
           {body}
         </AlertDescription>

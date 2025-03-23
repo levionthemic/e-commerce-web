@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+
 import {
   Timeline,
   TimelineContent,
@@ -11,14 +10,7 @@ import {
   TimelineTitle
 } from '~/components/ui/timeline'
 
-export default function TimelineComponent({ items }) {
-  const [step, setStep] = useState(1)
-  const [searchParams] = useSearchParams()
-
-  useEffect(() => {
-    const step = searchParams.get('step')
-    if (step) setStep(step)
-  }, [searchParams])
+export default function TimelineComponent({ items, step }) {
   return (
     (<Timeline defaultValue={3} orientation="horizontal">
       {items.map((item) => (

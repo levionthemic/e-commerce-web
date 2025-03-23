@@ -16,38 +16,69 @@ import { selectCurrentUser } from '~/redux/user/userSlice'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
 import PaymentMethodRadio from './PaymentMethodRadio'
 import { Input } from '~/components/ui/input'
-import { useNavigate } from 'react-router-dom'
+import { cloneDeep } from 'lodash'
+import { useEffect } from 'react'
 
 const formSchema = Joi.object({
-  address: Joi.string().required().trim().strict().messages({
+  creditName: Joi.string().empty('').trim().strict().messages({
+    'string.empty': FIELD_REQUIRED_MESSAGE
+  }),
+  creditNumber: Joi.string().empty('').trim().strict().messages({
+    'string.empty': FIELD_REQUIRED_MESSAGE
+  }),
+  creditExpireDay: Joi.string().empty('').trim().strict().messages({
+    'string.empty': FIELD_REQUIRED_MESSAGE
+  }),
+  creditCvv: Joi.string().empty('').trim().strict().messages({
     'string.empty': FIELD_REQUIRED_MESSAGE
   })
 })
 
-function Payment() {
-  const navigate = useNavigate()
+function Payment({ setStep, checkoutInfo, setCheckoutInfo }) {
   const currentUser = useSelector(selectCurrentUser)
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
-      fullName: currentUser?.fullName || '',
-      email: currentUser?.email || '',
-      phoneNumber: currentUser?.phoneNumber || '',
-      address: currentUser?.address || '',
-      note: ''
+      creditName: '',
+      creditNumber: '',
+      creditExpireDay: '',
+      creditCvv: ''
     }
   })
 
-  const handleUpdateShipping = (data) => {
-    console.log((data))
+  useEffect(() => {
+    setCheckoutInfo({
+      ...checkoutInfo,
+      payment: { type: 'cod', detail: {} }
+    })
+  }, [checkoutInfo, setCheckoutInfo])
+
+  const handleChoosePaymentMethod = (paymentMethod) => {
+    if (parseInt(paymentMethod) === 4) {
+      setCheckoutInfo({
+        ...checkoutInfo,
+        payment: { type: 'cod', detail: {} }
+      })
+    }
+  }
+
+  const handleBack = () => {
+    const oldCheckoutInfo = cloneDeep(checkoutInfo)
+    delete oldCheckoutInfo.payment
+    setCheckoutInfo(oldCheckoutInfo)
+    setStep(2)
+  }
+
+  const handleUpdatePayment = () => {
+    setStep(4)
   }
   return (
     <div className="my-6 border border-b-[#ddd] rounded-md p-4 w-[95%]">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleUpdateShipping)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(handleUpdatePayment)} className="space-y-8">
           <div>
             <div className="text-mainColor1-600 font-medium text-lg mb-2">Phương thức thanh toán</div>
-            <PaymentMethodRadio />
+            <PaymentMethodRadio handleChoosePaymentMethod={handleChoosePaymentMethod }/>
           </div>
 
           <div>
@@ -73,10 +104,10 @@ function Payment() {
             />
             <FormField
               control={form.control}
-              name="creditName"
+              name="creditNumber"
               render={({ field }) => (
                 <FormItem className='mb-4'>
-                  <FormLabel>Tên trên thẻ</FormLabel>
+                  <FormLabel>Số thẻ</FormLabel>
                   <FormControl>
                     <Input
                       className=''
@@ -84,7 +115,7 @@ function Payment() {
                     />
                   </FormControl>
                   <FormDescription>
-                    Điền đúng họ và tên trên thẻ tín dụng của bạn.
+                    Điền đúng số thẻ trên thẻ tín dụng của bạn.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -133,8 +164,8 @@ function Payment() {
 
           </div>
           <div className='grid grid-cols-2 gap-5'>
-            <Button type='submit' className='border bg-white text-mainColor1-600  border-mainColor1-600 hover:bg-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={() => navigate('/buyer/checkout?step=2')}>Quay lại</Button>
-            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={() => navigate('/buyer/checkout?step=4')}>Tiếp tục</Button>
+            <Button className='border bg-white text-mainColor1-600  border-mainColor1-600 hover:bg-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={handleBack}>Quay lại</Button>
+            <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Tiếp tục</Button>
           </div>
         </form>
       </Form>

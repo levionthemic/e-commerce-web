@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Button } from '~/components/ui/button'
 import TimelineComponent from '~/pages/Buyer/CheckoutPage/TimelineComponent'
 import { useEffect, useState } from 'react'
@@ -18,12 +18,13 @@ import clsx from 'clsx'
 
 function CheckoutPage() {
   const [step, setStep] = useState(1)
-  const [searchParams] = useSearchParams()
+
+  const [checkoutInfo, setCheckoutInfo] = useState(JSON.parse(localStorage.getItem('checkoutInfo')))
 
   const navigate = useNavigate()
-  const listCheckoutProducts = useLocation().state.selectedRows
+  const listCheckoutProducts = useLocation()?.state?.selectedRows
 
-  const totalPrice = listCheckoutProducts.reduce(
+  const totalPrice = listCheckoutProducts?.reduce(
     (sum, item) =>
       sum +
       item.quantity * item.type.price,
@@ -31,11 +32,18 @@ function CheckoutPage() {
   )
 
   useEffect(() => {
-    setStep(searchParams.get('step') || 1)
-  }, [searchParams])
+    if (checkoutInfo) {
+      localStorage.setItem('checkoutInfo', JSON.stringify(checkoutInfo))
+    }
+  }, [checkoutInfo])
 
   const handleCheckout = () => {
-    navigate('/buyer/checkout/complete')
+    const checkoutData = {
+      ...checkoutInfo,
+      productVariants: listCheckoutProducts
+    }
+
+    navigate('/buyer/checkout/complete', { state: { checkoutData: checkoutData } })
   }
 
   const timelineItems = [
@@ -67,12 +75,12 @@ function CheckoutPage() {
 
       <div className='grid grid-cols-12 gap-2'>
         <div className='col-span-9'>
-          <TimelineComponent items={timelineItems} />
+          <TimelineComponent items={timelineItems} step={step} />
 
-          {step == 1 && <Information />}
-          {step == 2 && <Shipping />}
-          {step == 3 && <Payment />}
-          {step == 4 && <Confirmation />}
+          {step == 1 && <Information setCheckoutInfo={setCheckoutInfo} setStep={setStep} checkoutInfo={checkoutInfo} />}
+          {step == 2 && <Shipping setStep={setStep} listCheckoutProducts={listCheckoutProducts} checkoutInfo={checkoutInfo} setCheckoutInfo={setCheckoutInfo}/>}
+          {step == 3 && <Payment setCheckoutInfo={setCheckoutInfo} setStep={setStep} checkoutInfo={checkoutInfo} />}
+          {step == 4 && <Confirmation setStep={setStep} checkoutInfo={checkoutInfo} />}
         </div>
 
         <div className='col-span-3'>
@@ -110,20 +118,20 @@ function CheckoutPage() {
                 <div className='flex items-center justify-between text-sm my-2'>
                   <span className='opacity-40'>Tổng tiền hàng</span>
                   <span className='font-bold text-red-600'>
-                    {totalPrice.toLocaleString()}
+                    {totalPrice?.toLocaleString('vi-VN')}
                     <sup>đ</sup>
                   </span>
                 </div>
                 <div className='flex items-center justify-between text-sm my-2'>
                   <span className='opacity-40'>Phí vận chuyển</span>
-                  <span className='font-bold text-red-600'>0đ</span>
+                  <span className='font-bold text-red-600'>{(checkoutInfo?.shipping?.detail?.total || 0)?.toLocaleString('vi-VN')}đ</span>
                 </div>
               </div>
 
               <div>
                 <div className='font-medium text-mainColor1-800'>Tổng tiền thanh toán</div>
                 <div className='text-red-600 text-right text-xl font-bold'>
-                  {(totalPrice + 0).toLocaleString()}
+                  {(totalPrice + (checkoutInfo?.shipping?.detail?.total || 0)).toLocaleString('vi-VN')}
                   <sup>đ</sup>
                 </div>
               </div>

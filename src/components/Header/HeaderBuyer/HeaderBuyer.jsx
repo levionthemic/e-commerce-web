@@ -86,6 +86,15 @@ function HeaderBuyer() {
     })
   }
 
+  const handleCheckout = () => {
+    const products = currentCart.fullProducts
+    const listProducts = products.map((product, index) => ({
+      ...product,
+      quantity: currentCart.itemList[index]?.quantity
+    }))
+    navigate('/buyer/checkout', { state: { selectedRows: listProducts } })
+  }
+
   const [open, setOpen] = useState(false)
 
   return (
@@ -171,7 +180,7 @@ function HeaderBuyer() {
                 </div>
                 <SheetFooter>
                   <SheetClose asChild>
-                    <Button className='bg-mainColor2-800/90 hover:bg-mainColor2-800 w-full hover:drop-shadow-lg' onClick={() => navigate('/buyer/checkout?step=1')}>Thanh toán ngay</Button>
+                    <Button className='bg-mainColor2-800/90 hover:bg-mainColor2-800 w-full hover:drop-shadow-lg' onClick={handleCheckout}>Thanh toán ngay</Button>
                   </SheetClose>
                 </SheetFooter>
               </SheetContent>
