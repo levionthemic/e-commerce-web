@@ -6,13 +6,16 @@ import SellerSidebar from '~/components/Sidebar/SellerSidebar'
 
 function SellerLayout() {
   return (
-    <SidebarProvider>
-      <SellerSidebar />
-      <div className='flex-1 bg-[#F3F3F3] w-[100vh-256px] overflow-x-hidden'>
-        <Header type={PAGE_TYPE.SELLER} />
-        <Outlet />
-      </div>
-    </SidebarProvider>
+    <div className='font-roboto'>
+      <SidebarProvider>
+        <SellerSidebar />
+        <div className='flex-1 bg-[#F3F3F3] w-[100vh-256px] overflow-x-hidden'>
+          <Header type={PAGE_TYPE.SELLER} />
+          <Outlet />
+        </div>
+      </SidebarProvider>
+    </div>
+
   )
 }
 

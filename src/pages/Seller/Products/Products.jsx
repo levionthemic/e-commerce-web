@@ -1,6 +1,7 @@
 import { Banknote, PackageOpen, RotateCcw, Truck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getProductsAPI } from '~/apis'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,27 +10,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '~/components/ui/breadcrumb'
-import { Button } from '~/components/ui/button'
+import { useTimeCount } from '~/hooks/use-time-count'
 import ProductTable from '~/pages/Seller/Products/ProductTable'
 
-
 function Products() {
-  const date = new Date(Date.now())
-  const formatter = new Intl.DateTimeFormat('vi-VN', {
-    weekday: 'long',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-  const [time, setTime] = useState(new Date().toLocaleTimeString('vi-VN'))
+  const { date, time } = useTimeCount()
+
+  const [products, setProducts] = useState([])
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date()
-      const timeString = now.toLocaleTimeString('vi-VN')
-      setTime(timeString)
-    }, 1000)
-    return () => clearInterval(timer)
-  })
+    getProductsAPI().then(data => setProducts(data?.products))
+  }, [])
+
   return (
     <div className='px-6 py-4'>
       <div className="flex items-center justify-between mb-4 gap-8">
@@ -56,12 +47,11 @@ function Products() {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-          <Button className='border border-mainColor1-600 bg-white text-mainColor1-800 hover:bg-mainColor1-800 hover:text-white rounded-xl'>Thêm sản phẩm</Button>
         </div>
-        <span className="italic text-sm text-gray-500 text-right">{time}<br />{formatter.format(date)}</span>
+        <span className="italic text-sm text-gray-500 text-right">{time}<br />{date}</span>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="col-span-1 bg-white rounded-lg p-4 flex items-center justify-between">
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Tổng Sản phẩm trong kho</span>
@@ -112,7 +102,7 @@ function Products() {
         </div>
       </div>
 
-      <ProductTable />
+      <ProductTable data={products} setData={setProducts} />
     </div>
 
   )

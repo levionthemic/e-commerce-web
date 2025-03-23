@@ -17,15 +17,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '~/components/ui/dropdown-menu'
 import { Input } from '~/components/ui/input'
@@ -70,10 +62,12 @@ import {
   FilterIcon,
   ListFilterIcon,
   PlusIcon,
+  Trash,
   TrashIcon
 } from 'lucide-react'
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { CiEdit } from 'react-icons/ci'
 
 
 // Custom filter function for multi-column searching
@@ -114,55 +108,87 @@ const columns = [
     enableResizing: false
   },
   {
+    id: 'avatar',
+    header: 'Ảnh',
+    accessorKey: 'avatar',
+    cell: ({ row }) => <img src={row.getValue('avatar')} alt='' className='w-10 h-10 border border-gray-300 p-0.5 overflow-hidden rounded-md'/>,
+    size: 40,
+    enableSorting: false
+  },
+  {
     id: 'name',
     header: 'Tên sản phẩm',
-    accessorKey: 'name'
+    accessorKey: 'name',
+    cell: ({ row }) => <div className='line-clamp-4 text-wrap font-medium'>{row.getValue('name')}</div>,
+    size: 200
   },
   {
-    id: 'category',
+    id: 'categoryId',
     header: 'Danh mục',
-    accessorKey: 'category'
+    accessorKey: 'categoryId',
+    size: 100,
+    enableSorting: false
   },
   {
-    id: 'discount',
-    header: 'Giảm giá',
-    accessorKey: 'discount'
+    id: 'brandId',
+    header: 'Thương hiệu',
+    accessorKey: 'brandId',
+    size: 100,
+    enableSorting: false
   },
   {
     id: 'avgPrice',
     header: 'Giá trung bình',
-    accessorKey: 'avgPrice'
-  },
-  {
-    id: 'avatar',
-    header: 'Hình ảnh',
-    accessorKey: 'avatar'
+    accessorKey: 'avgPrice',
+    cell: ({ row }) => <span className='font-bold'>{row.getValue('avgPrice').toLocaleString('vi-VN')}<sup>đ</sup></span>,
+    size: 100
   },
   {
     id: 'rating',
     header: 'Đánh giá',
-    accessorKey: 'rating'
+    accessorKey: 'rating',
+    size: 60
   },
   {
     id: 'sold',
     header: 'Đã bán',
-    accessorKey: 'sold'
+    accessorKey: 'sold',
+    size: 50
   },
   {
-    id: 'deleted',
+    id: 'createdAt',
+    header: 'Ngày tạo',
+    accessorKey: 'createdAt',
+    cell: ({ row }) => <span>{new Date(row.getValue('createdAt')).toLocaleString('vi-vn')}</span>,
+    size: 100
+  },
+  {
+    id: 'updatedAt',
+    header: 'Ngày cập nhật',
+    cell: ({ row }) => <span>{new Date(row.getValue('updatedAt')).toLocaleString('vi-vn')}</span>,
+    accessorKey: 'updatedAt'
+  },
+  {
+    id: '_deleted',
     header: 'Trạng thái',
-    accessorKey: 'deleted'
+    accessorKey: '_deleted',
+    cell: ({ row }) => <Badge>{row.getValue('_deleted') ? 'Đã xóa' : 'Bình thường'}</Badge>,
+    size: 85,
+    enableResizing: false,
+    enableSorting: false
   },
   {
     id: 'actions',
+    header: 'Thao tác',
     cell: ({ row }) => <RowActions row={row} />,
-    size: 50,
+    size: 70,
     enableResizing: false,
-    enableHiding: false
+    enableHiding: false,
+    enableSorting: false
   }
 ]
 
-export default function ProductTable() {
+export default function ProductTable({ data, setData }) {
   const navigate = useNavigate()
   const id = useId()
   const [columnFilters, setColumnFilters] = useState([])
@@ -179,18 +205,6 @@ export default function ProductTable() {
       desc: false
     }
   ])
-
-  const [data, setData] = useState([])
-  useEffect(() => {
-    async function fetchPosts() {
-      const res = await fetch(
-        'https://res.cloudinary.com/dlzlfasou/raw/upload/users-01_fertyx.json'
-      )
-      const data = await res.json()
-      setData(data)
-    }
-    fetchPosts()
-  }, [])
 
   const handleDeleteRows = () => {
     const selectedRows = table.getSelectedRowModel().rows
@@ -225,7 +239,7 @@ export default function ProductTable() {
 
   // Get unique status values
   const uniqueStatusValues = useMemo(() => {
-    const statusColumn = table.getColumn('status')
+    const statusColumn = table.getColumn('_deleted')
 
     if (!statusColumn) return []
 
@@ -236,18 +250,18 @@ export default function ProductTable() {
 
   // Get counts for each status
   const statusCounts = useMemo(() => {
-    const statusColumn = table.getColumn('status')
+    const statusColumn = table.getColumn('_deleted')
     if (!statusColumn) return new Map()
     return statusColumn.getFacetedUniqueValues()
   }, [table])
 
   const selectedStatuses = useMemo(() => {
-    const filterValue = table.getColumn('deleted')?.getFilterValue()
+    const filterValue = table.getColumn('_deleted')?.getFilterValue()
     return filterValue ?? []
   }, [table])
 
   const handleStatusChange = (checked, value) => {
-    const filterValue = table.getColumn('status')?.getFilterValue()
+    const filterValue = table.getColumn('_deleted')?.getFilterValue()
     const newFilterValue = filterValue ? [...filterValue] : []
 
     if (checked) {
@@ -259,7 +273,7 @@ export default function ProductTable() {
       }
     }
 
-    table.getColumn('status')?.setFilterValue(newFilterValue.length ? newFilterValue : undefined)
+    table.getColumn('_deleted')?.setFilterValue(newFilterValue.length ? newFilterValue : undefined)
   }
 
   return (
@@ -317,7 +331,7 @@ export default function ProductTable() {
             </PopoverTrigger>
             <PopoverContent className="w-auto min-w-36 p-3" align="start">
               <div className="space-y-3">
-                <div className="text-muted-foreground text-xs font-medium">Filters</div>
+                <div className="text-muted-foreground text-xs font-medium">Bộ lọc</div>
                 <div className="space-y-3">
                   {uniqueStatusValues.map((value, i) => (
                     <div key={value} className="flex items-center gap-2">
@@ -362,7 +376,7 @@ export default function ProductTable() {
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                       onSelect={(event) => event.preventDefault()}
                     >
-                      {column.id}
+                      {column.columnDef.header}
                     </DropdownMenuCheckboxItem>
                   )
                 })}
@@ -415,12 +429,12 @@ export default function ProductTable() {
       </div>
 
       {/* Table */}
-      <div className='bg-white overflow-hidden border rounded-lg'>
+      <div className='bg-white overflow-hidden border rounded-lg font-lexend'>
         <Table
           className="table-fixed"
-          style={{
-            width: table.getCenterTotalSize()
-          }}
+          // style={{
+          //   width: table.getCenterTotalSize()
+          // }}
         >
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -498,6 +512,7 @@ export default function ProductTable() {
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
@@ -512,7 +527,7 @@ export default function ProductTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                Không có kết quả
                 </TableCell>
               </TableRow>
             )}
@@ -629,54 +644,18 @@ export default function ProductTable() {
 
 function RowActions() {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="flex justify-end">
-          <Button size="icon" variant="ghost" className="shadow-none" aria-label="Edit item">
-            <EllipsisIcon size={16} aria-hidden="true" />
-          </Button>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>Edit</span>
-            <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span>Duplicate</span>
-            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>Archive</span>
-            <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Move to project</DropdownMenuItem>
-                <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Advanced options</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Add to favorites</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
-          <span>Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex justify-between">
+      <Button size="icon" variant="ghost" className="shadow-none" aria-label="Edit item">
+        <CiEdit size={16} aria-hidden="true" />
+      </Button>
+
+      <Button size="icon" variant="ghost" className="shadow-none" aria-label="Delete item">
+        <Trash size={16} aria-hidden="true" />
+      </Button>
+
+      <Button size="icon" variant="ghost" className="shadow-none" aria-label="More item">
+        <EllipsisIcon size={16} aria-hidden="true" />
+      </Button>
+    </div>
   )
 }

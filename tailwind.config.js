@@ -12,6 +12,14 @@ export default {
   			nunitoSans: [
   				'Nunito Sans',
   				'sans-serif'
+  			],
+        roboto: [
+  				'Roboto',
+  				'sans-serif'
+  			],
+        lexend: [
+  				'Lexend',
+  				'sans-serif'
   			]
   		},
   		borderRadius: {
