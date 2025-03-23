@@ -8,6 +8,7 @@ export function useImageUpload({
   const fileInputRef = useRef(null)
   const [previewUrl, setPreviewUrl] = useState(null)
   const [fileName, setFileName] = useState(null)
+  const [file, setFile] = useState(null)
 
   const handleThumbnailClick = useCallback(() => {
     fileInputRef.current?.click()
@@ -17,6 +18,7 @@ export function useImageUpload({
     const file = event.target.files?.[0]
     if (file) {
       setFileName(file.name)
+      setFile(file)
       const url = URL.createObjectURL(file)
       setPreviewUrl(url)
       previewRef.current = url
@@ -48,6 +50,7 @@ export function useImageUpload({
     previewUrl,
     fileName,
     fileInputRef,
+    file,
     handleThumbnailClick,
     handleFileChange,
     handleRemove

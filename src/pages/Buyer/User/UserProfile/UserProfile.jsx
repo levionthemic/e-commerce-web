@@ -428,8 +428,8 @@ function UserProfile() {
                 </AlertDialogContent>
               </AlertDialog>
               <UploadAvatar previewUrl={currentUser?.avatar} />
-              <div className='text-xl mt-2 text-mainColor2-800 font-medium'>{currentUser.username}</div>
-              <div className='text-xs text-mainColor2-800/90'>{currentUser.email}</div>
+              <div className='text-xl mt-8 text-mainColor2-800 font-medium'>{currentUser?.name}</div>
+              <div className='text-xs text-mainColor2-800/90'>{currentUser?.email}</div>
             </div>
             <div className="bg-white rounded-xl grid grid-cols-2 mx-6 py-4 gap-y-3">
               <div className="mx-2 py-2">

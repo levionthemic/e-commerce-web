@@ -1,19 +1,40 @@
 import { useImageUpload } from '~/hooks/use-image-upload'
 import { Button } from '~/components/ui/button'
 import { CircleUserRoundIcon, XIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import { useDispatch } from 'react-redux'
+import { updateUserAPI } from '~/redux/user/userSlice'
 
 export default function UploadAvatar() {
+  const dispatch = useDispatch()
   const {
     previewUrl,
     fileInputRef,
     handleThumbnailClick,
     handleFileChange,
     handleRemove,
-    fileName
+    fileName,
+    file
   } = useImageUpload()
 
+  const handleUploadAvatar = () => {
+    const reqData = new FormData()
+    reqData.append('avatar', file)
+
+    toast.promise(
+      dispatch(updateUserAPI(reqData)),
+      {
+        pending: 'Đang tải hình ảnh lên...',
+        success: (res) => {
+          if (!res.error) toast.success('Tải hình ảnh lên thành công!')
+        }
+      }
+    )
+  }
+
+
   return (
-    (<div>
+    <div>
       <div className="relative inline-flex">
         <Button
           variant="outline"
@@ -56,6 +77,9 @@ export default function UploadAvatar() {
       <div className="sr-only" aria-live="polite" role="status">
         {previewUrl ? 'Image uploaded and preview available' : 'No image uploaded'}
       </div>
-    </div>)
+      {previewUrl && <div className='mt-2'>
+        <Button onClick={handleUploadAvatar}>Tải lên</Button>
+      </div>}
+    </div>
   )
 }
