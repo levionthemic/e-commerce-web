@@ -30,7 +30,7 @@ export const logoutUserAPI = createAsyncThunk(
 export const updateUserAPI = createAsyncThunk(
   'user/updateUserAPI',
   async (data) => {
-    const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/user/update`, data)
+    const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/buyer/profile/update`, data)
     return response.data
   }
 )

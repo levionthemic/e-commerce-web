@@ -103,6 +103,14 @@ export default {
   					opacity: 1
   				}
   			},
+        fadeIn70: {
+  				from: {
+  					opacity: 0
+  				},
+  				to: {
+  					opacity: .7
+  				}
+  			},
   			fadeInTop: {
   				'0%': {
   					transform: 'translateY(-30px)',
@@ -149,6 +157,7 @@ export default {
   		},
   		animation: {
   			fadeIn: 'fadeIn .7s ease-in-out',
+  			fadeIn70: 'fadeIn70 .2s ease-in-out',
   			fadeInTop: 'fadeInTop 1.5s ease 0s normal none',
   			phoneShake: 'phoneShake 0.5s infinite ease-in-out',
   			'accordion-down': 'accordion-down 0.2s ease-out',

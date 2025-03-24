@@ -2,6 +2,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
 import Autocomplete from '~/components/Autocomplete'
 import { Button } from '~/components/ui/button'
 import {
@@ -15,6 +16,7 @@ import {
 } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
+import { selectCurrentUser } from '~/redux/user/userSlice'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE, FIELD_REQUIRED_MESSAGE, PHONE_NUMBER_RULE, PHONE_NUMBER_RULE_MESSAGE } from '~/utils/validators'
 
 const formSchema = Joi.object({
@@ -57,13 +59,15 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
   const [districtId, setDistrictId] = useState()
   const [wardId, setWardId] = useState()
 
+  const currentUser = useSelector(selectCurrentUser)
+
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
-      address: checkoutInfo?.address,
-      email: checkoutInfo?.email,
-      name: checkoutInfo?.name,
-      phone: checkoutInfo?.phone
+      address: checkoutInfo?.address || currentUser?.address,
+      email: checkoutInfo?.email || currentUser?.email,
+      name: checkoutInfo?.name || currentUser?.name,
+      phone: checkoutInfo?.phone || currentUser?.phone
     }
   })
 

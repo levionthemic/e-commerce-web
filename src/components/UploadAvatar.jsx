@@ -1,11 +1,12 @@
 import { useImageUpload } from '~/hooks/use-image-upload'
 import { Button } from '~/components/ui/button'
-import { CircleUserRoundIcon, XIcon } from 'lucide-react'
+import { CircleUserRoundIcon, ImageUp, XIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { useDispatch } from 'react-redux'
 import { updateUserAPI } from '~/redux/user/userSlice'
+import { useState } from 'react'
 
-export default function UploadAvatar() {
+export default function UploadAvatar({ avatar }) {
   const dispatch = useDispatch()
   const {
     previewUrl,
@@ -16,17 +17,22 @@ export default function UploadAvatar() {
     fileName,
     file
   } = useImageUpload()
+  const [showUpload, setShowUpload] = useState(false)
 
   const handleUploadAvatar = () => {
     const reqData = new FormData()
     reqData.append('avatar', file)
+    reqData.append('status', 'active')
 
     toast.promise(
       dispatch(updateUserAPI(reqData)),
       {
         pending: 'Đang tải hình ảnh lên...',
         success: (res) => {
-          if (!res.error) toast.success('Tải hình ảnh lên thành công!')
+          if (!res.error) {
+            toast.success('Tải hình ảnh lên thành công!')
+            handleRemove()
+          }
         }
       }
     )
@@ -38,9 +44,15 @@ export default function UploadAvatar() {
       <div className="relative inline-flex">
         <Button
           variant="outline"
-          className="relative size-16 overflow-hidden"
+          className="relative size-24 overflow-hidden rounded-full p-0"
           onClick={handleThumbnailClick}
+          onMouseOver={() => setShowUpload(true)}
+          onMouseOut={() => setShowUpload(false)}
           aria-label={previewUrl ? 'Change image' : 'Upload image'}>
+          <div className={`absolute bg-black opacity-70 w-full h-full text-white z-50 flex items-center justify-center p-0 flex-col gap-1 border-[2px] border-black ${showUpload ? 'block' : 'hidden'} animate-fadeIn70`}>
+            <ImageUp className='text-white !size-5 z-50'/>
+            <span>Tải lên</span>
+          </div>
           {previewUrl ? (
             <img
               className="h-full w-full object-cover"
@@ -51,7 +63,7 @@ export default function UploadAvatar() {
               style={{ objectFit: 'cover' }} />
           ) : (
             <div aria-hidden="true">
-              <CircleUserRoundIcon className="opacity-60" size={16} />
+              {avatar ? <img src={avatar} className='w-full object-cover'/> : <CircleUserRoundIcon className="opacity-60" size={16} />}
             </div>
           )}
         </Button>
@@ -73,7 +85,7 @@ export default function UploadAvatar() {
           accept="image/*"
           aria-label="Upload image file" />
       </div>
-      {fileName && <p className="text-muted-foreground mt-2 text-xs">{fileName}</p>}
+      {fileName && <p className="text-muted-foreground mt-2 text-xs mx-10 line-clamp-1">{fileName}</p>}
       <div className="sr-only" aria-live="polite" role="status">
         {previewUrl ? 'Image uploaded and preview available' : 'No image uploaded'}
       </div>

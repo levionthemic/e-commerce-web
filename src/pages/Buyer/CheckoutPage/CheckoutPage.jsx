@@ -32,6 +32,20 @@ function CheckoutPage() {
   )
 
   useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault()
+      localStorage.removeItem('checkoutInfo')
+      event.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [])
+
+  useEffect(() => {
     if (checkoutInfo) {
       localStorage.setItem('checkoutInfo', JSON.stringify(checkoutInfo))
     }

@@ -429,14 +429,14 @@ function UserProfile() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              <UploadAvatar previewUrl={currentUser?.avatar} />
-              <div className='text-xl mt-8 text-mainColor2-800 font-medium'>{currentUser?.name}</div>
+              <UploadAvatar avatar={currentUser?.avatar} />
+              <div className='text-xl mt-6 text-mainColor2-800 font-medium'>{currentUser?.name}</div>
               <div className='text-xs text-mainColor2-800/90'>{currentUser?.email}</div>
             </div>
-            <div className="bg-white rounded-xl grid grid-rows-4 mx-6 py-2 gap-y-3">
+            <div className="bg-white rounded-xl grid grid-rows-4 mx-6 py-2">
               <div className="mx-2 py-2">
                 <div className='bg-[#F7F7FE] w-fit text-center text-xs text-mainColor1-600 px-2 py-1.5 rounded-lg font-medium'>Sản phẩm đã xem</div>
-                <div className="flex items-end gap-10 mt-1 mb-2">
+                <div className="flex items-end justify-between mt-1 mb-4">
                   <span className='font-bold ml-1 my-1 text-xl leading-none'>2380</span>
                   <div className="flex items-center gap-2 text-sm text-green-500">
                     <TrendingUp className='w-4 leading-none'/>
@@ -449,7 +449,7 @@ function UserProfile() {
 
               <div className="mx-2 py-2">
                 <div className='bg-[#F9F6FE] w-fit text-center text-xs text-mainColor2-800/90 px-3 py-1.5 rounded-lg font-medium'>Đơn đặt hàng</div>
-                <div className="flex items-end gap-10 mt-1 mb-2">
+                <div className="flex items-end justify-between mt-1 mb-4">
                   <span className='font-bold ml-1 my-1 text-xl leading-none'>32</span>
                   <div className="flex items-center gap-2 text-sm text-green-500">
                     <TrendingUp className='w-4 leading-none'/>
@@ -461,7 +461,7 @@ function UserProfile() {
 
               <div className="mx-2 py-2">
                 <div className='bg-[#FEF6F5] w-fit text-center text-xs text-red-500 px-3 py-1.5 rounded-lg font-medium'>Sản phẩm yêu thích</div>
-                <div className="flex items-end gap-10 mt-1 mb-2">
+                <div className="flex items-end justify-between mt-1 mb-4">
                   <span className='font-bold ml-1 my-1 text-xl leading-none'>127</span>
                   <div className="flex items-center gap-2 text-sm text-green-500">
                     <TrendingUp className='w-4 leading-none'/>
@@ -472,7 +472,7 @@ function UserProfile() {
               </div>
               <div className="mx-2 py-2">
                 <div className='bg-[#F3FEF8] w-fit text-center text-xs text-green-500 px-3 py-1.5 rounded-lg font-medium'>Đánh giá</div>
-                <div className="flex items-end gap-10 mt-1">
+                <div className="flex items-end justify-between mt-1">
                   <span className='font-bold ml-1 my-1 text-xl leading-none'>12</span>
                   <div className="flex items-center gap-2 text-sm text-green-500">
                     <TrendingUp className='w-4 leading-none'/>
