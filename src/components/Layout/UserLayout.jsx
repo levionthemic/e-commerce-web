@@ -4,9 +4,9 @@ import UserSidebar from '~/pages/Buyer/User/UserSidebar'
 
 function UserLayout() {
   return (
-    <SidebarProvider className='font-nunitoSans'>
+    <SidebarProvider className='font-nunitoSans' style={{ '--sidebar-width': '14rem' }}>
       <UserSidebar />
-      <main className='flex-1'>
+      <main className='flex-1 overflow-x-auto'>
         {/* <SidebarTrigger /> */}
         <Outlet />
       </main>

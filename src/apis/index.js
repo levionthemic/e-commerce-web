@@ -38,3 +38,9 @@ export const getCategoriesAPI = async () => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/categories`)
   return response.data
 }
+
+// Orders APIS
+export const fetchOrdersAPI = async () => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/orders`)
+  return response.data
+}

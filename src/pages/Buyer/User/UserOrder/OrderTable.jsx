@@ -17,15 +17,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '~/components/ui/dropdown-menu'
 import { Input } from '~/components/ui/input'
@@ -69,10 +61,9 @@ import {
   EllipsisIcon,
   FilterIcon,
   ListFilterIcon,
-  PlusIcon,
   TrashIcon
 } from 'lucide-react'
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 
 
 // Custom filter function for multi-column searching
@@ -112,30 +103,42 @@ const columns = [
     enableHiding: false
   },
   {
-    header: 'Name',
-    accessorKey: 'name',
+    id: '_id',
+    header: 'Mã đơn hàng',
+    accessorKey: '_id',
     cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>,
     size: 180,
     filterFn: multiColumnFilterFn,
     enableHiding: false
   },
   {
-    header: 'Email',
-    accessorKey: 'email',
-    size: 220
+    id: 'sellerId',
+    header: 'Người bán',
+    accessorKey: 'sellerId'
   },
   {
-    header: 'Location',
-    accessorKey: 'location',
-    cell: ({ row }) => (
-      <div>
-        <span className="text-lg leading-none">{row.original.flag}</span> {row.getValue('location')}
-      </div>
-    ),
-    size: 180
+    id: 'itemList',
+    header: 'Danh sách sản phẩm',
+    accessorKey: 'itemList'
   },
   {
-    header: 'Status',
+    id: 'shippingMethod',
+    header: 'Đơn vị vận chuyển',
+    accessorKey: 'shippingMethod'
+  },
+  {
+    id: 'paymentMethod',
+    header: 'Phương thức thanh toán',
+    accessorKey: 'paymentMethod'
+  },
+  {
+    id: 'shippingAddress',
+    header: 'Địa chỉ nhận hàng',
+    accessorKey: 'shippingAddress'
+  },
+  {
+    id: 'status',
+    header: 'Trạng thái',
     accessorKey: 'status',
     cell: ({ row }) => (
       <Badge
@@ -150,17 +153,14 @@ const columns = [
     filterFn: statusFilterFn
   },
   {
-    header: 'Performance',
-    accessorKey: 'performance'
-  },
-  {
-    header: 'Balance',
-    accessorKey: 'balance',
+    id: 'finalPrice',
+    header: 'Giá trị đơn hàng',
+    accessorKey: 'finalPrice',
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('balance'))
-      const formatted = new Intl.NumberFormat('en-US', {
+      const amount = parseFloat(row.getValue('finalPrice'))
+      const formatted = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
-        currency: 'USD'
+        currency: 'VND'
       }).format(amount)
       return formatted
     },
@@ -168,14 +168,14 @@ const columns = [
   },
   {
     id: 'actions',
-    header: () => <span className="sr-only">Actions</span>,
+    header: 'Thao tác',
     cell: ({ row }) => <RowActions row={row} />,
     size: 60,
     enableHiding: false
   }
 ]
 
-export default function OrderTable() {
+export default function OrderTable({ data, setData }) {
   const id = useId()
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
@@ -187,27 +187,15 @@ export default function OrderTable() {
 
   const [sorting, setSorting] = useState([
     {
-      id: 'name',
+      id: '_id',
       desc: false
     }
   ])
 
-  const [data, setData] = useState([])
-  useEffect(() => {
-    async function fetchPosts() {
-      const res = await fetch(
-        'https://res.cloudinary.com/dlzlfasou/raw/upload/users-01_fertyx.json'
-      )
-      const data = await res.json()
-      setData(data)
-    }
-    fetchPosts()
-  }, [])
-
   const handleDeleteRows = () => {
     const selectedRows = table.getSelectedRowModel().rows
     const updatedData = data.filter(
-      (item) => !selectedRows.some((row) => row.original.id === item.id)
+      (item) => !selectedRows.some((row) => row.original._id === item._id)
     )
     setData(updatedData)
     table.resetRowSelection()
@@ -278,20 +266,20 @@ export default function OrderTable() {
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          {/* Filter by name or email */}
+          {/* Filter by orderId */}
           <div className="relative">
             <Input
               id={`${id}-input`}
               ref={inputRef}
               className={cn(
                 'peer min-w-60 ps-9',
-                Boolean(table.getColumn('name')?.getFilterValue()) && 'pe-9'
+                Boolean(table.getColumn('_id')?.getFilterValue()) && 'pe-9'
               )}
-              value={(table.getColumn('name')?.getFilterValue() ?? '')}
-              onChange={(e) => table.getColumn('name')?.setFilterValue(e.target.value)}
-              placeholder="Filter by name or email..."
+              value={(table.getColumn('_id')?.getFilterValue() ?? '')}
+              onChange={(e) => table.getColumn('_id')?.setFilterValue(e.target.value)}
+              placeholder="Lọc theo mã đơn hàng..."
               type="text"
-              aria-label="Filter by name or email"
+              aria-label="Lọc theo mã đơn hàng"
             />
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
               <ListFilterIcon size={16} aria-hidden="true" />
@@ -316,7 +304,7 @@ export default function OrderTable() {
             <PopoverTrigger asChild>
               <Button variant="outline">
                 <FilterIcon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
-                Status
+                Trạng thái
                 {selectedStatuses.length > 0 && (
                   <span className="bg-background text-muted-foreground/70 -me-1 inline-flex h-5 max-h-full items-center rounded border px-1 font-[inherit] text-[0.625rem] font-medium">
                     {selectedStatuses.length}
@@ -326,7 +314,7 @@ export default function OrderTable() {
             </PopoverTrigger>
             <PopoverContent className="w-auto min-w-36 p-3" align="start">
               <div className="space-y-3">
-                <div className="text-muted-foreground text-xs font-medium">Filters</div>
+                <div className="text-muted-foreground text-xs font-medium">Bộ lọc</div>
                 <div className="space-y-3">
                   {uniqueStatusValues.map((value, i) => (
                     <div key={value} className="flex items-center gap-2">
@@ -355,11 +343,11 @@ export default function OrderTable() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
                 <Columns3Icon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
-                View
+                Hiển thị
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+              <DropdownMenuLabel>Hiển thị cột</DropdownMenuLabel>
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -372,7 +360,7 @@ export default function OrderTable() {
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                       onSelect={(event) => event.preventDefault()}
                     >
-                      {column.id}
+                      {column.columnDef.header}
                     </DropdownMenuCheckboxItem>
                   )
                 })}
@@ -416,11 +404,6 @@ export default function OrderTable() {
               </AlertDialogContent>
             </AlertDialog>
           )}
-          {/* Add user button */}
-          <Button className="ml-auto" variant="outline">
-            <PlusIcon className="-ms-1 opacity-60" size={16} aria-hidden="true" />
-            Add user
-          </Button>
         </div>
       </div>
 
@@ -434,8 +417,14 @@ export default function OrderTable() {
                   return (
                     <TableHead
                       key={header.id}
-                      style={{ width: `${header.getSize()}px` }}
+                      // style={{ width: `${header.getSize()}px` }}
                       className="h-11"
+                      {...{
+                        colSpan: header.colSpan,
+                        style: {
+                          width: header.getSize()
+                        }
+                      }}
                     >
                       {header.isPlaceholder ? null : header.column.getCanSort() ? (
                         <div
@@ -497,7 +486,7 @@ export default function OrderTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  Không có dữ liệu.
                 </TableCell>
               </TableRow>
             )}
@@ -510,7 +499,7 @@ export default function OrderTable() {
         {/* Results per page */}
         <div className="flex items-center gap-3">
           <Label htmlFor={id} className="max-sm:sr-only">
-            Rows per page
+            Số dòng / trang
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
@@ -544,7 +533,7 @@ export default function OrderTable() {
                 table.getRowCount()
               )}
             </span>{' '}
-            of <span className="text-foreground">{table.getRowCount().toString()}</span>
+            của <span className="text-foreground">{table.getRowCount().toString()}</span>
           </p>
         </div>
 
@@ -608,71 +597,16 @@ export default function OrderTable() {
           </Pagination>
         </div>
       </div>
-      <p className="text-muted-foreground mt-4 text-center text-sm">
-        Example of a more complex table made with{' '}
-        <a
-          className="hover:text-foreground underline"
-          href="https://tanstack.com/table"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          TanStack Table
-        </a>
-      </p>
     </div>
   )
 }
 
 function RowActions() {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <div className="flex justify-end">
-          <Button size="icon" variant="ghost" className="shadow-none" aria-label="Edit item">
-            <EllipsisIcon size={16} aria-hidden="true" />
-          </Button>
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>Edit</span>
-            <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span>Duplicate</span>
-            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <span>Archive</span>
-            <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Move to project</DropdownMenuItem>
-                <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Advanced options</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Add to favorites</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
-          <span>Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex justify-end">
+      <Button size="icon" variant="ghost" className="shadow-none" aria-label="Edit item">
+        <EllipsisIcon size={16} aria-hidden="true" />
+      </Button>
+    </div>
   )
 }

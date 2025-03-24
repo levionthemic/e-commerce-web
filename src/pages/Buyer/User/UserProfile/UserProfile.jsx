@@ -37,6 +37,8 @@ import Rating from 'react-rating'
 import { useId, useState } from 'react'
 import { Switch } from '~/components/ui/switch'
 import { GENDER } from '~/utils/constants'
+import { TrendingUp } from 'lucide-react'
+import { Separator } from '~/components/ui/separator'
 
 function UserProfile() {
   const dispatch = useDispatch()
@@ -88,7 +90,7 @@ function UserProfile() {
   })
 
   const handleLeftFormSubmit = (data) => {
-    console.log(data);
+    console.log(data)
   }
 
   const id = useId()
@@ -407,12 +409,12 @@ function UserProfile() {
 
         </div>
 
-        <div className="flex-1 px-6 flex items-center sticky top-0 right-0 min-h-[100vh]">
-          <div className='bg-gray-100/80 h-[95vh] rounded-3xl flex-1'>
-            <div className="text-center relative py-32">
+        <div className="flex-1 px-4 flex items-center sticky top-0 right-0 min-h-[100vh]">
+          <div className='bg-gray-100/80 h-[95vh] rounded-xl flex-1 grid grid-rows-2 py-4'>
+            <div className="text-center relative flex flex-col items-center justify-center">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <IoIosLogOut className='absolute top-3 right-3 text-mainColor1-800 text-xl cursor-pointer'/>
+                  <IoIosLogOut className='absolute top-0 right-3 text-mainColor1-800 text-xl cursor-pointer'/>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -431,22 +433,52 @@ function UserProfile() {
               <div className='text-xl mt-8 text-mainColor2-800 font-medium'>{currentUser?.name}</div>
               <div className='text-xs text-mainColor2-800/90'>{currentUser?.email}</div>
             </div>
-            <div className="bg-white rounded-xl grid grid-cols-2 mx-6 py-4 gap-y-3">
+            <div className="bg-white rounded-xl grid grid-rows-4 mx-6 py-2 gap-y-3">
               <div className="mx-2 py-2">
-                <div className='bg-[#F7F7FE] w-[80%] text-center text-xs text-mainColor1-600 px-3 py-1.5 rounded-lg font-medium mx-auto'>Sản phẩm đã xem</div>
-                <div className='font-bold ml-4 my-1'>2380</div>
+                <div className='bg-[#F7F7FE] w-fit text-center text-xs text-mainColor1-600 px-2 py-1.5 rounded-lg font-medium'>Sản phẩm đã xem</div>
+                <div className="flex items-end gap-10 mt-1 mb-2">
+                  <span className='font-bold ml-1 my-1 text-xl leading-none'>2380</span>
+                  <div className="flex items-center gap-2 text-sm text-green-500">
+                    <TrendingUp className='w-4 leading-none'/>
+                    <span>6.53%</span>
+                  </div>
+                </div>
+
+                <Separator />
+              </div>
+
+              <div className="mx-2 py-2">
+                <div className='bg-[#F9F6FE] w-fit text-center text-xs text-mainColor2-800/90 px-3 py-1.5 rounded-lg font-medium'>Đơn đặt hàng</div>
+                <div className="flex items-end gap-10 mt-1 mb-2">
+                  <span className='font-bold ml-1 my-1 text-xl leading-none'>32</span>
+                  <div className="flex items-center gap-2 text-sm text-green-500">
+                    <TrendingUp className='w-4 leading-none'/>
+                    <span>6.53%</span>
+                  </div>
+                </div>
+                <Separator />
+              </div>
+
+              <div className="mx-2 py-2">
+                <div className='bg-[#FEF6F5] w-fit text-center text-xs text-red-500 px-3 py-1.5 rounded-lg font-medium'>Sản phẩm yêu thích</div>
+                <div className="flex items-end gap-10 mt-1 mb-2">
+                  <span className='font-bold ml-1 my-1 text-xl leading-none'>127</span>
+                  <div className="flex items-center gap-2 text-sm text-green-500">
+                    <TrendingUp className='w-4 leading-none'/>
+                    <span>6.53%</span>
+                  </div>
+                </div>
+                <Separator />
               </div>
               <div className="mx-2 py-2">
-                <div className='bg-[#F9F6FE] w-[80%] text-center text-xs text-mainColor2-800/90 px-3 py-1.5 rounded-lg font-medium mx-auto'>Đơn đặt hàng</div>
-                <div className='font-bold ml-4 my-1'>32</div>
-              </div>
-              <div className="mx-2 py-2">
-                <div className='bg-[#FEF6F5] w-[80%] text-center text-xs text-red-500 px-3 py-1.5 rounded-lg font-medium mx-auto'>Sản phẩm yêu thích</div>
-                <div className='font-bold ml-4 my-1'>127</div>
-              </div>
-              <div className="mx-2 py-2">
-                <div className='bg-[#F3FEF8] w-[80%] text-center text-xs text-green-500 px-3 py-1.5 rounded-lg font-medium mx-auto'>Đánh giá</div>
-                <div className='font-bold ml-4 my-1'>29</div>
+                <div className='bg-[#F3FEF8] w-fit text-center text-xs text-green-500 px-3 py-1.5 rounded-lg font-medium'>Đánh giá</div>
+                <div className="flex items-end gap-10 mt-1">
+                  <span className='font-bold ml-1 my-1 text-xl leading-none'>12</span>
+                  <div className="flex items-center gap-2 text-sm text-green-500">
+                    <TrendingUp className='w-4 leading-none'/>
+                    <span>6.53%</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -22,7 +22,10 @@ function Completion() {
           <div className='p-5 rounded-full text-white bg-green-400 text-3xl mb-10'><FaCheck /></div>
           <div className='text-2xl font-semibold mb-2'>Đã đặt hàng thành công!</div>
           <p>Bạn có thể theo dõi đơn hàng đã đặt trong mục <Link to={'/user/order'} className='italic'>Đơn hàng của tôi</Link></p>
-          <Button className='mt-10'><Link to='/buyer'>Tiếp tục mua sắm</Link></Button>
+          <div className='flex items-center justify-center gap-6'>
+            <Button className='mt-10 hover:shadow-xl'><Link to='/buyer'>Tiếp tục mua sắm</Link></Button>
+            <Button className='mt-10 border bg-white border-mainColor1-100 text-mainColor1-800 hover:bg-mainColor1-800 hover:text-white  hover:shadow-xl'><Link to='/user/order'>Xem đơn hàng</Link></Button>
+          </div>
         </div>
 
         <div className="flex-1">
@@ -58,14 +61,14 @@ function Completion() {
               <div className='flex items-center justify-between text-sm my-2'>
                 <span className='opacity-40'>Tổng tiền hàng</span>
                 <span className='font-bold text-red-600'>
-                  {(totalPrice).toLocaleString('vi-VN')}
+                  {(totalPrice || 0)?.toLocaleString('vi-VN')}
                   <sup>đ</sup>
                 </span>
               </div>
               <div className='flex items-center justify-between text-sm my-2'>
                 <span className='opacity-40'>Phí vận chuyển</span>
                 <span className='font-bold text-red-600'>
-                  {(checkoutData.shipping.detail.total).toLocaleString('vi-VN')}
+                  {(checkoutData?.shipping?.detail.total || 0)?.toLocaleString('vi-VN')}
                   <sup>đ</sup>
                 </span>
               </div>
@@ -74,7 +77,7 @@ function Completion() {
             <div>
               <div className='font-medium text-mainColor1-800'>Tổng tiền thanh toán</div>
               <div className='text-red-600 text-right text-xl font-bold'>
-                {(totalPrice + checkoutData.shipping.detail.total).toLocaleString('vi-VN')}
+                {(totalPrice + checkoutData?.shipping.detail.total || 0)?.toLocaleString('vi-VN')}
                 <sup>đ</sup>
               </div>
             </div>
