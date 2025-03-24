@@ -57,6 +57,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '~/components/ui/alert-dialog'
+import { getProductsAPI } from '~/apis'
+import { useDebounceFn } from '~/hooks/use-debounce'
 
 
 function HeaderBuyer() {
@@ -96,147 +98,215 @@ function HeaderBuyer() {
   }
 
   const [open, setOpen] = useState(false)
+  const [searchProducts, setSearchProducts] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  const [showBackgroundOverlay, setShowBackgroundOverlay] = useState(false)
+
+
+  const handleFocus = () => {
+    setShowBackgroundOverlay(true)
+    document.body.style.overflow = 'hidden'
+  }
+
+  const handleBlur = useDebounceFn(() => {
+    setShowBackgroundOverlay(false)
+    document.body.style.overflow = 'auto'
+  }, 100)
+
+  const handleChange = useDebounceFn((event) => {
+    setLoading(true)
+    const keyword = event.target.value
+    if (!keyword) {
+      setSearchProducts([])
+      setLoading(false)
+      return
+    }
+    const searchPath = `?${createSearchParams({
+      'q[name]': keyword
+    })}`
+    getProductsAPI(searchPath)
+      .then((data) => {
+        setSearchProducts(data?.products || [])
+      })
+      .finally(() => { setLoading(false) })
+  }, 1000)
 
   return (
-    <div className='sticky top-0 left-0 bg-white z-50'>
-      <div className='container mx-auto pt-6 pb-4'>
-        <div className="flex items-center justify-between">
-          <div
-            className='text-4xl font-medium text-mainColor1-600 cursor-pointer hover:scale-105 transition-transform hover:duration-500'
-            onClick={() => navigate('/')}
-          >
-          LEVI
-          </div>
-          <div className="flex-1">
-            <form action="#" onSubmit={handleSubmit(handleSearch)} className="relative w-[80%] mx-auto">
-              <Input
-                className='peer ps-9 pe-9 w-full placeholder:text-sm placeholder:text-mainColor1-100 rounded-full border-mainColor1-800 text-mainColor1-600 hover:border-[2px] focus:border-[2px] flex-1'
-                placeholder='Bạn cần tìm gì?'
-                {...register('searchValue')}
-              />
-              <div className="text-mainColor1-600/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-                <SearchIcon size={16} />
-              </div>
-              <button
-                className="text-mainColor1-600/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Submit search"
-                type="submit"
-              >
-                <ArrowRightIcon size={16} aria-hidden="true" />
-              </button>
-            </form>
-          </div>
-
-          <div className='flex items-center gap-6'>
-            <IoNotificationsOutline className='text-mainColor1-600 text-xl font-bold' />
-
-            <Sheet key={'right'}>
-              <SheetTrigger asChild>
-                <div className='relative cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform'>
-                  <LuShoppingCart className='text-mainColor1-600 text-xl' />
-                  <Badge className="w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-600">
-                    {currentCart?.itemList?.length || 0}
-                  </Badge>
+    <>
+      <div className='sticky top-0 left-0 bg-white z-50'>
+        <div className='container mx-auto pt-6 pb-4'>
+          <div className="flex items-center justify-between">
+            <div
+              className='text-4xl font-medium text-mainColor1-600 cursor-pointer hover:scale-105 transition-transform hover:duration-500'
+              onClick={() => navigate('/')}
+            >
+            LEVI
+            </div>
+            <div className="flex-1">
+              <form action="#" onSubmit={handleSubmit(handleSearch)} className="relative w-[80%] mx-auto">
+                <Input
+                  className='peer ps-9 pe-9 w-full placeholder:text-sm placeholder:text-mainColor1-100 rounded-full border-mainColor1-800 text-mainColor1-600 hover:border-[2px] focus:border-[2px] flex-1'
+                  placeholder='Bạn cần tìm gì?'
+                  {...register('searchValue')}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                />
+                <div className="text-mainColor1-600/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                  <SearchIcon size={16} />
                 </div>
-              </SheetTrigger>
-              <SheetContent side={'right'}>
-                <SheetHeader className='mt-3'>
-                  <SheetTitle className='flex items-center justify-between'>
-                    <div>
-                      Giỏ hàng của bạn {' '}
-                      <span className='text-sm text-gray-700'>({currentCart?.itemList.length})</span>
-                    </div>
-                    <SheetClose asChild>
-                      <Link to='/buyer/cart' className='text-mainColor1-400 font-normal text-sm'>Xem tất cả</Link>
-                    </SheetClose>
+                <button
+                  className="text-mainColor1-600/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Submit search"
+                  type="submit"
+                >
+                  <ArrowRightIcon size={16} aria-hidden="true" />
+                </button>
+              </form>
+            </div>
 
-                  </SheetTitle>
-                  <SheetDescription>
-                    Sơ lược các sản phẩm trong giỏ hàng.
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="py-4">
-                  {currentCart?.fullProducts?.map((product, index) => (
-                    <div key={index} className='flex items-center gap-2 my-3 overflow-hidden'>
-                      <img src={product?.avatar} alt="" width={40} height={40} />
-                      <div className='flex flex-col gap-1'>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className='text-sm line-clamp-1 text-mainColor2-800'>{product?.name}</span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{product?.name}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                        <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
-                          <Badge className='bg-mainColor2-800/90'>{currentCart?.itemList[index].quantity} sản phẩm</Badge>
-                          <span className='text-[0.8rem] text-muted-foreground'>x {product?.type?.price?.toLocaleString('vi-VN')}<sup>đ</sup></span>
+            <div className='flex items-center gap-6'>
+              <IoNotificationsOutline className='text-mainColor1-600 text-xl font-bold' />
+
+              <Sheet key={'right'}>
+                <SheetTrigger asChild>
+                  <div className='relative cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform'>
+                    <LuShoppingCart className='text-mainColor1-600 text-xl' />
+                    <Badge className="w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-600">
+                      {currentCart?.itemList?.length || 0}
+                    </Badge>
+                  </div>
+                </SheetTrigger>
+                <SheetContent side={'right'}>
+                  <SheetHeader className='mt-3'>
+                    <SheetTitle className='flex items-center justify-between'>
+                      <div>
+                        Giỏ hàng của bạn {' '}
+                        <span className='text-sm text-gray-700'>({currentCart?.itemList.length})</span>
+                      </div>
+                      <SheetClose asChild>
+                        <Link to='/buyer/cart' className='text-mainColor1-400 font-normal text-sm'>Xem tất cả</Link>
+                      </SheetClose>
+
+                    </SheetTitle>
+                    <SheetDescription>
+                      Sơ lược các sản phẩm trong giỏ hàng.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="py-4">
+                    {currentCart?.fullProducts?.map((product, index) => (
+                      <div key={index} className='flex items-center gap-2 my-3 overflow-hidden'>
+                        <img src={product?.avatar} alt="" width={40} height={40} />
+                        <div className='flex flex-col gap-1'>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className='text-sm line-clamp-1 text-mainColor2-800'>{product?.name}</span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{product?.name}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
+                            <Badge className='bg-mainColor2-800/90'>{currentCart?.itemList[index].quantity} sản phẩm</Badge>
+                            <span className='text-[0.8rem] text-muted-foreground'>x {product?.type?.price?.toLocaleString('vi-VN')}<sup>đ</sup></span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-                <SheetFooter>
-                  <SheetClose asChild>
-                    <Button className='bg-mainColor2-800/90 hover:bg-mainColor2-800 w-full hover:drop-shadow-lg' onClick={handleCheckout}>Thanh toán ngay</Button>
-                  </SheetClose>
-                </SheetFooter>
-              </SheetContent>
+                    ))}
+                  </div>
+                  <SheetFooter>
+                    <SheetClose asChild>
+                      <Button className='bg-mainColor2-800/90 hover:bg-mainColor2-800 w-full hover:drop-shadow-lg' onClick={handleCheckout}>Thanh toán ngay</Button>
+                    </SheetClose>
+                  </SheetFooter>
+                </SheetContent>
 
-            </Sheet>
+              </Sheet>
 
-            <DropdownMenu open={open} onOpenChange={setOpen}>
-              <DropdownMenuTrigger asChild>
-                <div className='flex items-center gap-3 cursor-pointer'>
-                  <Avatar>
-                    <AvatarImage src={currentUser?.avatar} />
-                    <AvatarFallback>LV</AvatarFallback>
-                  </Avatar>
-                  <div className='text-sm text-gray-500'>Xin chào, <br></br><b className='text-gray-900'>{currentUser?.username}</b></div>
-                </div>
+              <DropdownMenu open={open} onOpenChange={setOpen}>
+                <DropdownMenuTrigger asChild>
+                  <div className='flex items-center gap-3 cursor-pointer'>
+                    <Avatar>
+                      <AvatarImage src={currentUser?.avatar} />
+                      <AvatarFallback>LV</AvatarFallback>
+                    </Avatar>
+                    <div className='text-sm text-gray-500'>Xin chào, <br></br><b className='text-gray-900'>{currentUser?.username}</b></div>
+                  </div>
 
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-40">
-                <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => navigate('/user/profile')} className='cursor-pointer'>Hồ sơ</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/user/order')} className='cursor-pointer'>Đơn hàng</DropdownMenuItem>
-                  <DropdownMenuItem>Cài đặt</DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem
-                      className='text-red-600 font-medium hover:bg-red-100 hover:text-red-600 cursor-pointer'
-                      onSelect={(event) => {event.preventDefault()}}
-                    >
-                      Đăng xuất
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Bạn có chắc chắn muốn đăng xuất?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Bạn sẽ cần phải đăng nhập lại trước khi truy cập vào hệ thống.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel onClick={() => setOpen(false)}>Hủy</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleLogout}>Đăng xuất</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-40">
+                  <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem onClick={() => navigate('/user/profile')} className='cursor-pointer'>Hồ sơ</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/user/order')} className='cursor-pointer'>Đơn hàng</DropdownMenuItem>
+                    <DropdownMenuItem>Cài đặt</DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem
+                        className='text-red-600 font-medium hover:bg-red-100 hover:text-red-600 cursor-pointer'
+                        onSelect={(event) => {event.preventDefault()}}
+                      >
+                        Đăng xuất
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Bạn có chắc chắn muốn đăng xuất?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Bạn sẽ cần phải đăng nhập lại trước khi truy cập vào hệ thống.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setOpen(false)}>Hủy</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleLogout}>Đăng xuất</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
 
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
+        <MenuBar />
       </div>
-      <MenuBar />
-    </div>
+      {showBackgroundOverlay &&
+        <>
+          <div className='w-[100vw] h-[100vh] fixed z-50 top-20 bg-black opacity-80'></div>
+          <div
+            className='bg-white opacity-100 z-[51] w-[53%] h-fit fixed top-16 left-[18%] shadow-xl p-1 rounded-sm text-center text-sm'
+            style={{
+              boxShadow: 'rgba(0, 0, 0, 0.28) 0px 6px 12px 0px'
+            }}
+          >
+            {loading && 'Đang tìm kiếm...'}
+            {searchProducts.length
+              ? searchProducts.map(prod => (
+                <div
+                  key={prod._id}
+                  className='flex items-center gap-4 hover:bg-gray-100 px-1 rounded-sm my-1 cursor-pointer py-2'
+                  onClick={() => navigate(`/buyer/product/${prod._id}`)}
+                >
+                  <div>
+                    <img src={prod?.avatar} alt="" className='w-10 h-10'/>
+                  </div>
+                  <div>
+                    <span className='text-sm'>{prod?.name}</span>
+                  </div>
+                </div>
+              ))
+              : 'Không có kết quả.'
+            }
+          </div>
+        </>
+      }
+    </>
 
   )
 }
