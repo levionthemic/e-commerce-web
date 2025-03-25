@@ -41,13 +41,15 @@ import { Pencil, TrendingUp } from 'lucide-react'
 import { Separator } from '~/components/ui/separator'
 import Autocomplete from '~/components/Autocomplete'
 import OTP from '~/components/OTP'
+import { clearCart } from '~/redux/cart/cartSlice'
 
 function UserProfile() {
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
+    dispatch(clearCart())
     toast.promise(dispatch(logoutUserAPI()), {
-      loading: 'Đang đăng xuất...'
+      pending: 'Đang đăng xuất...'
     })
   }
 

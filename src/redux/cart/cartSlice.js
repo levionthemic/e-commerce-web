@@ -35,7 +35,9 @@ const cartSlice = createSlice({
     setCart: (state, action) => {
       state.currentCart = action.payload
     },
-    clearCart: (state) => state.currentCart = null
+    clearCart: (state) => {
+      state.currentCart = null
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchCurrentCartAPI.fulfilled, (state, action) => {

@@ -3,16 +3,41 @@
 import { useImageUpload } from '~/hooks/use-image-upload'
 import { Button } from '~/components/ui/button'
 import { CircleUserRoundIcon } from 'lucide-react'
+import { toast } from 'sonner'
+import { useDispatch } from 'react-redux'
+import { ACCOUNT_STATUS } from '~/utils/constants'
+import { updateUserAPI } from '~/redux/user/userSlice'
 
-export default function UploadImage() {
+export default function UploadImage({ fieldName }) {
+  const dispatch = useDispatch()
   const {
     previewUrl,
     fileInputRef,
     handleThumbnailClick: handleButtonClick,
     handleFileChange,
     handleRemove,
-    fileName
+    fileName,
+    file
   } = useImageUpload()
+
+  const handleUploadImage = () => {
+    const reqData = new FormData()
+    reqData.append(fieldName, file)
+    reqData.append('status', ACCOUNT_STATUS.ACTIVE)
+
+    toast.promise(
+      dispatch(updateUserAPI(reqData)),
+      {
+        pending: 'Đang tải hình ảnh lên...',
+        success: (res) => {
+          if (!res.error) {
+            handleRemove()
+            return 'Tải hình ảnh lên thành công!'
+          }
+        }
+      }
+    )
+  }
 
   return (
     <div>
@@ -34,9 +59,12 @@ export default function UploadImage() {
           )}
         </div>
         <div className="relative inline-block flex-1">
-          <Button onClick={(event) => {event.preventDefault(); handleButtonClick()}} aria-haspopup="dialog" className='w-full'>
-            {fileName ? 'Thay đổi' : 'Chọn'}
-          </Button>
+          <div className=" flex items-center gap-2">
+            <Button onClick={(event) => {event.preventDefault(); handleButtonClick()}} aria-haspopup="dialog" className='w-full' variant={fileName ? 'outline' : ''}>
+              {fileName ? 'Thay đổi' : 'Chọn'}
+            </Button>
+            {fileName && <Button onClick={handleUploadImage}>Tải lên</Button>}
+          </div>
           <input
             type="file"
             ref={fileInputRef}

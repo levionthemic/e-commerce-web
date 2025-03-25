@@ -68,7 +68,10 @@ function Login() {
         loading: 'Đang đăng nhập...',
         success: (res) => {
           if (!res.error) {
-            navigate('/buyer')
+            if (res.role === PAGE_TYPE.BUYER)
+              navigate('/buyer')
+            else
+              navigate('/seller')
             return 'Đăng nhập thành công!'
           }
         }

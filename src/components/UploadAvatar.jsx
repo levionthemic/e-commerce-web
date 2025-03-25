@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux'
 import { updateUserAPI } from '~/redux/user/userSlice'
 import { useState } from 'react'
 
-export default function UploadAvatar({ avatar }) {
+export default function UploadAvatar({ avatar, className }) {
   const dispatch = useDispatch()
   const {
     previewUrl,
@@ -30,8 +30,8 @@ export default function UploadAvatar({ avatar }) {
         pending: 'Đang tải hình ảnh lên...',
         success: (res) => {
           if (!res.error) {
-            toast.success('Tải hình ảnh lên thành công!')
             handleRemove()
+            return 'Tải hình ảnh lên thành công!'
           }
         }
       }
@@ -40,9 +40,10 @@ export default function UploadAvatar({ avatar }) {
 
 
   return (
-    <div>
+    <div className={className}>
       <div className="relative inline-flex">
         <Button
+          type='button'
           variant="outline"
           className="relative size-24 overflow-hidden rounded-full p-0"
           onClick={handleThumbnailClick}

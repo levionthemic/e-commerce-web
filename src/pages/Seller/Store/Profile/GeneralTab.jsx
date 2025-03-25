@@ -1,26 +1,45 @@
 import { joiResolver } from '@hookform/resolvers/joi'
+import { format } from 'date-fns'
 import Joi from 'joi'
+import { CalendarIcon } from 'lucide-react'
 import { useId } from 'react'
 import { useForm } from 'react-hook-form'
+import { useSelector } from 'react-redux'
 import { Button } from '~/components/ui/button'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '~/components/ui/form'
+import { Calendar } from '~/components/ui/calendar'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Textarea } from '~/components/ui/textarea'
+import UploadAvatar from '~/components/UploadAvatar'
+import UploadImage from '~/components/UploadImage'
+import { cn } from '~/lib/utils'
+import { selectCurrentUser } from '~/redux/user/userSlice'
+import { ACCOUNT_STATUS } from '~/utils/constants'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
 
 function GeneralTab() {
   const id = useId()
+  const currentUser = useSelector(selectCurrentUser)
+
   const formSchema = Joi.object({
-    storeName: Joi.string().required().messages({
+    name: Joi.string().required().messages({
       'string.empty': FIELD_REQUIRED_MESSAGE
-    })
+    }),
+    foundedDate: Joi.date().required().required().messages({
+      'date.base': FIELD_REQUIRED_MESSAGE
+    }),
+    status: Joi.string().required().valid(...Object.values(ACCOUNT_STATUS)),
+    description: Joi.string()
   })
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
-      storeName: 'Tên cửa hàng',
+      name: currentUser?.name || 'LEVI Store',
+      foundedDate: '',
+      status: 'active',
       description: `
         ✨ LEVI Store - Thời Trang Đẳng Cấp, Phong Cách Bền Vững ✨
         Chào mừng bạn đến với LEVI Store, nơi mang đến những sản phẩm thời trang chất lượng cao, thiết kế tinh tế và đậm chất cá tính. Chúng tôi tự hào cung cấp các bộ sưu tập mới nhất, từ quần jeans, áo thun, sơ mi đến phụ kiện cao cấp, giúp bạn tự tin thể hiện phong cách riêng.
@@ -33,13 +52,12 @@ function GeneralTab() {
   })
 
   const items = [
-    { value: '1', label: 'Đang hoạt động' },
-    { value: '2', label: 'Tạm ngưng' },
-    { value: '3', label: 'Ngừng hoạt động' }
+    { value: 'active', label: 'Đang hoạt động' },
+    { value: 'inactive', label: 'Ngừng hoạt động' }
   ]
 
-  const handleUpdateStoreGeneralInformation = () => {
-
+  const handleUpdateStoreGeneralInformation = (data) => {
+    console.log(data)
   }
 
   return (
@@ -47,71 +65,119 @@ function GeneralTab() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleUpdateStoreGeneralInformation)}>
           <div className="grid grid-cols-3 gap-4 mb-4">
-            <FormField
-              control={form.control}
-              name="storeName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='text-base'>Tên cửa hàng</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Vd: Cửa hàng ABC"
-                      className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['storeName'] && 'border-red-500'}`}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription className=''>
-                          Bạn có thể thay đổi tên cửa hàng.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='createDate'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='text-base'>Ngày thành lập</FormLabel>
-                  <FormControl>
-                    <Input className='placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px]' {...field} />
-                  </FormControl>
-                  <FormDescription className=''>
-                          Bạn không thể thay đổi ngày bạn thành lập cửa hàng.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name='status'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='text-base'>Trạng thái cửa hàng</FormLabel>
-                  <FormControl>
-                    <RadioGroup className="flex flex-wrap gap-2" defaultValue="1" onValueChange={field.onChange}>
-                      {items.map((item) => (
-                        <div
-                          key={`${id}-${item.value}`}
-                          className="border-input has-data-[state=checked]:border-ring relative flex flex-col items-start gap-4 rounded-md border p-3 shadow-xs outline-none"
-                        >
-                          <div className="flex items-center gap-2">
-                            <RadioGroupItem
-                              id={`${id}-${item.value}`}
-                              value={item.value}
-                              className="after:absolute after:inset-0"
-                            />
-                            <Label htmlFor={`${id}-${item.value}`}>{item.label}</Label>
+            <div className='space-y-3'>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-base'>Tên cửa hàng</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Vd: Cửa hàng ABC"
+                        className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px] ${!!form.formState.errors['name'] && 'border-red-500'}`}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription className=''>
+                    Bạn có thể thay đổi tên cửa hàng.
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="foundedDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className='text-base'>Ngày thành lập</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-[240px] pl-3 text-left font-normal',
+                              !field.value && 'text-muted-foreground'
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, 'dd/MM/yyyy')
+                            ) : (
+                              <span>Chọn ngày thành lập</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date('1900-01-01')
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                    Bạn không thể thay đổi ngày thành lập.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <FormField
+                control={form.control}
+                name='status'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-base'>Trạng thái cửa hàng</FormLabel>
+                    <FormControl>
+                      <RadioGroup className="flex flex-wrap gap-2" defaultValue={field.value} onValueChange={field.onChange}>
+                        {items.map((item) => (
+                          <div
+                            key={`${id}-${item.value}`}
+                            className="border-input has-data-[state=checked]:border-ring relative flex flex-col items-start gap-4 rounded-md border p-3 shadow-xs outline-none"
+                          >
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem
+                                id={`${id}-${item.value}`}
+                                value={item.value}
+                                className="after:absolute after:inset-0"
+                              />
+                              <Label htmlFor={`${id}-${item.value}`}>{item.label}</Label>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                  <FormDescription className=''>
-                            Quyết định việc cửa hàng của bạn có được phép bán hàng hay không.
-                  </FormDescription>
-                </FormItem>
-              )}
-            />
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormDescription className=''>
+                    Trạng thái hoạt động hiện tại của cửa hàng.
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
+
+              <div className='space-y-2'>
+                <FormLabel className='text-base'>Ảnh bìa</FormLabel>
+                <UploadImage fieldName='coverPhoto' />
+
+              </div>
+
+            </div>
+
+            <div>
+              <Label className='text-base'>Ảnh đại diện</Label>
+              <FormDescription>Click vào để tải ảnh lên.</FormDescription>
+              <UploadAvatar className='mt-2 flex items-center justify-center flex-col' />
+            </div>
           </div>
 
           <FormField
