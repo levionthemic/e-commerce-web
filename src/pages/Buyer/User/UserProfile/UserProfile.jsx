@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux'
 
-import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
+import { logoutUserAPI, selectCurrentUser, updateUserAPI } from '~/redux/user/userSlice'
 import { useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
@@ -34,11 +34,13 @@ import {
 } from '~/components/ui/alert-dialog'
 import { toast } from 'sonner'
 import Rating from 'react-rating'
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { Switch } from '~/components/ui/switch'
-import { GENDER } from '~/utils/constants'
-import { TrendingUp } from 'lucide-react'
+import { ACCOUNT_STATUS, GENDER } from '~/utils/constants'
+import { Pencil, TrendingUp } from 'lucide-react'
 import { Separator } from '~/components/ui/separator'
+import Autocomplete from '~/components/Autocomplete'
+import OTP from '~/components/OTP'
 
 function UserProfile() {
   const dispatch = useDispatch()
@@ -56,8 +58,20 @@ function UserProfile() {
       'string.empty': FIELD_REQUIRED_MESSAGE,
       'string.pattern.base': EMAIL_RULE_MESSAGE
     }),
-    address: Joi.string().messages({
-      'string.empty': FIELD_REQUIRED_MESSAGE
+    address: Joi.object({
+      province: Joi.number().required().messages({
+        'any.required': FIELD_REQUIRED_MESSAGE
+      }),
+      district: Joi.number().required().messages({
+        'any.required': FIELD_REQUIRED_MESSAGE
+      }),
+      ward: Joi.string().required().trim().strict().messages({
+        'any.required': FIELD_REQUIRED_MESSAGE
+      }),
+      detail: Joi.string().required().trim().strict().messages({
+        'any.required': FIELD_REQUIRED_MESSAGE
+      })
+
     }),
     phone: Joi.string().pattern(PHONE_NUMBER_RULE).message(PHONE_NUMBER_RULE_MESSAGE).messages({
       'string.empty': FIELD_REQUIRED_MESSAGE
@@ -74,10 +88,10 @@ function UserProfile() {
   const leftForm = useForm({
     resolver: joiResolver(joiSchema),
     defaultValues: {
-      address: currentUser?.address || '',
+      address: currentUser?.address[0] || {},
       phone: currentUser?.phone || '',
       name: currentUser?.name || '',
-      gender: currentUser?.gender || 'male'
+      gender: currentUser?.gender || GENDER.MALE
     }
   })
 
@@ -89,12 +103,99 @@ function UserProfile() {
     }
   })
 
+  const [listProvinces, setListProvinces] = useState([])
+  const [listDistricts, setListDistricts] = useState([])
+  const [listWards, setListWards] = useState([])
+
+  const [provinceId, setProvinceId] = useState(currentUser?.address[0].province || null)
+  const [districtId, setDistrictId] = useState(currentUser?.address[0].district || null)
+  const [wardId, setWardId] = useState(currentUser?.address[0].ward || null)
+
+  useEffect(() => {
+    fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+      headers: { token: import.meta.env.VITE_GHN_TOKEN_API }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setListProvinces(data.data)
+      })
+  }, [])
+
+  useEffect(() => {
+    setListWards([])
+    if (provinceId) {
+      fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district', {
+        method: 'POST',
+        headers: { token: import.meta.env.VITE_GHN_TOKEN_API, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          province_id: provinceId
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.data?.length) setListDistricts(data.data)
+        })
+    }
+  }, [provinceId])
+
+  useEffect(() => {
+    if (districtId) {
+      fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id', {
+        method: 'POST',
+        headers: { token: import.meta.env.VITE_GHN_TOKEN_API, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          district_id: districtId
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.data?.length) setListWards(data.data)
+        })
+    }
+  }, [districtId])
+
+  useEffect(() => {
+    leftForm.setValue('address', {
+      province: provinceId,
+      district: districtId,
+      ward: wardId,
+      detail: leftForm.watch('address.detail')
+    })
+  }, [provinceId, districtId, wardId, leftForm, listProvinces, listDistricts, listWards])
+
+  const getDetails = (data) => {
+    if (data.type === 'province') setProvinceId(data.id)
+    else if (data.type === 'district') setDistrictId(data.id)
+    else setWardId(data.id)
+  }
+
+  const [disableEmail, setDisableEmail] = useState(true)
+  const [showPasswordInput, setShowPasswordInput] = useState(true)
+  const handleChangeEmail = () => {
+    //
+  }
+
   const handleLeftFormSubmit = (data) => {
-    console.log(data)
+    const updateData = {
+      ...data,
+      address: [data.address],
+      status: currentUser?.status
+    }
+    toast.promise(
+      dispatch(updateUserAPI(updateData)),
+      {
+        pending: 'Đang cập nhật...',
+        success: (res) => {
+          if (!res.error)
+            toast.success('Cập nhật thành công!')
+        }
+      }
+    )
+
   }
 
   const id = useId()
-  const [checked, setChecked] = useState(true)
+  const [checked, setChecked] = useState(currentUser?.status === ACCOUNT_STATUS.ACTIVE)
 
   return (
     <div className='px-4'>
@@ -200,19 +301,93 @@ function UserProfile() {
 
                   <FormField
                     control={leftForm.control}
-                    name="address"
-                    render={({ field }) => (
-                      <FormItem className='my-4'>
+                    name=""
+                    render={() => (
+                      <FormItem className='mb-10'>
                         <FormLabel className='text-base'>Địa chỉ</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder='Vd: 123 đường XYZ'
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['address'] && 'border-red-500'}`}
-                            {...field}
-                          />
+                          <div className="">
+                            <div className="grid grid-cols-3 gap-4 mb-4">
+                              <FormField
+                                control={leftForm.control}
+                                name="address.province"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Autocomplete
+                                        data={listProvinces?.map(i => ({ value: i.ProvinceID, label: i.ProvinceName, id: i.ProvinceID }))}
+                                        title={'Tỉnh/thành'}
+                                        getDetails={getDetails}
+                                        flag={'province'}
+                                        error={!!leftForm.formState.errors['address.province']}
+                                        defaultValue={field.value}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={leftForm.control}
+                                name="address.district"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Autocomplete
+                                        data={listDistricts?.map(i => ({ value: i.DistrictID, label: i.DistrictName, id: i.DistrictID }))}
+                                        title={'Quận/huyện'}
+                                        getDetails={getDetails}
+                                        flag={'district'}
+                                        error={!!leftForm.formState.errors['address.district']}
+                                        defaultValue={field.value}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={leftForm.control}
+                                name="address.ward"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Autocomplete
+                                        data={listWards?.map(i => ({ value: i.WardCode, label: i.WardName, id: i.WardCode }))}
+                                        title={'Phường/xã'}
+                                        getDetails={getDetails}
+                                        flag={'ward'}
+                                        error={!!leftForm.formState.errors['address.ward']}
+                                        defaultValue={field.value}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            <FormField
+                              control={leftForm.control}
+                              name="address.detail"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormControl>
+                                    <Input
+                                      placeholder="Vd: 123 đường ABC, phường X, quận Y, TPHCM"
+                                      className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!leftForm.formState.errors['address.detail'] && 'border-red-500'}`}
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
                         </FormControl>
-                        <FormDescription>
-                          Đia chỉ mặc định của bạn
+                        <FormDescription className=''>
+                          Địa chỉ nơi bạn cư trú.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -225,6 +400,7 @@ function UserProfile() {
                 </form>
               </Form>
             </div>
+
             <div className='my-4'>
               <div className='text-lg font-medium text-mainColor2-800'>Thông tin tài khoản</div>
               <Form {...rightForm}>
@@ -257,10 +433,15 @@ function UserProfile() {
                       <FormItem className='my-4'>
                         <FormLabel className='text-base'>Email</FormLabel>
                         <FormControl>
-                          <Input
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['email'] && 'border-red-500'}`}
-                            {...field}
-                          />
+                          <div className='flex items-center gap-4'>
+                            <Input
+                              disabled={disableEmail}
+                              className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!leftForm.formState.errors['email'] && 'border-red-500'}`}
+                              {...field}
+                            />
+                            <OTP trigger={<Button variant='outline' type='button' onClick={handleChangeEmail}><Pencil />Thay đổi</Button>} setState={setDisableEmail}/>
+                          </div>
+
                         </FormControl>
                         <FormDescription>
                           Mỗi tài khoản chỉ có duy nhất 1 email.
@@ -277,15 +458,15 @@ function UserProfile() {
                       <FormItem className='my-4'>
                         <FormLabel className='text-base'>Mật khẩu</FormLabel>
                         <FormControl>
-                          <Input
-                            type='password'
-                            className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!rightForm.formState.errors['password'] && 'border-red-500'}`}
-                            {...field}
-                          />
+                          <div>
+                            <Input
+                              type='password'
+                              className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-full focus:outline-none focus:border-[2px] border-[1px] ${!!rightForm.formState.errors['password'] && 'border-red-500'} ${showPasswordInput && 'hidden'}`}
+                              {...field}
+                            />
+                            <OTP trigger={<Button variant='outline' type='button' className={`${!showPasswordInput && 'hidden'}`}><Pencil />Thay đổi mật khẩu</Button>} setState={setShowPasswordInput} />
+                          </div>
                         </FormControl>
-                        <FormDescription>
-                          Bạn có thể thay đổi mật khẩu.
-                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}

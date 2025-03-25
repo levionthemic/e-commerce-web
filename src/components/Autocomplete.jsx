@@ -56,7 +56,7 @@ export default function Autocomplete({ data, label, title, getDetails, flag, err
                     value={i.value}
                     onSelect={(currentValue) => {
                       getDetails({ id: i.id, type: flag })
-                      setValue(currentValue === value ? '' : currentValue)
+                      setValue(currentValue === i.label || currentValue === i.value ? i.value : '')
                       setOpen(false)
                     }}>
                     {i.label}
