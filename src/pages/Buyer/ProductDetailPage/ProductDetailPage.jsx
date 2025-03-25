@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import Rating from 'react-rating'
@@ -37,6 +37,7 @@ import { MdAddShoppingCart } from 'react-icons/md'
 
 function ProductDetailPage() {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { productId } = useParams()
 
   const [product, setProduct] = useState(null)
@@ -64,6 +65,7 @@ function ProductDetailPage() {
   const currentUser = useSelector(selectCurrentUser)
 
   useEffect(() => {
+    window.scrollTo(0, 0)
     getProductDetailsAPI(productId)
       .then((data) => {
         setProduct(data)
@@ -89,6 +91,19 @@ function ProductDetailPage() {
         }
       }
     )
+  }
+
+  const handleCheckout = () => {
+    if (!typeId) {
+      toast.error('Bạn chưa chọn loại sản phẩm!', { position: 'top-right' })
+      return
+    }
+
+    navigate('/buyer/checkout', { state: { selectedRows: [{
+      ...product,
+      type: product.types.find(t => t.typeId.toString() === typeId),
+      quantity: quantity
+    }] } })
   }
 
   if (!product) {
@@ -117,7 +132,7 @@ function ProductDetailPage() {
         <div className='grid grid-cols-4 gap-6 relative'>
           <div className="col-span-3">
             <div className="grid grid-cols-3 gap-6 h-fit relative mb-6">
-              <div className="bg-white flex items-center justify-center h-fit rounded-lg p-4 pb-32 sticky top-3 left-0 max-h-fit">
+              <div className="bg-white flex items-center justify-center h-fit rounded-lg p-4 pb-32 sticky top-36 left-0 max-h-fit">
                 <div className='rounded-2xl overflow-hidden border'>
                   <img
                     src={product?.avatar}
@@ -197,7 +212,7 @@ function ProductDetailPage() {
 
                 <div className='rounded-lg bg-white p-4 mb-6'>
                   <div className='text-lg font-semibold text-mainColor1-600 mb-1'>Thông tin vận chuyển</div>
-                  <p className='text-sm'>Giao đến: {currentUser?.address || 'Q. 1, P. Bến Nghé, Hồ Chí Minh'}</p>
+                  <p className='text-sm'>Giao đến: {`${currentUser?.address[0].detail}, ${currentUser?.address[0].ward}, ${currentUser?.address[0].district}, ${currentUser?.address[0].province}`}</p>
                   <div className='divider w-full h-px border border-t-0 border-gray-200 my-2'></div>
                   <div>GHTK</div>
                 </div>
@@ -297,7 +312,7 @@ function ProductDetailPage() {
           </div>
 
 
-          <div className="sticky top-3 left-0 max-h-full h-fit">
+          <div className="sticky top-36 left-0 max-h-full h-fit">
             <div className='rounded-lg bg-white p-4 mb-6'>
               <div className='text-xl font-semibold text-mainColor1-600 mb-2'>Tóm tắt</div>
 
@@ -350,7 +365,7 @@ function ProductDetailPage() {
               </div>
 
               <div className='flex flex-col gap-2 mt-4 mb-2'>
-                <Button className='w-full py-5 bg-mainColor1-800 hover:bg-mainColor1-600 hover:drop-shadow-xl text-lg'> <IoBagCheckOutline /> Mua ngay</Button>
+                <Button className='w-full py-5 bg-mainColor1-800 hover:bg-mainColor1-600 hover:drop-shadow-xl text-lg' onClick={handleCheckout}> <IoBagCheckOutline /> Mua ngay</Button>
                 <Button className='w-full bg-white border-mainColor2-800 text-mainColor2-800 border hover:bg-mainColor2-800/90 hover:text-white' onClick={handleAddToCart}>
                   <MdAddShoppingCart />
                   Thêm vào giỏ hàng

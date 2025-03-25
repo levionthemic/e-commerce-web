@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 function MenuBar() {
   return (
-    <div className='bg-mainColor1-400 rounded-full'>
+    <div className='bg-mainColor1-400 rounded-full' style={{ boxShadow: 'rgba(0, 0, 0, 0.15) 0px 15px 25px, rgba(0, 0, 0, 0.05) 0px 5px 10px' }}>
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           <IoMenu className='text-2xl text-white cursor-pointer hover:scale-110 transition-transform hover:ease-in-out hover:duration-300' />

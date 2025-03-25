@@ -153,7 +153,7 @@ function CheckoutPage() {
 
             <div className={clsx({ 'mt-6': true, 'hidden': step < 4 })}>
               <Button
-                className='w-full bg-mainColor1-600 hover:bg-mainColor1-800 transition-all hover:ease-in-out hover:duration-300 text-white text-md rounded-full'
+                className='w-full bg-mainColor1-600 hover:bg-mainColor1-800 transition-all hover:ease-in-out hover:duration-300 text-white text-xl py-6 rounded-xl'
                 onClick={handleCheckout}
               >
                 Đặt hàng

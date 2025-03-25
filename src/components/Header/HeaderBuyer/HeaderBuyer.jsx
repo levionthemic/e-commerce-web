@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
@@ -25,7 +25,6 @@ import {
   DropdownMenuTrigger
 } from '~/components/ui/dropdown-menu'
 import { Badge } from '~/components/ui/badge'
-import { useForm } from 'react-hook-form'
 
 import { Button } from '~/components/ui/button'
 import {
@@ -68,17 +67,20 @@ function HeaderBuyer() {
   const currentCart = useSelector(selectCurrentCart)
   const dispatch = useDispatch()
 
-  const { handleSubmit, register } = useForm()
+  const inputRef = useRef()
 
   useEffect(() => {
     dispatch(fetchCurrentCartAPI())
   }, [dispatch])
 
 
-  const handleSearch = (data) => {
-    const searchValue = data.searchValue.trim()
+  const handleSearch = (event) => {
+    event.preventDefault()
+    const searchValue = inputRef.current.value
     if (searchValue) {
       navigate(`/buyer/search?${createSearchParams({ 'keyword': searchValue })}`)
+      handleBlur()
+      window.scrollTo(0, 0)
     }
   }
 
@@ -109,10 +111,12 @@ function HeaderBuyer() {
     document.body.style.overflow = 'hidden'
   }
 
-  const handleBlur = useDebounceFn(() => {
+  const handleBlur = () => {
+    inputRef.current.blur()
     setShowBackgroundOverlay(false)
     document.body.style.overflow = 'auto'
-  }, 100)
+    setSearchProducts([])
+  }
 
   const handleChange = useDebounceFn((event) => {
     setLoading(true)
@@ -132,6 +136,7 @@ function HeaderBuyer() {
       .finally(() => { setLoading(false) })
   }, 1000)
 
+
   return (
     <>
       <div className='sticky top-0 left-0 bg-white z-50'>
@@ -144,14 +149,14 @@ function HeaderBuyer() {
             LEVI
             </div>
             <div className="flex-1">
-              <form action="#" onSubmit={handleSubmit(handleSearch)} className="relative w-[80%] mx-auto">
+              <form onSubmit={handleSearch} className="relative w-[80%] mx-auto">
                 <Input
                   className='peer ps-9 pe-9 w-full placeholder:text-sm placeholder:text-mainColor1-100 rounded-full border-mainColor1-800 text-mainColor1-600 hover:border-[2px] focus:border-[2px] flex-1'
                   placeholder='Bạn cần tìm gì?'
-                  {...register('searchValue')}
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   onChange={handleChange}
+                  ref={inputRef}
                 />
                 <div className="text-mainColor1-600/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
                   <SearchIcon size={16} />
@@ -166,7 +171,7 @@ function HeaderBuyer() {
               </form>
             </div>
 
-            <div className='flex items-center gap-6'>
+            <div className='flex items-center gap-10'>
               <IoNotificationsOutline className='text-mainColor1-600 text-xl font-bold' />
 
               <Sheet key={'right'}>
@@ -194,24 +199,25 @@ function HeaderBuyer() {
                       Sơ lược các sản phẩm trong giỏ hàng.
                     </SheetDescription>
                   </SheetHeader>
-                  <div className="py-4">
+                  <div className="py-4 max-h-[89%] overflow-auto">
                     {currentCart?.fullProducts?.map((product, index) => (
-                      <div key={index} className='flex items-center gap-2 my-3 overflow-hidden'>
+                      <div key={index} className='flex items-center gap-2 my-6'>
                         <img src={product?.avatar} alt="" width={40} height={40} />
                         <div className='flex flex-col gap-1'>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className='text-sm line-clamp-1 text-mainColor2-800'>{product?.name}</span>
+                                <span className='text-sm line-clamp-1 text-mainColor2-800 leading-none'>{product?.name}</span>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>{product?.name}</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
+                          <p className='line-clamp-1 text-xs text-gray-400 mb-0.5'>Loại: {product.type.typeName}</p>
                           <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
-                            <Badge className='bg-mainColor2-800/90'>{currentCart?.itemList[index].quantity} sản phẩm</Badge>
-                            <span className='text-[0.8rem] text-muted-foreground'>x {product?.type?.price?.toLocaleString('vi-VN')}<sup>đ</sup></span>
+                            <Badge className='bg-mainColor2-800/90'>{currentCart.itemList[index].quantity} sản phẩm</Badge>
+                            <span className='text-[0.8rem] text-muted-foreground'>x {product?.type.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
                           </div>
                         </div>
                       </div>
@@ -286,12 +292,12 @@ function HeaderBuyer() {
             }}
           >
             {loading && 'Đang tìm kiếm...'}
-            {searchProducts.length
+            {!loading && searchProducts.length
               ? searchProducts.map(prod => (
                 <div
                   key={prod._id}
                   className='flex items-center gap-4 hover:bg-gray-100 px-1 rounded-sm my-1 cursor-pointer py-2'
-                  onClick={() => navigate(`/buyer/product/${prod._id}`)}
+                  onMouseDown={() => {navigate(`/buyer/product/${prod._id}`)}}
                 >
                   <div>
                     <img src={prod?.avatar} alt="" className='w-10 h-10'/>

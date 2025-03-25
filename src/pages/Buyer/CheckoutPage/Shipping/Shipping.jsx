@@ -9,7 +9,6 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage
 } from '~/components/ui/form'
 import {
@@ -17,7 +16,6 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue
 } from '~/components/ui/select'
@@ -29,11 +27,15 @@ import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import ghtkLogo from '~/assets/ghtk-logo.png'
 import ghnLogo from '~/assets/ghn-logo.png'
 import { cloneDeep } from 'lodash'
+import { SHIPPING_METHOD } from '~/utils/constants'
 
 
 const formSchema = Joi.object({
   address: Joi.string().required().trim().strict().messages({
     'string.empty': FIELD_REQUIRED_MESSAGE
+  }),
+  shippingMethod: Joi.string().required().valid(...Object.values(SHIPPING_METHOD)).messages({
+    'any.required': FIELD_REQUIRED_MESSAGE
   })
 })
 
@@ -43,7 +45,8 @@ function Shipping({ setStep, listCheckoutProducts, checkoutInfo, setCheckoutInfo
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
-      address: currentUser?.address || '2'
+      address: '0',
+      shippingMethod: checkoutInfo?.shipping?.type
     }
   })
 
@@ -77,15 +80,12 @@ function Shipping({ setStep, listCheckoutProducts, checkoutInfo, setCheckoutInfo
     })
   }, [checkoutInfo?.address.district, checkoutInfo?.address.ward, listCheckoutProducts])
 
-  const handleUpdateShipping = () => {
-    setStep(3)
-  }
-
-  const handleChooseShippingMethod = (shippingMethod) => {
+  const handleUpdateShipping = (data) => {
     setCheckoutInfo({
       ...checkoutInfo,
-      shipping: shippingData.find(s => s.type === shippingMethod)
+      shipping: shippingData.find(s => s.type === data.shippingMethod)
     })
+    setStep(3)
   }
 
   const handleBack = () => {
@@ -112,8 +112,12 @@ function Shipping({ setStep, listCheckoutProducts, checkoutInfo, setCheckoutInfo
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {/* {currentUser?.addresses?.map((address, index) => <SelectItem key={index} value="apple">{address || '123 đường ABC, phường X, quận Y, TPHCM'}</SelectItem>)} */}
-                        <SelectItem value="2">{checkoutInfo?.shortAddress}</SelectItem>
+                        {/* {currentUser?.address?.map((address, index) =>
+                          <SelectItem key={index} value={`${index}`}>
+                            {`${address.detail}, ${address.ward}, ${address.district}, ${address.province}`}
+                          </SelectItem>)
+                        } */}
+                        <SelectItem value="0">{checkoutInfo?.shortAddress}</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -128,53 +132,70 @@ function Shipping({ setStep, listCheckoutProducts, checkoutInfo, setCheckoutInfo
 
           <div>
             <div className="text-mainColor1-600 font-medium text-lg mb-2">Dịch vụ vận chuyển</div>
-            <RadioGroup className="gap-2" defaultValue={checkoutInfo?.shipping?.type} onValueChange={(event) => handleChooseShippingMethod(event)}>
-              <div
-                className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
-                <RadioGroupItem
-                  value={'ghtk'}
-                  id={`${id}-1`}
-                  aria-describedby={`${id}-1-description`}
-                  className="order-1 after:absolute after:inset-0" />
-                <div className="flex grow items-start gap-3">
-                  <img src={ghtkLogo} alt='' width={30} height={30} />
-                  <div className="grid grow gap-2">
-                    <Label htmlFor={`${id}-1`}>
-                          Giao hàng tiết kiệm{' '}
-                      <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
-                            (Giao vào thứ 7)
-                      </span>
-                    </Label>
-                    <p id={`${id}-1-description`} className="text-muted-foreground text-xs">
-                          Chi phí: 0đ - Free
-                    </p>
-                  </div>
-                </div>
-              </div>
+            <FormField
+              control={form.control}
+              name="shippingMethod"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <RadioGroup className="gap-2" defaultValue={field.value} onValueChange={field.onChange}>
+                      <FormItem className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
+                        <FormControl>
+                          <RadioGroupItem
+                            value={SHIPPING_METHOD.GHTK}
+                            id={`${id}-1`}
+                            aria-describedby={`${id}-1-description`}
+                            className="order-1 after:absolute after:inset-0" />
+                        </FormControl>
 
-              <div
-                className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
-                <RadioGroupItem
-                  value={'ghn'}
-                  id={`${id}-2`}
-                  aria-describedby={`${id}-2-description`}
-                  className="order-1 after:absolute after:inset-0" />
-                <div className="flex grow items-start gap-3">
-                  <img src={ghnLogo} alt='' width={30} height={30} />
-                  <div className="grid grow gap-2">
-                    <Label htmlFor={`${id}-2`}>
+                        <div className="flex grow items-start gap-3">
+                          <img src={ghtkLogo} alt='' width={30} height={30} />
+                          <div className="grid grow gap-2">
+                            <Label htmlFor={`${id}-1`}>
+                          Giao hàng tiết kiệm{' '}
+                              <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
+                            (Giao vào thứ 7)
+                              </span>
+                            </Label>
+                            <p id={`${id}-1-description`} className="text-muted-foreground text-xs">
+                          Chi phí: 0đ - Free
+                            </p>
+                          </div>
+                        </div>
+                      </FormItem>
+
+                      <FormItem className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
+                        <FormControl>
+                          <RadioGroupItem
+                            value={SHIPPING_METHOD.GHN}
+                            id={`${id}-2`}
+                            aria-describedby={`${id}-2-description`}
+                            className="order-1 after:absolute after:inset-0" />
+                        </FormControl>
+                        <div className="flex grow items-start gap-3">
+                          <img src={ghnLogo} alt='' width={30} height={30} />
+                          <div className="grid grow gap-2">
+                            <Label htmlFor={`${id}-2`}>
                           Giao hàng nhanh{' '}
-                      <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
+                              <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
                             (Giao trong 2 giờ)
-                      </span>
-                    </Label>
-                    <p id={`${id}-2-description`} className="text-muted-foreground text-xs">
+                              </span>
+                            </Label>
+                            <p id={`${id}-2-description`} className="text-muted-foreground text-xs">
                           Chi phí: {shippingData ? shippingData[1]?.detail?.total?.toLocaleString('vi-VN') : 0}đ
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </RadioGroup>
+                            </p>
+                          </div>
+                        </div>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormDescription>
+                    Chọn bất kì dịch vụ vận chuyển mà bạn muốn.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           <div className='grid grid-cols-2 gap-5'>
             <Button className='border bg-white text-mainColor1-600  border-mainColor1-600 hover:bg-white text-md font-semibold rounded-lg hover:drop-shadow-xl' onClick={handleBack}>Quay lại</Button>

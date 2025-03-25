@@ -20,6 +20,8 @@ import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-tabl
 import { cloneDeep } from 'lodash'
 import { Button } from '~/components/ui/button'
 import { toast } from 'sonner'
+import { EllipsisIcon, Trash2Icon } from 'lucide-react'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alert-dialog'
 
 function CartPage() {
   const navigate = useNavigate()
@@ -57,6 +59,22 @@ function CartPage() {
     dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
   }
 
+  const handleDeleteItemCart = (product) => {
+    let itemList = cloneDeep(cart.itemList)
+    let fullProducts = cloneDeep(cart.fullProducts)
+
+    itemList = itemList.filter(item => !(item.productId === product._id && item.typeId === product.type.typeId))
+    fullProducts = fullProducts.filter(item => !(item._id === product._id && item.type.typeId === product.type.typeId))
+
+    let updateCart = cloneDeep(cart)
+    updateCart.itemList = itemList
+    updateCart.fullProducts = fullProducts
+
+    dispatch(setCart(updateCart))
+
+    // Call API
+  }
+
   const columns = [
     {
       id: 'select',
@@ -75,16 +93,18 @@ function CartPage() {
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
         />
-      )
+      ),
+      size: 30
     },
     {
-      header: 'Ảnh sản phẩm',
+      header: 'Ảnh',
       accessorKey: 'avatar',
       cell: ({ row }) => <img
         src={row.getValue('avatar')}
         alt={row.getValue('name')}
-        className='w-20 h-20'
-      />
+        className='w-16 h-16 rounded'
+      />,
+      size: 60
     },
     {
       header: 'Tên sản phẩm',
@@ -98,7 +118,8 @@ function CartPage() {
         <div>
           {row.original.type.price.toLocaleString('vi-VN')}<sup>đ</sup>
         </div>
-      )
+      ),
+      size: 80
     },
     {
       header: 'Loại sản phẩm',
@@ -115,7 +136,7 @@ function CartPage() {
       accessorKey: 'quantity',
       cell: ({ row }) => {
         return (
-          <div className='flex items-center justify-between rounded-lg p-1 border border-gray-300'>
+          <div className='flex items-center justify-between rounded-lg p-1 border border-gray-300 w-fit'>
             <RiSubtractFill
               className='cursor-pointer text-xl hover:bg-mainColor2-800/40 rounded-md'
               onClick={() => { handleDecreaseQuantity(row.original._id, row.original.type.typeId) }}
@@ -131,22 +152,53 @@ function CartPage() {
             />
           </div>
         )
-      }
+      },
+      size: 80
     },
     {
       header: () => <div className="text-right">Thành tiền</div>,
       accessorKey: 'totalPrice',
       cell: ({ row }) => {
-        return <div className="text-right">{(row.original.type.price * cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId)?.quantity).toLocaleString('vi-VN')}
+        return <div className="text-right font-semibold">{(row.original.type.price * cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId)?.quantity).toLocaleString('vi-VN')}
           <sup>đ</sup></div>
-      }
+      },
+      size: 80
+    },
+    {
+      header: <div className='text-right'>Thao tác</div>,
+      accessorKey: 'actions',
+      cell: ({ row }) => (
+        <div className='flex items-center justify-end gap-1'>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <div className='hover:bg-red-200 hover:text-red-500 p-1.5 rounded-md cursor-pointer transition-all hover:ease-in-out hover:duration-300'>
+                <Trash2Icon className='size-4' />
+              </div>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Bạn có chắc chắn muốn xóa?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Hành động này sẽ không thể khôi phục.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleDeleteItemCart(row.original)}>Xóa</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <div className='hover:bg-gray-200 p-1.5 rounded-md cursor-pointer transition-all hover:ease-in-out hover:duration-300' onClick={() => navigate(`/buyer/product/${row.original._id}`)}>
+            <EllipsisIcon className='size-4'/>
+          </div>
+        </div>
+      ),
+      size: 80
     }
   ]
 
-  const [data] = useState(cart.fullProducts)
-
   const table = useReactTable({
-    data,
+    data: cart.fullProducts,
     columns,
     getCoreRowModel: getCoreRowModel()
   })
@@ -178,19 +230,19 @@ function CartPage() {
 
   return (
     <div className='container mx-auto'>
-      <div className="grid grid-cols-4 gap-5">
+      <div className="grid grid-cols-4 gap-5 relative max-h-full my-4">
         <div className="col-span-3 py-4 h-fit">
           <div className='font-semibold text-2xl text-mainColor2-800 mb-6'>Giỏ Hàng Của Bạn</div>
           {!cart || !cart?.itemList.length
             ? <p>Giỏ hàng của bạn đang trống.</p>
             : <div>
-              <Table>
+              <Table className='table-fixed'>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
                     <TableRow key={headerGroup.id} className="hover:bg-transparent">
                       {headerGroup.headers.map((header) => {
                         return (
-                          <TableHead key={header.id}>
+                          <TableHead key={header.id} style={{ width: `${header.getSize()}px` }}>
                             {header.isPlaceholder
                               ? null
                               : flexRender(header.column.columnDef.header, header.getContext())}
@@ -223,7 +275,7 @@ function CartPage() {
                   <TableRow className="hover:bg-transparent">
                     <TableCell colSpan={6}>Tổng thành tiền</TableCell>
                     <TableCell className="text-right">
-                      <div className="total-price text-right">{totalPrice()?.toLocaleString('vi-VN') || 0}
+                      <div className="total-price text-right font-bold text-lg">{totalPrice()?.toLocaleString('vi-VN') || 0}
                         <sup>đ</sup></div>
                     </TableCell>
                   </TableRow>
@@ -232,7 +284,7 @@ function CartPage() {
             </div>
           }
         </div>
-        <div className="col-span-1 bg-[#ECEEF6]">
+        <div className="col-span-1 bg-[#ECEEF6] sticky top-32 rounded-lg left-0 max-h-[80%]">
           <div className='bg-white rounded-lg m-4 p-4'>
             <div className='uppercase tracking-wide text-sm font-semibold text-mainColor1-600 text-center py-4'>Tóm tắt</div>
 

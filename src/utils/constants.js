@@ -21,3 +21,8 @@ export const ACCOUNT_STATUS = {
   ACTIVE: 'active',
   INACTIVE: 'inactive'
 }
+
+export const SHIPPING_METHOD = {
+  GHTK: 'ghtk',
+  GHN: 'ghn'
+}

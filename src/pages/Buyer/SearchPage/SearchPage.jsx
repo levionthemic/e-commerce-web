@@ -60,10 +60,10 @@ function SearchPage() {
   return (
     <div className='container mx-auto my-6'>
       <div className='flex gap-6 h-full relative'>
-        <div className='w-[20%] px-6 h-full sticky top-4 left-0 max-h-full'>
+        <div className='w-[20%] px-6 h-full sticky top-36 left-0 max-h-full'>
           <div className='text-mainColor2-800 font-medium text-xl'>Bộ lọc sản phẩm</div>
 
-          <div className='mt-4 '>
+          <div className='mt-4'>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleFilter)} className="space-y-6">
                 <FormField

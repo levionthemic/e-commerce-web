@@ -21,7 +21,7 @@ export default function PaginationComponent({
   })
 
   return (
-    <Pagination>
+    <Pagination className='justify-end'>
       <PaginationContent>
         {/* First page button */}
         <PaginationItem>
