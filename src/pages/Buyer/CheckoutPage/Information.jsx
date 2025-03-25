@@ -51,15 +51,15 @@ const formSchema = Joi.object({
 
 
 function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
+  const currentUser = useSelector(selectCurrentUser)
+
   const [listProvinces, setListProvinces] = useState([])
   const [listDistricts, setListDistricts] = useState([])
   const [listWards, setListWards] = useState([])
 
-  const [provinceId, setProvinceId] = useState()
-  const [districtId, setDistrictId] = useState()
-  const [wardId, setWardId] = useState()
-
-  const currentUser = useSelector(selectCurrentUser)
+  const [provinceId, setProvinceId] = useState(checkoutInfo?.address.province || currentUser?.address.province)
+  const [districtId, setDistrictId] = useState(checkoutInfo?.address.district || currentUser?.address.district)
+  const [wardId, setWardId] = useState(checkoutInfo?.address.ward || currentUser?.address.ward)
 
   const form = useForm({
     resolver: joiResolver(formSchema),
@@ -222,16 +222,16 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                       <FormField
                         control={form.control}
                         name="address.province"
-                        render={() => (
+                        render={({ field }) => (
                           <FormItem>
                             <FormControl>
                               <Autocomplete
-                                data={listProvinces?.map(i => ({ value: i.ProvinceName, label: i.ProvinceName, id: i.ProvinceID }))}
+                                data={listProvinces?.map(i => ({ value: i.ProvinceID, label: i.ProvinceName, id: i.ProvinceID }))}
                                 title={'Tỉnh/thành'}
                                 getDetails={getDetails}
                                 flag={'province'}
                                 error={!!form.formState.errors['address.province']}
-                                // defaultValue={field.value}
+                                defaultValue={field.value}
                               />
                             </FormControl>
                             <FormMessage />
@@ -242,16 +242,16 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                       <FormField
                         control={form.control}
                         name="address.district"
-                        render={() => (
+                        render={({ field }) => (
                           <FormItem>
                             <FormControl>
                               <Autocomplete
-                                data={listDistricts?.map(i => ({ value: i.DistrictName, label: i.DistrictName, id: i.DistrictID }))}
+                                data={listDistricts?.map(i => ({ value: i.DistrictID, label: i.DistrictName, id: i.DistrictID }))}
                                 title={'Quận/huyện'}
                                 getDetails={getDetails}
                                 flag={'district'}
                                 error={!!form.formState.errors['address.district']}
-                                // defaultValue={field.value}
+                                defaultValue={field.value}
                               />
                             </FormControl>
                             <FormMessage />
@@ -262,16 +262,16 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                       <FormField
                         control={form.control}
                         name="address.ward"
-                        render={() => (
+                        render={({ field }) => (
                           <FormItem>
                             <FormControl>
                               <Autocomplete
-                                data={listWards?.map(i => ({ value: i.WardName, label: i.WardName, id: i.WardCode }))}
+                                data={listWards?.map(i => ({ value: i.WardCode, label: i.WardName, id: i.WardCode }))}
                                 title={'Phường/xã'}
                                 getDetails={getDetails}
                                 flag={'ward'}
                                 error={!!form.formState.errors['address.ward']}
-                                // defaultValue={field.value}
+                                defaultValue={field.value}
                               />
                             </FormControl>
                             <FormMessage />
