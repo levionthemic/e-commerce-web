@@ -2,7 +2,7 @@
 This is just my little pet project about E-Commerce platform.
 
 # Tech Stack:
-- FE: ReactJS + TailwindCSS + Shadcn/UI + Material UI. Build with Vite.
+- FE: ReactJS + TailwindCSS + Shadcn/UI + OriginUI. Build with Vite.
 - BE: ExpressJs.
 - Database: MongoDB.
 
