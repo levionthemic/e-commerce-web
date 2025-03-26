@@ -15,6 +15,8 @@ import {
   TooltipTrigger
 } from '~/components/ui/tooltip'
 import clsx from 'clsx'
+import { toast } from 'sonner'
+import { addOrderAPI } from '~/apis'
 
 function CheckoutPage() {
   const [step, setStep] = useState(1)
@@ -57,7 +59,13 @@ function CheckoutPage() {
       productVariants: listCheckoutProducts
     }
 
-    navigate('/buyer/checkout/complete', { state: { checkoutData: checkoutData } })
+    console.log(checkoutData)
+
+    toast.promise(addOrderAPI(checkoutData), {
+      pending: 'Đang xử lý...'
+    })
+
+    // navigate('/buyer/checkout/complete', { state: { checkoutData: checkoutData } })
   }
 
   const timelineItems = [

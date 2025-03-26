@@ -57,14 +57,14 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
   const [listDistricts, setListDistricts] = useState([])
   const [listWards, setListWards] = useState([])
 
-  const [provinceId, setProvinceId] = useState(checkoutInfo?.address.province || currentUser?.address.province)
-  const [districtId, setDistrictId] = useState(checkoutInfo?.address.district || currentUser?.address.district)
-  const [wardId, setWardId] = useState(checkoutInfo?.address.ward || currentUser?.address.ward)
+  const [provinceId, setProvinceId] = useState(checkoutInfo?.address.province || currentUser?.address[0].province)
+  const [districtId, setDistrictId] = useState(checkoutInfo?.address.district || currentUser?.address[0].district)
+  const [wardId, setWardId] = useState(checkoutInfo?.address.ward || currentUser?.address[0].ward)
 
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
-      address: checkoutInfo?.address || currentUser?.address,
+      address: checkoutInfo?.address || currentUser?.address[0],
       email: checkoutInfo?.email || currentUser?.email,
       name: checkoutInfo?.name || currentUser?.name,
       phone: checkoutInfo?.phone || currentUser?.phone
