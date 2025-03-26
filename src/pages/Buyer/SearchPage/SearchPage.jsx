@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Product from '~/components/Product/Product'
 import { createSearchParams, useSearchParams } from 'react-router-dom'
-import { getProductsAPI } from '~/apis'
+import { getProductsAPI, getProductsWithFiltersAPI } from '~/apis'
 
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
 import Loader from '~/components/Loader/Loader'
@@ -11,46 +11,109 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/
 import { Button } from '~/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
+import Rating from 'react-rating'
+import { FaRegStar, FaStar } from 'react-icons/fa'
 
 function SearchPage() {
   const [products, setProducts] = useState([])
   const [totalProducts, setTotalProducts] = useState(1)
+  const [categories, setCategories] = useState([])
+  const [brands, setBrands] = useState([])
   const [loading, setLoading] = useState(false)
 
   const [searchParams, setSearchParams] = useSearchParams()
   const keyword = searchParams.get('keyword')
   const page = parseInt(searchParams.get('page')) || DEFAULT_PAGE
 
+  const [filterByRate, setFilterByRate] = useState()
+  const [filterByPrice, setFilterByPrice] = useState()
+  const [filterByCategory, setFilterByCategory] = useState()
+  const [filterByBrand, setFilterByBrand] = useState()
+
+  const getPriceRange = (rate) => {
+    let minPrice = 0, maxPrice = 0
+    switch (rate) {
+    case '1': minPrice = 0; maxPrice = 500000; break
+    case '500': minPrice = 500000; maxPrice = 1000000; break
+    case '1000': minPrice = 1000000; maxPrice = 5000000; break
+    case '5000': minPrice = 5000000; maxPrice = 10000000; break
+    case '10000': minPrice = 10000000; maxPrice = 1000000000; break
+    default: break
+    }
+    return { minPrice, maxPrice }
+  }
+
+  const handlePaginate = useCallback((page) => {
+    searchParams.set('page', page)
+    setSearchParams(searchParams)
+  }, [searchParams, setSearchParams])
+
   useEffect(() => {
     // const { sortKey, sortValue } = defineSort(sortOption)
     setLoading(true)
-    const searchPath = `?${createSearchParams({
+
+    const searchObject = {
       'q[name]': keyword,
       'page': page
-    })}`
-    getProductsAPI(searchPath)
-      .then((data) => {
-        setProducts(data?.products || [])
-        setTotalProducts(data?.totalProducts || 0)
-      })
-      .finally(() => { setLoading(false), window.scrollTo(top) })
+    }
 
-  }, [page, keyword])
+    let filterFlag = false
 
-  const handlePaginate = (page) => {
-    searchParams.set('page', page)
-    setSearchParams(searchParams)
-  }
+    if (filterByRate && filterByRate !== 'all') {
+      searchObject['q[rating]'] = filterByRate
+      filterFlag = true
+    }
+    if (filterByPrice && filterByPrice !== 'all') {
+      filterFlag = true
+      const { minPrice, maxPrice } = getPriceRange(filterByPrice)
+      searchObject['q[minPrice]'] = minPrice
+      searchObject['q[maxPrice]'] = maxPrice
+    }
+    if (filterByCategory) {
+      searchObject['q[categoryId]'] = filterByCategory
+      filterFlag = true
+    }
+    if (filterByBrand) {
+      searchObject['q[brandId]'] = filterByBrand
+      filterFlag = true
+    }
+
+    const searchPath = `?${createSearchParams(searchObject)}`
+
+    if (!filterFlag) {
+      getProductsAPI(searchPath)
+        .then((data) => {
+          setProducts(data?.products || [])
+          setTotalProducts(data?.totalProducts || 0)
+          setCategories(data?.categories || [])
+          setBrands(data?.brands || [])
+        })
+        .finally(() => { setLoading(false), window.scrollTo(top) })
+    } else {
+      handlePaginate(1)
+      getProductsWithFiltersAPI(searchPath)
+        .then((data) => {
+          setProducts(data?.products || [])
+          setTotalProducts(data?.totalProducts || 0)
+        })
+        .finally(() => { setLoading(false), window.scrollTo(top) })
+    }
+
+  }, [page, keyword, filterByRate, filterByPrice, filterByCategory, filterByBrand, handlePaginate])
+
 
   const form = useForm({
     defaultValues: {
-      filterByRate: '0',
-      filterByPrice: '0'
+      filterByRate: 'all',
+      filterByPrice: 'all'
     }
   })
 
   const handleFilter = (data) => {
-    console.log(data)
+    setFilterByRate(data.filterByRate)
+    setFilterByPrice(data.filterByPrice)
+    setFilterByCategory(data.filterByCategory)
+    setFilterByBrand(data.filterByBrand)
   }
 
   if (loading) {
@@ -80,18 +143,26 @@ function SearchPage() {
                         >
                           <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
                             <FormControl>
-                              <RadioGroupItem value={'0'} className='bg-white' />
+                              <RadioGroupItem value={'all'} className='bg-white' />
                             </FormControl>
                             <FormLabel className="font-normal cursor-pointer">
                               Tất cả
                             </FormLabel>
                           </FormItem>
+
                           <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
                             <FormControl>
                               <RadioGroupItem value={'5'} className='bg-white' />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">
-                              5 sao - 4 sao
+                            <FormLabel className="font-normal cursor-pointer flex items-center gap-1.5">
+                              <Rating
+                                emptySymbol={<FaRegStar />}
+                                fullSymbol={<FaStar />}
+                                initialRating={5}
+                                readonly
+                                className='text-[#FBCA04] text-md leading-none'
+                              />
+                              <span>từ 5 sao</span>
                             </FormLabel>
                           </FormItem>
 
@@ -99,8 +170,15 @@ function SearchPage() {
                             <FormControl>
                               <RadioGroupItem value={'4'} className='bg-white' />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">
-                              4 sao - 3 sao
+                            <FormLabel className="font-normal cursor-pointer flex items-center gap-1.5">
+                              <Rating
+                                emptySymbol={<FaRegStar />}
+                                fullSymbol={<FaStar />}
+                                initialRating={4}
+                                readonly
+                                className='text-[#FBCA04] text-md leading-none'
+                              />
+                              <span>từ 4 sao</span>
                             </FormLabel>
                           </FormItem>
 
@@ -108,21 +186,16 @@ function SearchPage() {
                             <FormControl>
                               <RadioGroupItem value={'3'} className='bg-white' />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">3 sao - 2 sao</FormLabel>
-                          </FormItem>
-
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
-                            <FormControl>
-                              <RadioGroupItem value={'2'} className='bg-white' />
-                            </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">2 sao - 1 sao</FormLabel>
-                          </FormItem>
-
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
-                            <FormControl>
-                              <RadioGroupItem value={'1'} className='bg-white' />
-                            </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">Dưới 1 sao</FormLabel>
+                            <FormLabel className="font-normal cursor-pointer flex items-center gap-1.5">
+                              <Rating
+                                emptySymbol={<FaRegStar />}
+                                fullSymbol={<FaStar />}
+                                initialRating={3}
+                                readonly
+                                className='text-[#FBCA04] text-md leading-none'
+                              />
+                              <span>từ 3 sao</span>
+                            </FormLabel>
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
@@ -144,7 +217,7 @@ function SearchPage() {
                         >
                           <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
                             <FormControl>
-                              <RadioGroupItem value={'0'} className='bg-white' />
+                              <RadioGroupItem value={'all'} className='bg-white' />
                             </FormControl>
                             <FormLabel className="font-normal cursor-pointer">
                               Tất cả
@@ -208,9 +281,9 @@ function SearchPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="m@example.com">m@example.com</SelectItem>
-                          <SelectItem value="m@google.com">m@google.com</SelectItem>
-                          <SelectItem value="m@support.com">m@support.com</SelectItem>
+                          {categories?.map(category =>
+                            <SelectItem key={category?._id} value={category?._id}>{category?.name}</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormItem>
@@ -230,9 +303,9 @@ function SearchPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="m@example.com">m@example.com</SelectItem>
-                          <SelectItem value="m@google.com">m@google.com</SelectItem>
-                          <SelectItem value="m@support.com">m@support.com</SelectItem>
+                          {brands?.map(brand =>
+                            <SelectItem key={brand?._id} value={brand?._id}>{brand?.name}</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormItem>
