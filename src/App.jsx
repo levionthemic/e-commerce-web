@@ -28,9 +28,16 @@ import StoreProfile from './pages/Seller/Store/Profile/Profile'
 import Completion from './pages/Buyer/CheckoutPage/Completion'
 import CreateForm from './pages/Seller/Products/CreateForm/CreateForm'
 import ReviewPage from './pages/Buyer/ReviewPage/ReviewPage'
+import { PAGE_TYPE } from './utils/constants'
+import Page401 from './pages/Page401'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
+  return <Outlet />
+}
+
+const ProtectedRoute = ({ user, role }) => {
+  if (user.role !== role) return <Page401 />
   return <Outlet />
 }
 
@@ -47,20 +54,23 @@ function App() {
 
       <Route element={<PrivateRoute user={currentUser} />}>
         {/* Buyer pages */}
-        <Route path='/buyer' element={<BuyerLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path='search' element={<SearchPage />} />
-          <Route path='product/:productId' element={<ProductDetailPage />} />
-          <Route path='cart' element={<CartPage />} />
-          <Route path='checkout' element={<CheckoutPage />} />
-          <Route path='checkout/complete' element={<Completion />} />
-          <Route path='product/review/:productId' element={<ReviewPage />} />
-        </Route>
+        <Route element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.BUYER} />}>
+          <Route path='/buyer' element={<BuyerLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path='search' element={<SearchPage />} />
+            <Route path='product/:productId' element={<ProductDetailPage />} />
+            <Route path='cart' element={<CartPage />} />
+            <Route path='checkout' element={<CheckoutPage />} />
+            <Route path='checkout/complete' element={<Completion />} />
+            <Route path='product/review/:productId' element={<ReviewPage />} />
+          </Route>
 
-        {/* User pages (Buyer Module) */}
-        <Route path='/user' element={<UserLayout />}>
-          <Route path='profile' element={<UserProfile />} />
-          <Route path='order' element={<UserOrder />} />
+          {/* User pages (Buyer Module) */}
+          <Route path='/user' element={<UserLayout />}>
+            <Route path='profile' element={<UserProfile />} />
+            <Route path='order' element={<UserOrder />} />
+          </Route>
+
         </Route>
 
         {/* Admin pages */}
@@ -69,15 +79,17 @@ function App() {
         </Route>
 
         {/* Seller pages */}
-        <Route path='/seller' element={<SellerLayout />}>
-          <Route index element={<DashboardSeller />} />
-          <Route path='products' element={<ProductsSeller />} />
-          <Route path='products/add' element={<CreateForm />} />
-          <Route path='orders' element={<OrdersSeller />} />
-          <Route path='store/profile' element={<StoreProfile />} />
-          <Route path='store/inventory' element={<Inventory />} />
-          <Route path='promotion' element={<Promotion />} />
-          <Route path='comment' element={<Comments />} />
+        <Route element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.SELLER} />}>
+          <Route path='/seller' element={<SellerLayout />}>
+            <Route index element={<DashboardSeller />} />
+            <Route path='products' element={<ProductsSeller />} />
+            <Route path='products/add' element={<CreateForm />} />
+            <Route path='orders' element={<OrdersSeller />} />
+            <Route path='store/profile' element={<StoreProfile />} />
+            <Route path='store/inventory' element={<Inventory />} />
+            <Route path='promotion' element={<Promotion />} />
+            <Route path='comment' element={<Comments />} />
+          </Route>
         </Route>
 
         {/* 404 not found page */}

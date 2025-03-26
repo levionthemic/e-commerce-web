@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
+import { clearCart, fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
 
 import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
 import { Input } from '~/components/ui/input'
@@ -85,6 +85,7 @@ function HeaderBuyer() {
   }
 
   const handleLogout = async () => {
+    dispatch(clearCart())
     toast.promise(dispatch(logoutUserAPI()), {
       loading: 'Đang đăng xuất...'
     })

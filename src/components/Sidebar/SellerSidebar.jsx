@@ -32,12 +32,14 @@ import {
 import { useDispatch } from 'react-redux'
 import { toast } from 'sonner'
 import { logoutUserAPI } from '~/redux/user/userSlice'
+import { clearCart } from '~/redux/cart/cartSlice'
 
 function SellerSidebar() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
+    dispatch(clearCart())
     toast.promise(dispatch(logoutUserAPI()), {
       loading: 'Đang đăng xuất...'
     })

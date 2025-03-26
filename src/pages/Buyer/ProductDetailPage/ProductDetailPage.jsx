@@ -82,12 +82,13 @@ function ProductDetailPage() {
     toast.promise(
       dispatch(addToCartAPI(data)).unwrap(),
       {
-        loading: 'Đang đăng nhập...',
+        loading: 'Đang thêm vào giỏ hàng...',
         success: (res) => {
           if (!res.error) {
             dispatch(fetchCurrentCartAPI(data))
-            toast.success('Thêm vào giỏ hàng thành công!')
+            return 'Thêm vào giỏ hàng thành công!'
           }
+          throw res
         }
       }
     )

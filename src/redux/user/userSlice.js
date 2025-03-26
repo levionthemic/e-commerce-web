@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'sonner'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
-import { API_ROOT } from '~/utils/constants'
+import { ACCOUNT_STATUS, API_ROOT, PAGE_TYPE } from '~/utils/constants'
 
 export const loginUserAPI = createAsyncThunk(
   'user/loginUserAPI',
@@ -30,7 +30,17 @@ export const logoutUserAPI = createAsyncThunk(
 export const updateUserAPI = createAsyncThunk(
   'user/updateUserAPI',
   async (data) => {
-    const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/buyer/profile/update`, data)
+    const role = data.role || data.get('role')
+    let response = null
+    if (role === PAGE_TYPE.BUYER) {
+      delete data['role']
+      data.delete('role')
+      response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/buyer/profile/update`, data)
+    } else if (role === PAGE_TYPE.SELLER) {
+      delete data['role']
+      data.delete('role')
+      response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/seller/profile/update`, data)
+    }
     return response.data
   }
 )

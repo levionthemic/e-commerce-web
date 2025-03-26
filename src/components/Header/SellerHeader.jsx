@@ -40,7 +40,7 @@ function SellerHeader() {
             <AvatarFallback>LV</AvatarFallback>
           </Avatar>
           <div>
-            <div className='text-sm font-semibold'>Hồ Trần Ngọc Liêm</div>
+            <div className='text-sm font-semibold'>{currentUser?.name || 'Chưa có tên'}</div>
             <div className='text-xs text-gray-400'>Người bán</div>
           </div>
         </div>
