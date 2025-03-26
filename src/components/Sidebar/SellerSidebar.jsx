@@ -41,7 +41,7 @@ function SellerSidebar() {
   const handleLogout = async () => {
     dispatch(clearCart())
     toast.promise(dispatch(logoutUserAPI()), {
-      pending: 'Đang đăng xuất...'
+      loading: 'Đang đăng xuất...'
     })
   }
 

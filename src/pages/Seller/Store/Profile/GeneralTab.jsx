@@ -4,7 +4,8 @@ import Joi from 'joi'
 import { CalendarIcon } from 'lucide-react'
 import { useId } from 'react'
 import { useForm } from 'react-hook-form'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Calendar } from '~/components/ui/calendar'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
@@ -16,12 +17,13 @@ import { Textarea } from '~/components/ui/textarea'
 import UploadAvatar from '~/components/UploadAvatar'
 import UploadImage from '~/components/UploadImage'
 import { cn } from '~/lib/utils'
-import { selectCurrentUser } from '~/redux/user/userSlice'
+import { selectCurrentUser, updateUserAPI } from '~/redux/user/userSlice'
 import { ACCOUNT_STATUS } from '~/utils/constants'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
 
 function GeneralTab() {
   const id = useId()
+  const dispatch = useDispatch()
   const currentUser = useSelector(selectCurrentUser)
 
   const formSchema = Joi.object({
@@ -38,9 +40,9 @@ function GeneralTab() {
     resolver: joiResolver(formSchema),
     defaultValues: {
       name: currentUser?.name || 'LEVI Store',
-      foundedDate: '',
+      foundedDate: currentUser?.foundedDate || '',
       status: 'active',
-      description: `
+      description: currentUser?.description || `
         ✨ LEVI Store - Thời Trang Đẳng Cấp, Phong Cách Bền Vững ✨
         Chào mừng bạn đến với LEVI Store, nơi mang đến những sản phẩm thời trang chất lượng cao, thiết kế tinh tế và đậm chất cá tính. Chúng tôi tự hào cung cấp các bộ sưu tập mới nhất, từ quần jeans, áo thun, sơ mi đến phụ kiện cao cấp, giúp bạn tự tin thể hiện phong cách riêng.
         💎 Cam kết của chúng tôi: <br />
@@ -57,7 +59,17 @@ function GeneralTab() {
   ]
 
   const handleUpdateStoreGeneralInformation = (data) => {
-    console.log(data)
+    data.role = currentUser?.role
+    toast.promise(
+      dispatch(updateUserAPI(data)),
+      {
+        loading: 'Đang cập nhật...',
+        success: (res) => {
+          if (!res.error) return 'Cập nhật thành công!'
+          throw res
+        }
+      }
+    )
   }
 
   return (
@@ -176,7 +188,7 @@ function GeneralTab() {
             <div>
               <Label className='text-base'>Ảnh đại diện</Label>
               <FormDescription>Click vào để tải ảnh lên.</FormDescription>
-              <UploadAvatar className='mt-2 flex items-center justify-center flex-col' />
+              <UploadAvatar className='mt-2 flex items-center justify-center flex-col' avatar={currentUser?.avatar} />
             </div>
           </div>
 

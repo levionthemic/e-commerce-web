@@ -74,6 +74,7 @@ function Login() {
               navigate('/seller')
             return 'Đăng nhập thành công!'
           }
+          throw res
         }
       }
     )

@@ -3,14 +3,17 @@ import Joi from 'joi'
 import { useForm } from 'react-hook-form'
 import { BsTiktok } from 'react-icons/bs'
 import { FaFacebookF, FaInstagram } from 'react-icons/fa'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast } from 'sonner'
 import { Button } from '~/components/ui/button'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
-import { selectCurrentUser } from '~/redux/user/userSlice'
+import { selectCurrentUser, updateUserAPI } from '~/redux/user/userSlice'
+import { ACCOUNT_STATUS } from '~/utils/constants'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE, FIELD_REQUIRED_MESSAGE, PHONE_NUMBER_RULE, PHONE_NUMBER_RULE_MESSAGE } from '~/utils/validators'
 
 function ContactTab() {
+  const dispatch = useDispatch()
   const currentUser = useSelector(selectCurrentUser)
 
   const formSchema = Joi.object({
@@ -39,7 +42,17 @@ function ContactTab() {
   })
 
   const handleUpdateStoreGeneralInformation = (data) => {
-    console.log(data)
+    delete data['email']
+    toast.promise(
+      dispatch(updateUserAPI({ ...data, status: ACCOUNT_STATUS.ACTIVE, role: currentUser?.role })),
+      {
+        loading: 'Đang cập nhật...',
+        success: (res) => {
+          if (!res.error) return 'Cập nhật thành công!'
+          throw res
+        }
+      }
+    )
   }
 
   return (
@@ -89,7 +102,7 @@ function ContactTab() {
 
                       <div className="col-span-2">
                         <FormControl className='mb-2'>
-                          <Input placeholder='Vd: abc@example.com' className='placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px]' {...field} />
+                          <Input disabled placeholder='Vd: abc@example.com' className='placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-lg focus:outline-none focus:border-[2px] border-[1px]' {...field} />
                         </FormControl>
                         <FormMessage />
                       </div>

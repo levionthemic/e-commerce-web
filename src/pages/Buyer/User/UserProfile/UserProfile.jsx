@@ -49,7 +49,7 @@ function UserProfile() {
   const handleLogout = async () => {
     dispatch(clearCart())
     toast.promise(dispatch(logoutUserAPI()), {
-      pending: 'Đang đăng xuất...'
+      loading: 'Đang đăng xuất...'
     })
   }
 
@@ -181,15 +181,17 @@ function UserProfile() {
     const updateData = {
       ...data,
       address: [data.address],
-      status: currentUser?.status
+      status: currentUser?.status,
+      role: currentUser?.role
     }
     toast.promise(
       dispatch(updateUserAPI(updateData)),
       {
-        pending: 'Đang cập nhật...',
+        loading: 'Đang cập nhật...',
         success: (res) => {
           if (!res.error)
-            toast.success('Cập nhật thành công!')
+            return 'Cập nhật thành công!'
+          throw res
         }
       }
     )

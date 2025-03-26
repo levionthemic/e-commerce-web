@@ -2,16 +2,20 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import GeneralTab from './GeneralTab'
 import ContactTab from './ContactTab'
+import { useSelector } from 'react-redux'
+import { selectCurrentUser } from '~/redux/user/userSlice'
 
 
 function Profile() {
+  const currentUser = useSelector(selectCurrentUser)
+
   return (
     <div className=''>
       <div className="h-32 xl:h-52 w-full relative">
         <img src={'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGHFKKwY8l357L8JHge1OIuHKUPXU_4qIlrQ&s'} alt="" className='h-full w-full object-cover border'/>
 
         <Avatar className='w-24 h-24 xl:w-32 xl:h-32 absolute -bottom-[50%] left-16 border-[5px] border-[#F3F3F3]'>
-          <AvatarImage src="https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg" />
+          <AvatarImage src={currentUser?.avatar || 'https://i.pinimg.com/236x/5e/e0/82/5ee082781b8c41406a2a50a0f32d6aa6.jpg'} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
 

@@ -58,8 +58,11 @@ function Register() {
       {
         loading: 'Đang đăng ký...',
         success: (user) => {
-          navigate(`/login?registeredEmail=${user.email}`)
-          return 'Đăng ký thành công!'
+          if (!user.error) {
+            navigate(`/login?registeredEmail=${user.email}`)
+            return 'Đăng ký thành công!'
+          }
+          throw user
         }
       }
     )

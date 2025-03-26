@@ -1,7 +1,6 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectCurrentCart, setCart, updateCartQuantityAPI } from '~/redux/cart/cartSlice'
+import { deleteItemAPI, selectCurrentCart, setCart, updateCartQuantityAPI } from '~/redux/cart/cartSlice'
 
 import {
   Table,
@@ -71,6 +70,22 @@ function CartPage() {
     updateCart.fullProducts = fullProducts
 
     dispatch(setCart(updateCart))
+
+    toast.promise(
+      dispatch(deleteItemAPI({
+        productId: product._id,
+        typeId: product.type.typeId
+      })),
+      {
+        loading: 'Đang xóa...',
+        success: (res) => {
+          if (!res.error)
+            return 'Xóa sản phẩm khỏi giỏ hàng thành công!'
+          throw res
+        }
+      }
+    )
+
 
     // Call API
   }

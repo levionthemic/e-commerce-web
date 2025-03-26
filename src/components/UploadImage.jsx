@@ -4,12 +4,13 @@ import { useImageUpload } from '~/hooks/use-image-upload'
 import { Button } from '~/components/ui/button'
 import { CircleUserRoundIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { ACCOUNT_STATUS } from '~/utils/constants'
-import { updateUserAPI } from '~/redux/user/userSlice'
+import { selectCurrentUser, updateUserAPI } from '~/redux/user/userSlice'
 
 export default function UploadImage({ fieldName }) {
   const dispatch = useDispatch()
+  const currentUser = useSelector(selectCurrentUser)
   const {
     previewUrl,
     fileInputRef,
@@ -26,14 +27,15 @@ export default function UploadImage({ fieldName }) {
     reqData.append('status', ACCOUNT_STATUS.ACTIVE)
 
     toast.promise(
-      dispatch(updateUserAPI(reqData)),
+      dispatch(updateUserAPI(reqData, currentUser?.role)),
       {
-        pending: 'Đang tải hình ảnh lên...',
+        loading: 'Đang tải hình ảnh lên...',
         success: (res) => {
           if (!res.error) {
             handleRemove()
             return 'Tải hình ảnh lên thành công!'
           }
+          throw res
         }
       }
     )
