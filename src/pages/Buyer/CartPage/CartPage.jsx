@@ -222,7 +222,6 @@ function CartPage() {
     }
   ]
 
-  const [expanded, setExpanded] = useState(true)
   const [grouping, setGrouping] = useState(['sellerId'])
 
   const table = useReactTable({
@@ -234,12 +233,11 @@ function CartPage() {
     getExpandedRowModel: getExpandedRowModel(),
     state: {
       grouping,
-      expanded: expanded,
+      expanded: true,
       columnVisibility: {
         sellerId: false
       }
     },
-    onExpandedChange: setExpanded,
     onGroupingChange: setGrouping
   })
 
@@ -303,7 +301,14 @@ function CartPage() {
                             className='bg-mainColor1-100/50 hover:bg-mainColor1-100/50 cursor-pointer'
                             onClick={row.getToggleExpandedHandler()}
                           >
-                            <TableCell colSpan={columns.length - 2}>
+                            <TableCell colSpan={1}>
+                              <Checkbox
+                                checked={row.getIsSelected()}
+                                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                                aria-label="Select row"
+                              />
+                            </TableCell>
+                            <TableCell colSpan={columns.length - 3}>
                               <div className='flex items-center gap-2'>
                                 <Store />
                                 <span>{row.groupingColumnId}: {row.groupingValue} <b>({row.subRows.length} sản phẩm)</b></span>
