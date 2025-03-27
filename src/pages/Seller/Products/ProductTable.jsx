@@ -61,14 +61,14 @@ import {
   EllipsisIcon,
   FilterIcon,
   ListFilterIcon,
+  Pencil,
   PlusIcon,
   Trash,
   TrashIcon
 } from 'lucide-react'
 import { useId, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CiEdit } from 'react-icons/ci'
-
+import ProductDetailDialog from './ProductDetailDialog'
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn = (row, columnId, filterValue) => {
@@ -126,6 +126,7 @@ const columns = [
     id: 'categoryId',
     header: 'Danh mục',
     accessorKey: 'categoryId',
+    cell: ({ row }) => <div className='line-clamp-4 text-wrap font-medium'>{row.original.category.name}</div>,
     size: 100,
     enableSorting: false
   },
@@ -133,6 +134,7 @@ const columns = [
     id: 'brandId',
     header: 'Thương hiệu',
     accessorKey: 'brandId',
+    cell: ({ row }) => <div className='line-clamp-4 text-wrap font-medium'>{row.original.brand.name}</div>,
     size: 100,
     enableSorting: false
   },
@@ -179,7 +181,7 @@ const columns = [
   },
   {
     id: 'actions',
-    header: 'Thao tác',
+    header: <div className='text-center'>Thao tác</div>,
     cell: ({ row }) => <RowActions row={row} />,
     size: 70,
     enableResizing: false,
@@ -209,7 +211,7 @@ export default function ProductTable({ data, setData }) {
   const handleDeleteRows = () => {
     const selectedRows = table.getSelectedRowModel().rows
     const updatedData = data.filter(
-      (item) => !selectedRows.some((row) => row.original.id === item.id)
+      (item) => !selectedRows.some((row) => row.original._id === item._id)
     )
     setData(updatedData)
     table.resetRowSelection()
@@ -642,20 +644,18 @@ export default function ProductTable({ data, setData }) {
   )
 }
 
-function RowActions() {
+function RowActions({ row }) {
   return (
     <div className="flex justify-between">
-      <Button size="icon" variant="ghost" className="shadow-none" aria-label="Edit item">
-        <CiEdit size={16} aria-hidden="true" />
+      <Button size="icon" variant="ghost" className="shadow-none hover:bg-amber-100 hover:text-amber-500" aria-label="Edit item">
+        <Pencil size={16} aria-hidden="true" />
       </Button>
 
-      <Button size="icon" variant="ghost" className="shadow-none" aria-label="Delete item">
+      <Button size="icon" variant="ghost" className="shadow-none hover:bg-red-100 hover:text-red-500" aria-label="Delete item">
         <Trash size={16} aria-hidden="true" />
       </Button>
 
-      <Button size="icon" variant="ghost" className="shadow-none" aria-label="More item">
-        <EllipsisIcon size={16} aria-hidden="true" />
-      </Button>
+      <ProductDetailDialog product={row.original} />
     </div>
   )
 }
