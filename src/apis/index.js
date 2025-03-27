@@ -23,6 +23,11 @@ export const getProductsAPI = async (searchPath = '') => {
   return response.data
 }
 
+export const getProductsWithFiltersAPI = async (searchPath = '') => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/products/filter${searchPath}`)
+  return response.data
+}
+
 export const getProductDetailsAPI = async (productId) => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/products/${productId}`)
   return response.data
