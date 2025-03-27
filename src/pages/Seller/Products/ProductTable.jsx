@@ -68,6 +68,7 @@ import {
 } from 'lucide-react'
 import { useId, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import ProductDetailDialog from './ProductDetailDialog'
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn = (row, columnId, filterValue) => {
@@ -643,7 +644,7 @@ export default function ProductTable({ data, setData }) {
   )
 }
 
-function RowActions() {
+function RowActions({ row }) {
   return (
     <div className="flex justify-between">
       <Button size="icon" variant="ghost" className="shadow-none hover:bg-amber-100 hover:text-amber-500" aria-label="Edit item">
@@ -654,9 +655,7 @@ function RowActions() {
         <Trash size={16} aria-hidden="true" />
       </Button>
 
-      <Button size="icon" variant="ghost" className="shadow-none" aria-label="More item">
-        <EllipsisIcon size={16} aria-hidden="true" />
-      </Button>
+      <ProductDetailDialog product={row.original} />
     </div>
   )
 }
