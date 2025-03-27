@@ -15,12 +15,13 @@ import { Separator } from '~/components/ui/separator'
 import { RiSubtractFill } from 'react-icons/ri'
 import { IoMdAdd } from 'react-icons/io'
 import { Checkbox } from '~/components/ui/checkbox'
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { flexRender, getCoreRowModel, getExpandedRowModel, getGroupedRowModel, useReactTable } from '@tanstack/react-table'
 import { cloneDeep } from 'lodash'
 import { Button } from '~/components/ui/button'
 import { toast } from 'sonner'
-import { EllipsisIcon, Trash2Icon } from 'lucide-react'
+import { ChevronDown, ChevronUp, EllipsisIcon, Store, Trash2Icon } from 'lucide-react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alert-dialog'
+import { useState } from 'react'
 
 function CartPage() {
   const navigate = useNavigate()
@@ -110,6 +111,15 @@ function CartPage() {
         />
       ),
       size: 30
+    },
+    {
+      id: 'sellerId',
+      header: 'Người bán',
+      accessorKey: 'sellerId',
+      cell: ({ row }) => <div className='line-clamp-1 text-ellipsis'>{row.getValue('sellerId')}</div>,
+      size: 60,
+      enableGrouping: true,
+      enableHiding: true
     },
     {
       header: 'Ảnh',
@@ -212,10 +222,25 @@ function CartPage() {
     }
   ]
 
+  const [expanded, setExpanded] = useState(true)
+  const [grouping, setGrouping] = useState(['sellerId'])
+
   const table = useReactTable({
     data: cart.fullProducts,
     columns,
-    getCoreRowModel: getCoreRowModel()
+    getSubRows: row => row.subRows,
+    getCoreRowModel: getCoreRowModel(),
+    getGroupedRowModel: getGroupedRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    state: {
+      grouping,
+      expanded: expanded,
+      columnVisibility: {
+        sellerId: false
+      }
+    },
+    onExpandedChange: setExpanded,
+    onGroupingChange: setGrouping
   })
 
   const totalPrice = () => {
@@ -269,15 +294,41 @@ function CartPage() {
                 </TableHeader>
                 <TableBody>
                   {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
+                    table.getRowModel().rows.map((row) => {
+                      if (row.getIsGrouped()) {
+                        // Nếu là hàng nhóm, hiển thị tiêu đề nhóm
+                        return (
+                          <TableRow
+                            key={row.id}
+                            className='bg-mainColor1-100/50 hover:bg-mainColor1-100/50 cursor-pointer'
+                            onClick={row.getToggleExpandedHandler()}
+                          >
+                            <TableCell colSpan={columns.length - 2}>
+                              <div className='flex items-center gap-2'>
+                                <Store />
+                                <span>{row.groupingColumnId}: {row.groupingValue} <b>({row.subRows.length} sản phẩm)</b></span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {row.getCanExpand() &&
+                                <div className='flex justify-end'>
+                                  {row.getIsExpanded() ? <ChevronUp /> : <ChevronDown />}
+                                </div>
+                              }
+                            </TableCell>
+                          </TableRow>
+                        )
+                      }
+                      return (
+                        <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      )
+                    })
                   ) : (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="h-24 text-center">

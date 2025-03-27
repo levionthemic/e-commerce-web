@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { createSearchParams, Link, useNavigate } from 'react-router-dom'
+import { createSearchParams, useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
 import { clearCart, fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
@@ -91,15 +91,6 @@ function HeaderBuyer() {
     })
   }
 
-  const handleCheckout = () => {
-    const products = currentCart.fullProducts
-    const listProducts = products.map((product, index) => ({
-      ...product,
-      quantity: currentCart.itemList[index]?.quantity
-    }))
-    navigate('/buyer/checkout', { state: { selectedRows: listProducts } })
-  }
-
   const [open, setOpen] = useState(false)
   const [searchProducts, setSearchProducts] = useState([])
   const [loading, setLoading] = useState(false)
@@ -185,18 +176,12 @@ function HeaderBuyer() {
                   </div>
                 </SheetTrigger>
                 <SheetContent side={'right'}>
-                  <SheetHeader className='mt-3'>
-                    <SheetTitle className='flex items-center justify-between'>
-                      <div>
-                        Giỏ hàng của bạn {' '}
-                        <span className='text-sm text-gray-700'>({currentCart?.itemList.length})</span>
-                      </div>
-                      <SheetClose asChild>
-                        <Link to='/buyer/cart' className='text-mainColor1-400 font-normal text-sm'>Xem tất cả</Link>
-                      </SheetClose>
-
+                  <SheetHeader className='my-3'>
+                    <SheetTitle>
+                      Giỏ hàng của bạn {' '}
+                      <span className='text-sm text-gray-700'>({currentCart?.itemList.length})</span>
                     </SheetTitle>
-                    <SheetDescription>
+                    <SheetDescription className='!m-0'>
                       Sơ lược các sản phẩm trong giỏ hàng.
                     </SheetDescription>
                   </SheetHeader>
@@ -226,7 +211,12 @@ function HeaderBuyer() {
                   </div>
                   <SheetFooter>
                     <SheetClose asChild>
-                      <Button className='bg-mainColor2-800/90 hover:bg-mainColor2-800 w-full hover:drop-shadow-lg' onClick={handleCheckout}>Thanh toán ngay</Button>
+                      <Button
+                        className='bg-mainColor2-800/90 hover:bg-mainColor2-800 w-full hover:drop-shadow-lg'
+                        onClick={() => navigate('/buyer/cart')}
+                      >
+                        Xem giỏ hàng
+                      </Button>
                     </SheetClose>
                   </SheetFooter>
                 </SheetContent>

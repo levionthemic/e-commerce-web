@@ -49,7 +49,6 @@ const formSchema = Joi.object({
   note: Joi.string().empty('')
 })
 
-
 function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
   const currentUser = useSelector(selectCurrentUser)
 
@@ -210,6 +209,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
               )}
             />
           </div>
+
           <FormField
             control={form.control}
             name=""
@@ -296,16 +296,12 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                       )}
                     />
                   </div>
-
                 </FormControl>
-                <FormDescription className=''>
-                  Địa chỉ nơi bạn cư trú.
-                </FormDescription>
+                <FormDescription className=''>Địa chỉ nơi bạn cư trú.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-
 
           <FormField
             control={form.control}
@@ -326,6 +322,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
               </FormItem>
             )}
           />
+
           <div className='grid grid-cols-1 gap-5'>
             <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Tiếp tục</Button>
           </div>

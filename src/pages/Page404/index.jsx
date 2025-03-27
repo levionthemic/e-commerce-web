@@ -10,7 +10,7 @@ function Page404() {
           <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl">404 Page Not Found</h1>
           <p className="text-gray-500">Xin lỗi, chúng tôi không tìm thấy trang web ứng với URL của bạn.</p>
         </div>
-        <Button onClick={() => navigate('/buyer', { replace: true })}>
+        <Button onClick={() => navigate(-1, { replace: true })}>
           Quay lại
         </Button>
       </div>
