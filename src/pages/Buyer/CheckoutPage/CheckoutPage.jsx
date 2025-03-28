@@ -53,6 +53,8 @@ function CheckoutPage() {
     }
   }, [checkoutInfo])
 
+  useEffect(() => { window.scrollTo(0, 0) }, [step])
+
   const handleCheckout = () => {
     const checkoutData = {
       ...checkoutInfo,
@@ -106,7 +108,7 @@ function CheckoutPage() {
         </div>
 
         <div className='col-span-3'>
-          <div className='sticky top-7 left-0 h-fit mb-4'>
+          <div className='sticky top-36 left-0 h-fit mb-10'>
             <div className="border border-b-[#ddd] rounded-md mb-4 p-4 shadow-md">
               <div className='text-md text-mainColor1-800 font-medium'>Danh sách sản phẩm</div>
               {listCheckoutProducts?.map((product, index) => (
@@ -146,12 +148,36 @@ function CheckoutPage() {
                 </div>
                 <div className='flex items-center justify-between text-sm my-2'>
                   <span className='opacity-40'>Phí vận chuyển</span>
-                  <span className='font-bold text-red-600'>{(checkoutInfo?.shipping?.detail?.total || 0)?.toLocaleString('vi-VN')}đ</span>
+                  <span className='font-bold text-red-600'>
+                    {(checkoutInfo?.shipping?.detail?.total || 0)?.toLocaleString('vi-VN')}
+                    <sup>đ</sup>
+                  </span>
+                </div>
+                <div className='flex items-center justify-between text-sm my-2'>
+                  <span className='opacity-40'>Giảm giá sản phẩm</span>
+                  <span className='font-bold text-red-600'>
+                    - {(0)?.toLocaleString('vi-VN')}
+                    <sup>đ</sup>
+                  </span>
+                </div>
+                <div className='flex items-center justify-between text-sm my-2'>
+                  <span className='opacity-40'>Giảm giá vận chuyển</span>
+                  <span className='font-bold text-red-600'>
+                    - {(0)?.toLocaleString('vi-VN')}
+                    <sup>đ</sup>
+                  </span>
+                </div>
+                <div className='flex items-center justify-between text-sm my-2'>
+                  <span className='opacity-40'>Thuế</span>
+                  <span className='font-bold text-red-600'>
+                    {(0)?.toLocaleString('vi-VN')}
+                    <sup>đ</sup>
+                  </span>
                 </div>
               </div>
 
               <div>
-                <div className='font-medium text-mainColor1-800'>Tổng tiền thanh toán</div>
+                <div className='font-bold text-mainColor1-800'>Tổng tiền thanh toán</div>
                 <div className='text-red-600 text-right text-xl font-bold'>
                   {(totalPrice + (checkoutInfo?.shipping?.detail?.total || 0)).toLocaleString('vi-VN')}
                   <sup>đ</sup>

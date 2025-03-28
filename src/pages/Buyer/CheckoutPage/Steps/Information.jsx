@@ -15,7 +15,6 @@ import {
   FormMessage
 } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
-import { Textarea } from '~/components/ui/textarea'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { EMAIL_RULE, EMAIL_RULE_MESSAGE, FIELD_REQUIRED_MESSAGE, PHONE_NUMBER_RULE, PHONE_NUMBER_RULE_MESSAGE } from '~/utils/validators'
 
@@ -45,8 +44,7 @@ const formSchema = Joi.object({
       'any.required': FIELD_REQUIRED_MESSAGE
     })
 
-  }),
-  note: Joi.string().empty('')
+  })
 })
 
 function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
@@ -143,7 +141,8 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
 
   return (
     <div className="my-6 border border-b-[#ddd] rounded-md p-4 w-[95%]">
-      <div className="text-mainColor1-600 font-medium text-lg mb-4">Thông tin người nhận</div>
+      <div className="text-mainColor1-600 font-medium text-lg">Thông tin người nhận</div>
+      <p className='text-sm text-muted-foreground mb-4'>Mặc định sẽ lấy thông tin cá nhân trong tài khoản của bạn. Bạn có thể thay đổi chúng nếu muốn.</p>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleUpdateUser)} className="space-y-8">
@@ -297,13 +296,13 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                     />
                   </div>
                 </FormControl>
-                <FormDescription className=''>Địa chỉ nơi bạn cư trú.</FormDescription>
+                <FormDescription className=''>Địa chỉ nhận hàng của bạn.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <FormField
+          {/* <FormField
             control={form.control}
             name="note"
             render={({ field }) => (
@@ -321,7 +320,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
 
           <div className='grid grid-cols-1 gap-5'>
             <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Tiếp tục</Button>
