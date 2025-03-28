@@ -6,10 +6,19 @@ import momoLogo from '~/assets/momo-logo.png'
 import vnpayLogo from '~/assets/vnpay-logo.png'
 import { FaMoneyBillAlt } from 'react-icons/fa'
 
-export default function PaymentMethodRadio({ handleChoosePaymentMethod }) {
+export default function PaymentMethodRadio({ handleChoosePaymentMethod, index, checkoutInfo }) {
   const id = useId()
+  const getDefaultValue = () => {
+    switch (checkoutInfo?.payment?.[index]?.type) {
+    case 'cod': return '1'
+    case 'momo': return '2'
+    case 'vnpay': return '3'
+    case 'cc': return '4'
+    default: return '1'
+    }
+  }
   return (
-    <RadioGroup className="gap-2" defaultValue="1" onValueChange={(value) => {handleChoosePaymentMethod(value)}}>
+    <RadioGroup className="gap-2" defaultValue={getDefaultValue} onValueChange={(value) => {handleChoosePaymentMethod(value, index)}}>
       <div
         className="border-input has-[:checked]:border-mainColor1-200 has-[:checked]:bg-mainColor1-100/20 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
         <RadioGroupItem

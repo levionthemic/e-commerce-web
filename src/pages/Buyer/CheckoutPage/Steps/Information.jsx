@@ -30,7 +30,7 @@ const formSchema = Joi.object({
     'string.empty': FIELD_REQUIRED_MESSAGE,
     'string.pattern.base': PHONE_NUMBER_RULE_MESSAGE
   }),
-  address: Joi.object({
+  buyerAddress: Joi.object({
     province: Joi.number().required().messages({
       'any.required': FIELD_REQUIRED_MESSAGE
     }),
@@ -40,7 +40,7 @@ const formSchema = Joi.object({
     ward: Joi.string().required().trim().strict().messages({
       'any.required': FIELD_REQUIRED_MESSAGE
     }),
-    detail: Joi.string().required().trim().strict().messages({
+    address: Joi.string().required().trim().strict().messages({
       'any.required': FIELD_REQUIRED_MESSAGE
     })
 
@@ -54,14 +54,14 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
   const [listDistricts, setListDistricts] = useState([])
   const [listWards, setListWards] = useState([])
 
-  const [provinceId, setProvinceId] = useState(checkoutInfo?.address.province || currentUser?.address[0].province)
-  const [districtId, setDistrictId] = useState(checkoutInfo?.address.district || currentUser?.address[0].district)
-  const [wardId, setWardId] = useState(checkoutInfo?.address.ward || currentUser?.address[0].ward)
+  const [provinceId, setProvinceId] = useState(checkoutInfo?.buyerAddress.province || currentUser?.buyerAddress[0].province)
+  const [districtId, setDistrictId] = useState(checkoutInfo?.buyerAddress.district || currentUser?.buyerAddress[0].district)
+  const [wardId, setWardId] = useState(checkoutInfo?.buyerAddress.ward || currentUser?.buyerAddress[0].ward)
 
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
-      address: checkoutInfo?.address || currentUser?.address[0],
+      buyerAddress: checkoutInfo?.buyerAddress || currentUser?.buyerAddress[0],
       email: checkoutInfo?.email || currentUser?.email,
       name: checkoutInfo?.name || currentUser?.name,
       phone: checkoutInfo?.phone || currentUser?.phone
@@ -112,11 +112,11 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
   }, [districtId])
 
   useEffect(() => {
-    form.setValue('address', {
+    form.setValue('buyerAddress', {
       province: provinceId,
       district: districtId,
       ward: wardId,
-      detail: form.watch('address.detail')
+      address: form.watch('buyerAddress.address')
     })
   }, [provinceId, districtId, wardId, form, listProvinces, listDistricts, listWards])
 
@@ -127,13 +127,13 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
   }
 
   const handleUpdateUser = (data) => {
-    const address = data.address
+    const buyerAddress = data.buyerAddress
 
-    const wardName = listWards.find(i => i.WardCode === address.ward).WardName
-    const districtName = listDistricts.find(i => i.DistrictID === address.district).DistrictName
-    const provinceName = listProvinces.find(i => i.ProvinceID === address.province).ProvinceName
+    const wardName = listWards.find(i => i.WardCode === buyerAddress.ward).WardName
+    const districtName = listDistricts.find(i => i.DistrictID === buyerAddress.district).DistrictName
+    const provinceName = listProvinces.find(i => i.ProvinceID === buyerAddress.province).ProvinceName
 
-    const shortAddress = `${address.detail}, ${wardName}, ${districtName}, ${provinceName}`
+    const shortAddress = `${buyerAddress.address}, ${wardName}, ${districtName}, ${provinceName}`
 
     setCheckoutInfo({ ...data, shortAddress: shortAddress })
     setStep(2)
@@ -220,7 +220,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                     <div className="grid grid-cols-3 gap-10 mb-4">
                       <FormField
                         control={form.control}
-                        name="address.province"
+                        name="buyerAddress.province"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
@@ -229,7 +229,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                                 title={'Tỉnh/thành'}
                                 getDetails={getDetails}
                                 flag={'province'}
-                                error={!!form.formState.errors['address.province']}
+                                error={!!form.formState.errors['buyerAddress.province']}
                                 defaultValue={field.value}
                               />
                             </FormControl>
@@ -240,7 +240,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
 
                       <FormField
                         control={form.control}
-                        name="address.district"
+                        name="buyerAddress.district"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
@@ -249,7 +249,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                                 title={'Quận/huyện'}
                                 getDetails={getDetails}
                                 flag={'district'}
-                                error={!!form.formState.errors['address.district']}
+                                error={!!form.formState.errors['buyerAddress.district']}
                                 defaultValue={field.value}
                               />
                             </FormControl>
@@ -260,7 +260,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
 
                       <FormField
                         control={form.control}
-                        name="address.ward"
+                        name="buyerAddress.ward"
                         render={({ field }) => (
                           <FormItem>
                             <FormControl>
@@ -269,7 +269,7 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                                 title={'Phường/xã'}
                                 getDetails={getDetails}
                                 flag={'ward'}
-                                error={!!form.formState.errors['address.ward']}
+                                error={!!form.formState.errors['buyerAddress.ward']}
                                 defaultValue={field.value}
                               />
                             </FormControl>
@@ -280,13 +280,13 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
                     </div>
                     <FormField
                       control={form.control}
-                      name="address.detail"
+                      name="buyerAddress.address"
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
                             <Input
                               placeholder="Vd: 123 đường ABC, phường X, quận Y, TPHCM"
-                              className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!form.formState.errors['address.detail'] && 'border-red-500'}`}
+                              className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!form.formState.errors['buyerAddress.address'] && 'border-red-500'}`}
                               {...field}
                             />
                           </FormControl>
@@ -301,26 +301,6 @@ function Information({ setCheckoutInfo, setStep, checkoutInfo }) {
               </FormItem>
             )}
           />
-
-          {/* <FormField
-            control={form.control}
-            name="note"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='text-base'>Ghi chú</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className={'placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus-visible:ring-0 focus:border-[2px] border border-mainColor1-100/50'}
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription className=''>
-                  Ghi chú thêm như thời gian vận chuyển, yêu cầu khác,...
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
 
           <div className='grid grid-cols-1 gap-5'>
             <Button type='submit' className='bg-mainColor1-600 hover:bg-mainColor1-800 text-white text-md font-semibold rounded-lg hover:drop-shadow-xl'>Tiếp tục</Button>
