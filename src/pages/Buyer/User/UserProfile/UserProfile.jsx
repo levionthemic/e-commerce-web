@@ -60,7 +60,7 @@ function UserProfile() {
       'string.empty': FIELD_REQUIRED_MESSAGE,
       'string.pattern.base': EMAIL_RULE_MESSAGE
     }),
-    address: Joi.object({
+    buyerAddress: Joi.object({
       province: Joi.number().required().messages({
         'any.required': FIELD_REQUIRED_MESSAGE
       }),
@@ -70,7 +70,7 @@ function UserProfile() {
       ward: Joi.string().required().trim().strict().messages({
         'any.required': FIELD_REQUIRED_MESSAGE
       }),
-      detail: Joi.string().required().trim().strict().messages({
+      address: Joi.string().required().trim().strict().messages({
         'any.required': FIELD_REQUIRED_MESSAGE
       })
 
@@ -90,7 +90,7 @@ function UserProfile() {
   const leftForm = useForm({
     resolver: joiResolver(joiSchema),
     defaultValues: {
-      address: currentUser?.address[0] || {},
+      buyerAddress: currentUser?.buyerAddress[0] || {},
       phone: currentUser?.phone || '',
       name: currentUser?.name || '',
       gender: currentUser?.gender || GENDER.MALE
@@ -109,9 +109,9 @@ function UserProfile() {
   const [listDistricts, setListDistricts] = useState([])
   const [listWards, setListWards] = useState([])
 
-  const [provinceId, setProvinceId] = useState(currentUser?.address[0].province || null)
-  const [districtId, setDistrictId] = useState(currentUser?.address[0].district || null)
-  const [wardId, setWardId] = useState(currentUser?.address[0].ward || null)
+  const [provinceId, setProvinceId] = useState(currentUser?.buyerAddress[0].province || null)
+  const [districtId, setDistrictId] = useState(currentUser?.buyerAddress[0].district || null)
+  const [wardId, setWardId] = useState(currentUser?.buyerAddress[0].ward || null)
 
   useEffect(() => {
     fetch('https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province', {
@@ -157,11 +157,11 @@ function UserProfile() {
   }, [districtId])
 
   useEffect(() => {
-    leftForm.setValue('address', {
+    leftForm.setValue('buyerAddress', {
       province: provinceId,
       district: districtId,
       ward: wardId,
-      detail: leftForm.watch('address.detail')
+      address: leftForm.watch('buyerAddress.address')
     })
   }, [provinceId, districtId, wardId, leftForm, listProvinces, listDistricts, listWards])
 
@@ -180,7 +180,7 @@ function UserProfile() {
   const handleLeftFormSubmit = (data) => {
     const updateData = {
       ...data,
-      address: [data.address],
+      buyerAddress: [data.buyerAddress],
       status: currentUser?.status,
       role: currentUser?.role
     }
@@ -314,7 +314,7 @@ function UserProfile() {
                             <div className="grid grid-cols-3 gap-4 mb-4">
                               <FormField
                                 control={leftForm.control}
-                                name="address.province"
+                                name="buyerAddress.province"
                                 render={({ field }) => (
                                   <FormItem>
                                     <FormControl>
@@ -323,7 +323,7 @@ function UserProfile() {
                                         title={'Tỉnh/thành'}
                                         getDetails={getDetails}
                                         flag={'province'}
-                                        error={!!leftForm.formState.errors['address.province']}
+                                        error={!!leftForm.formState.errors['buyerAddress.province']}
                                         defaultValue={field.value}
                                       />
                                     </FormControl>
@@ -334,7 +334,7 @@ function UserProfile() {
 
                               <FormField
                                 control={leftForm.control}
-                                name="address.district"
+                                name="buyerAddress.district"
                                 render={({ field }) => (
                                   <FormItem>
                                     <FormControl>
@@ -343,7 +343,7 @@ function UserProfile() {
                                         title={'Quận/huyện'}
                                         getDetails={getDetails}
                                         flag={'district'}
-                                        error={!!leftForm.formState.errors['address.district']}
+                                        error={!!leftForm.formState.errors['buyerAddress.district']}
                                         defaultValue={field.value}
                                       />
                                     </FormControl>
@@ -354,7 +354,7 @@ function UserProfile() {
 
                               <FormField
                                 control={leftForm.control}
-                                name="address.ward"
+                                name="buyerAddress.ward"
                                 render={({ field }) => (
                                   <FormItem>
                                     <FormControl>
@@ -363,7 +363,7 @@ function UserProfile() {
                                         title={'Phường/xã'}
                                         getDetails={getDetails}
                                         flag={'ward'}
-                                        error={!!leftForm.formState.errors['address.ward']}
+                                        error={!!leftForm.formState.errors['buyerAddress.ward']}
                                         defaultValue={field.value}
                                       />
                                     </FormControl>
@@ -374,13 +374,13 @@ function UserProfile() {
                             </div>
                             <FormField
                               control={leftForm.control}
-                              name="address.detail"
+                              name="buyerAddress.address"
                               render={({ field }) => (
                                 <FormItem>
                                   <FormControl>
                                     <Input
                                       placeholder="Vd: 123 đường ABC, phường X, quận Y, TPHCM"
-                                      className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!leftForm.formState.errors['address.detail'] && 'border-red-500'}`}
+                                      className={`placeholder:text-green-50 placeholder:text-sm placeholder:text-opacity-50 rounded-xl focus:outline-none focus:border-[2px] border border-mainColor1-100/50 ${!!leftForm.formState.errors['buyerAddress.address'] && 'border-red-500'}`}
                                       {...field}
                                     />
                                   </FormControl>

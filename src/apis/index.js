@@ -54,3 +54,8 @@ export const addOrderAPI = async (data) => {
   const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/orders/add`, data)
   return response.data
 }
+
+export const clusterOrderAPI = async (data) => {
+  const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/order/cluster`, data)
+  return response.data
+}
