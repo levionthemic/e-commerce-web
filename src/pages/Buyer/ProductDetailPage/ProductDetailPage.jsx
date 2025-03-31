@@ -33,6 +33,7 @@ import { addToCartAPI, fetchCurrentCartAPI } from '~/redux/cart/cartSlice'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Label } from '~/components/ui/label'
 import { MdAddShoppingCart } from 'react-icons/md'
+import { getAddressString } from '~/utils/helpers'
 
 
 function ProductDetailPage() {
@@ -64,6 +65,8 @@ function ProductDetailPage() {
 
   const currentUser = useSelector(selectCurrentUser)
 
+  const [address, setAddress] = useState('')
+
   useEffect(() => {
     window.scrollTo(0, 0)
     getProductDetailsAPI(productId)
@@ -72,6 +75,10 @@ function ProductDetailPage() {
         setProductEndPrice(data?.avgPrice)
       })
   }, [productId])
+
+  useEffect(() => {
+    getAddressString(currentUser?.buyerAddress[0]).then(result => setAddress(result))
+  }, [currentUser?.buyerAddress])
 
   const handleAddToCart = () => {
     if (!typeId) {
@@ -213,7 +220,7 @@ function ProductDetailPage() {
 
                 <div className='rounded-lg bg-white p-4 mb-6'>
                   <div className='text-lg font-semibold text-mainColor1-600 mb-1'>Thông tin vận chuyển</div>
-                  <p className='text-sm'>Giao đến: {`${currentUser?.address[0].detail}, ${currentUser?.address[0].ward}, ${currentUser?.address[0].district}, ${currentUser?.address[0].province}`}</p>
+                  <p className='text-sm'>Giao đến: {address}</p>
                   <div className='divider w-full h-px border border-t-0 border-gray-200 my-2'></div>
                   <div>GHTK</div>
                 </div>

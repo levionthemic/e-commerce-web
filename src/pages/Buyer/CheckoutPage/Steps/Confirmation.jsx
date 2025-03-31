@@ -4,7 +4,7 @@ import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
 
-function Confirmation({ checkoutInfo, setStep, clusterOrders }) {
+function Confirmation({ checkoutInfo, setStep, clusterOrders, handleCheckout }) {
   const totalPrice = (clusterOrder) => {
     return clusterOrder.itemList?.reduce(
       (sum, item) =>
@@ -25,16 +25,16 @@ function Confirmation({ checkoutInfo, setStep, clusterOrders }) {
 
         <div className='flex items-center justify-between mx-20 mb-2'>
           <span className='text-sm text-gray-400'>Địa chỉ nhận hàng:</span>
-          <span className='font-semibold'>{checkoutInfo?.shortAddress}</span>
+          <span className='font-medium'>{checkoutInfo?.shortAddress}</span>
         </div>
 
         <div className='flex items-center justify-between mx-20 mb-4'>
           <span className='text-sm text-gray-400'>Số điện thoại liên hệ:</span>
-          <span className='font-semibold'>{checkoutInfo?.phone}</span>
+          <span className='font-medium'>{checkoutInfo?.phone}</span>
         </div>
       </div>
       {clusterOrders?.map((clusterOrder, index) => (
-        <div key={index} className="">
+        <div key={index} className="mt-6">
           <div className='font-semibold text-xl text-mainColor1-800'>Đơn hàng {index + 1}</div>
           <div className='grid grid-cols-12 gap-10'>
             <div className='col-span-9'>
@@ -55,8 +55,8 @@ function Confirmation({ checkoutInfo, setStep, clusterOrders }) {
               <div className="border border-b-[#ddd] rounded-md mb-4 p-4 shadow-md">
                 <div className='text-md text-mainColor1-800 font-medium'>Danh sách sản phẩm</div>
                 {clusterOrder.itemList?.map((product, index) => (
-                  <div key={index} className='flex items-center gap-2 my-4 overflow-hidden'>
-                    <img src={product?.avatar} alt="" width={100} height={100} />
+                  <div key={index} className='flex items-center gap-4 my-4 overflow-hidden'>
+                    <img src={product?.avatar} alt="" width={80} height={80} className='rounded-md' />
                     <div className='flex items-center justify-between flex-1'>
                       <div>
                         <TooltipProvider>
@@ -69,7 +69,7 @@ function Confirmation({ checkoutInfo, setStep, clusterOrders }) {
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-                        <p className='line-clamp-1 text-gray-400 mb-0.5'>Loại: {product.typeName}</p>
+                        <p className='line-clamp-1 text-sm text-gray-400 mb-0.5'>Loại: {product.typeName}</p>
                       </div>
                       <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
                         <Badge className='bg-mainColor2-800/90'>{product.quantity} sản phẩm</Badge>
@@ -140,7 +140,7 @@ function Confirmation({ checkoutInfo, setStep, clusterOrders }) {
 
       <Button
         className='mt-6 w-full bg-mainColor1-600 hover:bg-mainColor1-800 transition-all hover:ease-in-out hover:duration-300 text-white text-xl py-6 rounded-xl'
-        // onClick={handleCheckout}
+        onClick={handleCheckout}
       >
                 Đặt hàng
       </Button>

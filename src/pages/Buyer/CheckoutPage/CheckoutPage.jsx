@@ -123,6 +123,7 @@ function CheckoutPage() {
             clusterOrders={clusterOrders}
             setStep={setStep}
             checkoutInfo={checkoutInfo}
+            handleCheckout={handleCheckout}
           />
         }
       </div>
