@@ -1,4 +1,14 @@
-export const API_ROOT = 'http://localhost:8017'
+/* eslint-disable no-undef */
+let apiRoot = ''
+if (process.env.BUILD_MODE === 'dev') {
+  apiRoot = 'http://localhost:8017'
+}
+
+if (process.env.BUILD_MODE === 'production') {
+  apiRoot = 'https://e-commerce-api-fpzd.onrender.com'
+}
+
+export const API_ROOT = apiRoot
 
 export const PAGE_TYPE = {
   BUYER: 'buyer',
