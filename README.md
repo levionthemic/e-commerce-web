@@ -34,19 +34,21 @@ Follow these steps to set up the project on your local machine:
 2. **Install dependencies**:
    ```bash
    cd e-commerce-web
-   npm install
+   yarn
    ```
 3. **Set up environment variables**:
    - Create a `.env` file and configure necessary variables like MongoDB connection string, Stripe/Momo API keys, etc.
 4. **Run the application**:
    ```bash
-   npm run dev
+   yarn dev
    ```
 
 ## Usage
 - Open `http://localhost:5173` in your browser.
 - Register a new account or log in.
 - Browse products, add them to the cart, and proceed with checkout.
+- Sample account for buyer: liem.ho2211835@hcmut.edu.vn - htnl832004
+- Sample account for seller: liem.levicoding834124@gmail.com - htnl832004
 
 ## Contact
 For any inquiries or feedback, feel free to contact us at: ecommerceplatform.pp.204@gmail.com.
