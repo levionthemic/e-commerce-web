@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Login from './Login'
 import Register from './Register'
+import { PAGE_TYPE } from '~/utils/constants'
 
 function Auth() {
   const location = useLocation()
@@ -12,7 +13,9 @@ function Auth() {
 
   const currentUser = useSelector(selectCurrentUser)
   if (currentUser) {
-    return <Navigate to='/buyer' replace={true} />
+    if (currentUser.role === PAGE_TYPE.BUYER)
+      return <Navigate to='/buyer' replace={true} />
+    return <Navigate to='/seller' replace={true} />
   }
 
   return (

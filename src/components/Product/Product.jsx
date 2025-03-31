@@ -136,8 +136,8 @@ function Product({ product, loading }) {
         : <Drawer onAnimationEnd={(open) => handleCloseDrawer(open)}>
           <DrawerTrigger asChild>
             <CardFooter className='p-0 text-sm cursor-pointer grid grid-cols-2 text-center'>
-              <div className='hover:bg-mainColor2-800 text-mainColor2-800 hover:text-white flex items-center justify-center p-2 border-r border-r-gray-200'>
-                <MdAddShoppingCart className='text-2xl' onClick={() => setIsAddToCart(true)} />
+              <div className='hover:bg-mainColor2-800 text-mainColor2-800 hover:text-white flex items-center justify-center p-2 border-r border-r-gray-200' onClick={() => setIsAddToCart(true)} >
+                <MdAddShoppingCart className='text-2xl' />
               </div>
 
               <div className='hover:bg-mainColor1-800 p-2 text-mainColor1-800 hover:text-white flex items-center justify-center'>

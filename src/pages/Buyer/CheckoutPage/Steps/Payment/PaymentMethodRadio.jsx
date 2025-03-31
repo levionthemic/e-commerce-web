@@ -6,35 +6,41 @@ import momoLogo from '~/assets/momo-logo.png'
 import vnpayLogo from '~/assets/vnpay-logo.png'
 import { FaMoneyBillAlt } from 'react-icons/fa'
 
-export default function PaymentMethodRadio({ handleChoosePaymentMethod }) {
+export default function PaymentMethodRadio({ handleChoosePaymentMethod, index, checkoutInfo }) {
   const id = useId()
+  const getDefaultValue = () => {
+    switch (checkoutInfo?.payment?.[index]?.type) {
+    case 'cod': return '1'
+    case 'momo': return '2'
+    case 'vnpay': return '3'
+    case 'cc': return '4'
+    default: return '1'
+    }
+  }
   return (
-    <RadioGroup className="gap-2" defaultValue="4" onValueChange={(value) => {handleChoosePaymentMethod(value)}}>
+    <RadioGroup className="gap-2" defaultValue={getDefaultValue} onValueChange={(value) => {handleChoosePaymentMethod(value, index)}}>
       <div
-        className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
+        className="border-input has-[:checked]:border-mainColor1-200 has-[:checked]:bg-mainColor1-100/20 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
         <RadioGroupItem
           value="1"
           id={`${id}-1`}
           aria-describedby={`${id}-1-description`}
           className="order-1 after:absolute after:inset-0" />
-        <div className="flex grow items-start gap-3">
-          <img src={creditCardLogo} alt='' width={30} height={30} />
+        <div className="flex grow items-center gap-3">
+          <FaMoneyBillAlt className='text-3xl text-green-600'/>
           <div className="grid grow gap-2">
             <Label htmlFor={`${id}-1`}>
-              Thanh toán bằng thẻ tín dụng{' '}
+              Thanh toán bằng tiền mặt{' '}
               <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
-                (Credit card)
+                (COD)
               </span>
             </Label>
-            <p id={`${id}-1-description`} className="text-muted-foreground text-xs">
-              Cần điền đầy đủ thông tin bên dưới.
-            </p>
           </div>
         </div>
       </div>
 
       <div
-        className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
+        className="border-input has-[:checked]:border-mainColor1-200 has-[:checked]:bg-mainColor1-100/20 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
         <RadioGroupItem
           value="2"
           id={`${id}-2`}
@@ -54,7 +60,7 @@ export default function PaymentMethodRadio({ handleChoosePaymentMethod }) {
       </div>
 
       <div
-        className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
+        className="border-input has-[:checked]:border-mainColor1-200 has-[:checked]:bg-mainColor1-100/20 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
         <RadioGroupItem
           value="3"
           id={`${id}-3`}
@@ -74,24 +80,28 @@ export default function PaymentMethodRadio({ handleChoosePaymentMethod }) {
       </div>
 
       <div
-        className="border-input has-data-[state=checked]:border-ring relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
+        className="border-input has-[:checked]:border-mainColor1-200 has-[:checked]:bg-mainColor1-100/20 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-xs outline-none">
         <RadioGroupItem
           value="4"
           id={`${id}-4`}
           aria-describedby={`${id}-4-description`}
-          className="order-1 after:absolute after:inset-0" />
-        <div className="flex grow items-center gap-3">
-          <FaMoneyBillAlt className='text-3xl text-green-600'/>
+          className="order-4 after:absolute after:inset-0" />
+        <div className="flex grow items-start gap-3">
+          <img src={creditCardLogo} alt='' width={30} height={30} />
           <div className="grid grow gap-2">
             <Label htmlFor={`${id}-4`}>
-              Thanh toán bằng tiền mặt{' '}
+              Thanh toán bằng thẻ tín dụng{' '}
               <span className="text-muted-foreground text-xs leading-[inherit] font-normal">
-                (COD)
+                (Credit card)
               </span>
             </Label>
+            <p id={`${id}-1-description`} className="text-muted-foreground text-xs">
+              Cần điền đầy đủ thông tin bên dưới.
+            </p>
           </div>
         </div>
       </div>
+
     </RadioGroup>
   )
 }
