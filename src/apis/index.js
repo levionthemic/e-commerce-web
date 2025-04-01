@@ -51,7 +51,7 @@ export const fetchOrdersAPI = async () => {
 }
 
 export const addOrderAPI = async (data) => {
-  const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/orders/add`, data)
+  const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/order/add`, data)
   return response.data
 }
 

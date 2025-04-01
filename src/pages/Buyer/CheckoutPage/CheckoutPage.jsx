@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import TimelineComponent from '~/pages/Buyer/CheckoutPage/TimelineComponent'
 import { useEffect, useState } from 'react'
 import Information from '~/pages/Buyer/CheckoutPage/Steps/Information'
@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { addOrderAPI, clusterOrderAPI } from '~/apis'
 
 function CheckoutPage() {
+  const navigate = useNavigate()
   const [step, setStep] = useState(1)
 
   const [checkoutInfo, setCheckoutInfo] = useState(JSON.parse(localStorage.getItem('checkoutInfo')))
@@ -50,18 +51,41 @@ function CheckoutPage() {
   useEffect(() => { window.scrollTo(0, 0) }, [step])
 
   const handleCheckout = () => {
-    const checkoutData = {
-      ...checkoutInfo,
-      productVariants: listCheckoutProducts
-    }
-
-    console.log(checkoutData)
-
-    toast.promise(addOrderAPI(checkoutData), {
-      pending: 'Đang xử lý...'
+    const checkoutData = clusterOrders?.map((clusterOrder, index) => {
+      const buyerInfo = {
+        buyerAddress: checkoutInfo?.buyerAddress,
+        buyerName: checkoutInfo?.name,
+        buyerPhone: checkoutInfo?.phone,
+        buyerEmail: checkoutInfo?.email
+      }
+      const result = {
+        ...buyerInfo,
+        ...clusterOrder,
+        note: checkoutInfo.note[index],
+        discountCode: [],
+        finalPrice: clusterOrder.orgPrice,
+        shippingFee: checkoutInfo.shipping?.[index]?.detail.total,
+        shippingMethod: checkoutInfo?.shipping?.[index].type
+      }
+      delete result['shopAddress']
+      delete result['buyerId']
+      return result
     })
 
-    // navigate('/buyer/checkout/complete', { state: { checkoutData: checkoutData } })
+    toast.promise(
+      Promise.all(checkoutData.map(data => addOrderAPI(data))),
+      {
+        loading: 'Đang xử lý...',
+        success: (res) => {
+          if (!res.error) {
+            navigate('/buyer/checkout/complete', { state: { checkoutData: res } })
+            return 'Đặt hàng thành công!'
+          }
+          throw res
+        },
+        error: 'Đặt hàng thất bại!'
+      }
+    )
   }
 
   const timelineItems = [
