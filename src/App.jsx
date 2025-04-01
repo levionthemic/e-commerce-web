@@ -27,7 +27,6 @@ import Inventory from '~/pages/Seller/Store/Inventory/Inventory'
 import StoreProfile from './pages/Seller/Store/Profile/Profile'
 import Completion from './pages/Buyer/CheckoutPage/Completion'
 import CreateForm from './pages/Seller/Products/CreateForm/CreateForm'
-import ReviewPage from './pages/Buyer/ReviewPage/ReviewPage'
 import { PAGE_TYPE } from './utils/constants'
 import Page401 from './pages/Page401'
 
@@ -62,7 +61,6 @@ function App() {
             <Route path='cart' element={<CartPage />} />
             <Route path='checkout' element={<CheckoutPage />} />
             <Route path='checkout/complete' element={<Completion />} />
-            <Route path='product/review/:productId' element={<ReviewPage />} />
           </Route>
 
           {/* User pages (Buyer Module) */}

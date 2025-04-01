@@ -34,6 +34,7 @@ import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Label } from '~/components/ui/label'
 import { MdAddShoppingCart } from 'react-icons/md'
 import { getAddressString } from '~/utils/helpers'
+import ReviewModal from './ReviewModal'
 
 
 function ProductDetailPage() {
@@ -114,6 +115,16 @@ function ProductDetailPage() {
     }] } })
   }
 
+  const onSubmitReview = (data) => {
+    const reviewData = {
+      productId: product._id,
+      ...data,
+      medias: []
+    }
+
+    console.log(reviewData)
+  }
+
   if (!product) {
     return <Loader caption={'Đang tải...'} />
   }
@@ -140,7 +151,7 @@ function ProductDetailPage() {
         <div className='grid grid-cols-4 gap-6 relative'>
           <div className="col-span-3">
             <div className="grid grid-cols-3 gap-6 h-fit relative mb-6">
-              <div className="bg-white flex items-center justify-center h-fit rounded-lg p-4 pb-32 sticky top-36 left-0 max-h-fit">
+              <div className="bg-white flex items-center justify-center h-fit rounded-lg p-4 pb-32 sticky top-36 left-0">
                 <div className='rounded-2xl overflow-hidden border'>
                   <img
                     src={product?.avatar}
@@ -196,7 +207,7 @@ function ProductDetailPage() {
                         {product?.types?.map((type) => (
                           <div
                             key={type.typeId}
-                            className="border-input has-data-[state=checked]:border-ring has-data-[state=checked]:bg-accent relative flex flex-col gap-4 border px-4 py-3 outline-none first:rounded-t-md last:rounded-b-md has-data-[state=checked]:z-10"
+                            className="border-input has-[button[data-state=checked]]:border-mainColor1-200 has-[button[data-state=checked]]:bg-mainColor1-100/20 relative flex flex-col gap-4 border px-4 py-3 outline-none first:rounded-t-md last:rounded-b-md has-[button[data-state=checked]]:z-10"
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
@@ -245,18 +256,23 @@ function ProductDetailPage() {
               </div>
             </div>
 
-            <div className="col-span-3">
+            <div className="">
               <div className='rounded-lg bg-white p-4 mb-6 relative h-fit'>
-                <div className='text-xl font-semibold text-mainColor2-800'>Bình luận sản phẩm</div>
-                <p className='text-sm text-muted-foreground'>Bạn có thể xem các đánh giá từ các khách hàng khác.</p>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <div className='text-xl font-semibold text-mainColor2-800'>Bình luận sản phẩm</div>
+                    <p className='text-sm text-muted-foreground'>Bạn có thể xem các đánh giá từ các khách hàng khác.</p>
+                  </div>
+                  <ReviewModal product={product} onSubmitReview={onSubmitReview} />
+                </div>
                 <div className='mt-4'>
                   {(!product?.comments || product?.comments?.length === 0) &&
                   <span className='pl-12 text-md font-medium text-gray-400'>Chưa có đánh giá!</span>
                   }
                   {product?.comments?.map((comment, index) =>
                     <div key={index}>
-                      <div className="flex items-center gap-10 mb-4">
-                        <div className='flex gap-3 mb-1.5'>
+                      <div className="flex items-center gap-8 mb-4">
+                        <div className='flex gap-3 mb-1.5 w-[20%]'>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -288,8 +304,8 @@ function ProductDetailPage() {
                             </span>
                           </div>
                         </div>
-                        <div className="">
-                          <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-4">
                             <Rating
                               emptySymbol={<FaRegStar />}
                               fullSymbol={<FaStar />}
@@ -297,10 +313,10 @@ function ProductDetailPage() {
                               readonly
                               className='text-[#FBCA04] text-xl leading-none'
                             />
-                            <span className='text-xl font-semibold'>{COMMENTS[comment?.rating - 1]}</span>
+                            <span className='text-lg font-semibold leading-none'>{COMMENTS[comment?.rating - 1]}</span>
                           </div>
 
-                          <div className='block py-2 mt-1/2 mb-2 break-words'>
+                          <div className='block py-2 mt-1/2 mb-2 break-words text-sm'>
                             {comment?.content}
                           </div>
 
@@ -320,7 +336,7 @@ function ProductDetailPage() {
           </div>
 
 
-          <div className="sticky top-36 left-0 max-h-full h-fit">
+          <div className="sticky top-36 left-0 h-fit">
             <div className='rounded-lg bg-white p-4 mb-6'>
               <div className='text-xl font-semibold text-mainColor1-600 mb-2'>Tóm tắt</div>
 
