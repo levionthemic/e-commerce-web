@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { IoMdAdd, IoMdStar, IoMdStarOutline } from 'react-icons/io'
 import { RiSubtractFill } from 'react-icons/ri'
 
-import { getProductDetailsAPI, getProductsAPI } from '~/apis'
+import { addCommentAPI, getProductDetailsAPI, getProductsAPI } from '~/apis'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Loader from '~/components/Loader/Loader'
 import { Button } from '~/components/ui/button'
@@ -35,6 +35,7 @@ import { Label } from '~/components/ui/label'
 import { MdAddShoppingCart } from 'react-icons/md'
 import { getAddressString } from '~/utils/helpers'
 import ReviewModal from './ReviewModal'
+import { socketIoInstance } from '~/socket'
 
 
 function ProductDetailPage() {
@@ -121,9 +122,48 @@ function ProductDetailPage() {
       ...data,
       medias: []
     }
-
-    console.log(reviewData)
+    socketIoInstance.emit('FE_SUBMIT_REVIEW', reviewData)
+    // toast.promise(
+    //   addCommentAPI(reviewData),
+    //   {
+    //     loading: 'Đang gửi đánh giá...',
+    //     success: (res) => {
+    //       if (!res.error) {
+    //         //
+    //       }
+    //       throw res
+    //     }
+    //   }
+    // )
   }
+  const [onReview, setOnReview] = useState(false)
+
+  const updateStartReview = (userInfo) => {
+    if (currentUser.email !== userInfo.email) {
+      setOnReview(true)
+    }
+  }
+
+  const updateStopReview = (userInfo) => {
+    if (currentUser.email !== userInfo.email) {
+      setOnReview(false)
+    }
+  }
+
+  const updateProductReview = (data) => {
+    //
+  }
+
+  useEffect(() => {
+    socketIoInstance.on('BE_START_REVIEW', updateStartReview)
+    socketIoInstance.on('BE_STOP_REVIEW', updateStopReview)
+    socketIoInstance.on('BE_SUBMIT_REVIEW', updateProductReview)
+
+    return () => {
+      socketIoInstance.off('BE_START_REVIEW', updateStartReview)
+      socketIoInstance.off('BE_STOP_REVIEW', updateStopReview)
+    }
+  }, [])
 
   if (!product) {
     return <Loader caption={'Đang tải...'} />
@@ -331,6 +371,7 @@ function ProductDetailPage() {
                     </div>
                   )}
                 </div>
+                {onReview && <div>Đang có ai đó đánh giá...</div>}
               </div>
             </div>
           </div>

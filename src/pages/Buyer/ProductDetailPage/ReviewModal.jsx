@@ -7,6 +7,8 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
 import { Textarea } from '~/components/ui/textarea'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
+import { useEffect, useState } from 'react'
+import { socketIoInstance } from '~/socket'
 
 function ReviewModal({ onSubmitReview }) {
   const formSchema = Joi.object({
@@ -15,14 +17,26 @@ function ReviewModal({ onSubmitReview }) {
     }),
     content: Joi.string().default('')
   })
+
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
       rating: 0
     }
   })
+
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (open) {
+      socketIoInstance.emit('FE_START_REVIEW')
+    } else {
+      socketIoInstance.emit('FE_STOP_REVIEW')
+    }
+  }, [open])
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className='bg-mainColor2-800 hover:bg-mainColor2-800/80'>
           Đánh giá

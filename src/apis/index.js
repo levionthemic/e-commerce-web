@@ -59,3 +59,9 @@ export const clusterOrderAPI = async (data) => {
   const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/order/cluster`, data)
   return response.data
 }
+
+// Review APIs
+export const addCommentAPI = async (data) => {
+  const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/review/add`, data)
+  return response.data
+}
