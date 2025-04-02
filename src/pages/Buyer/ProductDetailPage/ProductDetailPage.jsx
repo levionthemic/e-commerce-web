@@ -79,7 +79,7 @@ function ProductDetailPage() {
   }, [productId])
 
   useEffect(() => {
-    getAddressString(currentUser?.buyerAddress[0]).then(result => setAddress(result))
+    getAddressString(currentUser?.buyerAddress?.[0]).then(result => setAddress(result))
   }, [currentUser?.buyerAddress])
 
   const handleAddToCart = () => {
@@ -136,16 +136,18 @@ function ProductDetailPage() {
     //   }
     // )
   }
-  const [onReview, setOnReview] = useState(false)
-
-  const updateStartReview = (userInfo) => {
-    if (currentUser.email !== userInfo.email) {
+  const [onReview, setOnReview] = useState(JSON.parse(localStorage.getItem('onReview')))
+  const updateStartReview = (data) => {
+    console.log(data)
+    if (data.productId === productId && data.userId !== currentUser._id) {
+      localStorage.setItem('onReview', JSON.stringify(true))
       setOnReview(true)
     }
   }
 
-  const updateStopReview = (userInfo) => {
-    if (currentUser.email !== userInfo.email) {
+  const updateStopReview = (data) => {
+    if (data.productId === productId) {
+      localStorage.setItem('onReview', JSON.stringify(false))
       setOnReview(false)
     }
   }
@@ -155,6 +157,7 @@ function ProductDetailPage() {
   }
 
   useEffect(() => {
+    if (!localStorage.getItem('onReview')) localStorage.setItem('onReview', JSON.stringify(false))
     socketIoInstance.on('BE_START_REVIEW', updateStartReview)
     socketIoInstance.on('BE_STOP_REVIEW', updateStopReview)
     socketIoInstance.on('BE_SUBMIT_REVIEW', updateProductReview)

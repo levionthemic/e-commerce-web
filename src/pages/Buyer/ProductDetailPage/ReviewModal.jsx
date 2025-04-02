@@ -9,8 +9,12 @@ import { Textarea } from '~/components/ui/textarea'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
 import { useEffect, useState } from 'react'
 import { socketIoInstance } from '~/socket'
+import { selectCurrentUser } from '~/redux/user/userSlice'
+import { useSelector } from 'react-redux'
 
-function ReviewModal({ onSubmitReview }) {
+function ReviewModal({ onSubmitReview, product }) {
+  const currentUser = useSelector(selectCurrentUser)
+
   const formSchema = Joi.object({
     rating: Joi.number().required().messages({
       'any.required': FIELD_REQUIRED_MESSAGE
@@ -29,9 +33,15 @@ function ReviewModal({ onSubmitReview }) {
 
   useEffect(() => {
     if (open) {
-      socketIoInstance.emit('FE_START_REVIEW')
+      socketIoInstance.emit('FE_START_REVIEW', {
+        productId : product._id,
+        userId: currentUser._id
+      })
     } else {
-      socketIoInstance.emit('FE_STOP_REVIEW')
+      socketIoInstance.emit('FE_STOP_REVIEW', {
+        productId : product._id,
+        userId: currentUser._id
+      })
     }
   }, [open])
 
