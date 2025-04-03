@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -84,7 +84,7 @@ function ProductDetailPage() {
     socketIoInstance.on('BE_NEW_REVIEW', (data) => {
       setProduct((prevProduct) => {
         const newProduct = cloneDeep(prevProduct)
-        newProduct.comments = data.review.comments
+        newProduct.comments = data.review
         newProduct.rating = data.updatedProduct.rating
         return newProduct
       })
@@ -177,9 +177,14 @@ function ProductDetailPage() {
   }
 
   const [page, setPage] = useState(1)
+  const sectionRef = useRef(null)
 
   const handlePaginate = (page) => {
-
+    sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setTimeout(() => {
+      window.scrollBy({ top: -120, behavior: 'smooth' })
+    }, 500)
+    setPage(page)
   }
 
 
@@ -315,7 +320,7 @@ function ProductDetailPage() {
             </div>
 
             <div className="">
-              <div className='rounded-lg bg-white p-4 mb-6 relative h-fit'>
+              <div className='rounded-lg bg-white p-4 mb-6 relative h-fit' ref={sectionRef}>
                 <div className='flex items-center justify-between'>
                   <div>
                     <div className='text-xl font-semibold text-mainColor2-800'>Bình luận sản phẩm</div>
@@ -323,19 +328,30 @@ function ProductDetailPage() {
                   </div>
                   <ReviewModal product={product} onSubmitReview={onSubmitReview} updateStopTyping={updateStopTyping} updateStartTyping={updateStartTyping} />
                 </div>
+                {typingUsers.length > 0 &&
+                  <div className='text-muted-foreground text-sm flex items-center justify-center gap-2 my-8'>
+                    <div className="flex items-center space-x-1 bg-muted rounded-full p-2">
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0s]"></span>
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                    </div>
+
+                    Đang có {typingUsers.length} người đánh giá...
+                  </div>
+                }
                 <div className='mt-4'>
                   {(!product?.comments || product?.comments?.length === 0) &&
                   <span className='pl-12 text-md font-medium text-gray-400'>Chưa có đánh giá!</span>
                   }
-                  {product?.comments?.map((comment, index) =>
+                  {product?.comments[page - 1]?.map((comment, index) =>
                     <div key={index}>
                       <div className="flex items-center gap-8 mb-4">
-                        <div className='flex gap-3 mb-1.5 w-[20%] min-w-40'>
+                        <div className='flex gap-3 mb-1.5 w-[20%] min-w-44'>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Avatar className='cursor-pointer'>
-                                  <AvatarImage src={currentUser?.avatar} />
+                                  <AvatarImage src={comment?.buyerAvatar} />
                                   <AvatarFallback>LV</AvatarFallback>
                                 </Avatar>
                               </TooltipTrigger>
@@ -385,24 +401,13 @@ function ProductDetailPage() {
                           </div>
                         </div>
                       </div>
-                      {index < product?.comments?.length - 1 && <Separator className='my-6' />}
+                      {index < product?.comments[page - 1]?.length - 1 && <Separator className='my-6' />}
                     </div>
                   )}
                 </div>
-                {typingUsers.length > 0 &&
-                  <div className='text-muted-foreground text-sm flex items-center gap-2 mt-10'>
-                    <div className="flex items-center space-x-1 bg-muted rounded-full p-2">
-                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0s]"></span>
-                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
-                    </div>
-
-                    Đang có {typingUsers.length} người đánh giá...
-                  </div>
-                }
                 <PaginationComponent
                   currentPage={page}
-                  totalPages={1}
+                  totalPages={product?.comments.length}
                   handlePaginate={handlePaginate}
                 />
               </div>
