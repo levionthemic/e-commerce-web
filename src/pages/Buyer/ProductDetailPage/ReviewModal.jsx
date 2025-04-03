@@ -8,16 +8,12 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Textarea } from '~/components/ui/textarea'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
 import { useEffect, useState } from 'react'
-import { socketIoInstance } from '~/socket'
-import { selectCurrentUser } from '~/redux/user/userSlice'
-import { useSelector } from 'react-redux'
 
-function ReviewModal({ onSubmitReview, product }) {
-  const currentUser = useSelector(selectCurrentUser)
-
+function ReviewModal({ onSubmitReview, updateStartTyping, updateStopTyping }) {
   const formSchema = Joi.object({
-    rating: Joi.number().required().messages({
-      'any.required': FIELD_REQUIRED_MESSAGE
+    rating: Joi.number().required().min(1).messages({
+      'any.required': FIELD_REQUIRED_MESSAGE,
+      'number.min': FIELD_REQUIRED_MESSAGE
     }),
     content: Joi.string().default('')
   })
@@ -32,18 +28,14 @@ function ReviewModal({ onSubmitReview, product }) {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    if (open) {
-      socketIoInstance.emit('FE_START_REVIEW', {
-        productId : product._id,
-        userId: currentUser._id
-      })
-    } else {
-      socketIoInstance.emit('FE_STOP_REVIEW', {
-        productId : product._id,
-        userId: currentUser._id
-      })
-    }
+    if (open) updateStartTyping()
+    else updateStopTyping()
   }, [open])
+
+  const handleSubmit = (data) => {
+    setOpen(false)
+    onSubmitReview(data)
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -55,7 +47,7 @@ function ReviewModal({ onSubmitReview, product }) {
 
       <DialogContent className="sm:max-w-[425px]">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmitReview)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
             <DialogHeader>
               <DialogTitle>Đánh giá sản phẩm</DialogTitle>
               <DialogDescription>

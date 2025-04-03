@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -36,6 +36,7 @@ import { MdAddShoppingCart } from 'react-icons/md'
 import { getAddressString } from '~/utils/helpers'
 import ReviewModal from './ReviewModal'
 import { socketIoInstance } from '~/socket'
+import { cloneDeep } from 'lodash'
 
 
 function ProductDetailPage() {
@@ -71,11 +72,33 @@ function ProductDetailPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0)
+
+    socketIoInstance.emit('FE_JOIN_PRODUCT', productId)
+
+    socketIoInstance.on('BE_UPDATE_TYPING', ({ productId: id, users }) => {
+      if (id === productId) setTypingUsers(users.filter((id) => id !== currentUser._id))
+    })
+
+    socketIoInstance.on('BE_NEW_REVIEW', (data) => {
+      setProduct((prevProduct) => {
+        const newProduct = cloneDeep(prevProduct)
+        newProduct.comments = data.review.comments
+        newProduct.rating = data.updatedProduct.rating
+        return newProduct
+      })
+    })
+
     getProductDetailsAPI(productId)
       .then((data) => {
         setProduct(data)
         setProductEndPrice(data?.avgPrice)
       })
+
+
+    return () => {
+      socketIoInstance.emit('FE_LEAVE_PRODUCT', productId)
+      socketIoInstance.off('BE_UPDATE_TYPING')
+    }
   }, [productId])
 
   useEffect(() => {
@@ -122,51 +145,35 @@ function ProductDetailPage() {
       ...data,
       medias: []
     }
-    socketIoInstance.emit('FE_SUBMIT_REVIEW', reviewData)
-    // toast.promise(
-    //   addCommentAPI(reviewData),
-    //   {
-    //     loading: 'Đang gửi đánh giá...',
-    //     success: (res) => {
-    //       if (!res.error) {
-    //         //
-    //       }
-    //       throw res
-    //     }
-    //   }
-    // )
+
+    toast.promise(
+      addCommentAPI(reviewData),
+      {
+        loading: 'Đang gửi đánh giá...',
+        success: (res) => {
+          if (!res.error) {
+            return 'Đánh giá thành công!'
+          }
+          throw res
+        }
+      }
+    )
   }
-  const [onReview, setOnReview] = useState(JSON.parse(localStorage.getItem('onReview')))
-  const updateStartReview = (data) => {
-    console.log(data)
-    if (data.productId === productId && data.userId !== currentUser._id) {
-      localStorage.setItem('onReview', JSON.stringify(true))
-      setOnReview(true)
+  const [isTyping, setIsTyping] = useState(false)
+  const [typingUsers, setTypingUsers] = useState([])
+
+  const updateStartTyping = () => {
+    if (!isTyping) {
+      socketIoInstance.emit('FE_START_TYPING', { productId, userId: currentUser._id })
+      setIsTyping(true)
     }
   }
 
-  const updateStopReview = (data) => {
-    if (data.productId === productId) {
-      localStorage.setItem('onReview', JSON.stringify(false))
-      setOnReview(false)
-    }
+  const updateStopTyping = () => {
+    socketIoInstance.emit('FE_STOP_TYPING', { productId, userId: currentUser._id })
+    setIsTyping(false)
   }
 
-  const updateProductReview = (data) => {
-    //
-  }
-
-  useEffect(() => {
-    if (!localStorage.getItem('onReview')) localStorage.setItem('onReview', JSON.stringify(false))
-    socketIoInstance.on('BE_START_REVIEW', updateStartReview)
-    socketIoInstance.on('BE_STOP_REVIEW', updateStopReview)
-    socketIoInstance.on('BE_SUBMIT_REVIEW', updateProductReview)
-
-    return () => {
-      socketIoInstance.off('BE_START_REVIEW', updateStartReview)
-      socketIoInstance.off('BE_STOP_REVIEW', updateStopReview)
-    }
-  }, [])
 
   if (!product) {
     return <Loader caption={'Đang tải...'} />
@@ -306,7 +313,7 @@ function ProductDetailPage() {
                     <div className='text-xl font-semibold text-mainColor2-800'>Bình luận sản phẩm</div>
                     <p className='text-sm text-muted-foreground'>Bạn có thể xem các đánh giá từ các khách hàng khác.</p>
                   </div>
-                  <ReviewModal product={product} onSubmitReview={onSubmitReview} />
+                  <ReviewModal product={product} onSubmitReview={onSubmitReview} updateStopTyping={updateStopTyping} updateStartTyping={updateStartTyping} />
                 </div>
                 <div className='mt-4'>
                   {(!product?.comments || product?.comments?.length === 0) &&
@@ -374,7 +381,7 @@ function ProductDetailPage() {
                     </div>
                   )}
                 </div>
-                {onReview && <div>Đang có ai đó đánh giá...</div>}
+                {typingUsers.length > 0 && <div>Đang có {typingUsers.length} người đánh giá...</div>}
               </div>
             </div>
           </div>
