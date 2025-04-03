@@ -30,6 +30,7 @@ import CreateForm from './pages/Seller/Products/CreateForm/CreateForm'
 import ReviewPage from './pages/Buyer/ReviewPage/ReviewPage'
 import { PAGE_TYPE } from './utils/constants'
 import Page401 from './pages/Page401'
+import SellerViewPage from './pages/Buyer/SellerViewPage/SellerViewPage'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -63,6 +64,7 @@ function App() {
             <Route path='checkout' element={<CheckoutPage />} />
             <Route path='checkout/complete' element={<Completion />} />
             <Route path='product/review/:productId' element={<ReviewPage />} />
+            <Route path='seller/view' element={<SellerViewPage />} />
           </Route>
 
           {/* User pages (Buyer Module) */}
