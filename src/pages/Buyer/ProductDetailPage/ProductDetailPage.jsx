@@ -37,6 +37,8 @@ import { getAddressString } from '~/utils/helpers'
 import ReviewModal from './ReviewModal'
 import { socketIoInstance } from '~/socket'
 import { cloneDeep } from 'lodash'
+import { EllipsisIcon } from 'lucide-react'
+import PaginationComponent from '~/components/Pagination/PaginationComponent'
 
 
 function ProductDetailPage() {
@@ -172,6 +174,12 @@ function ProductDetailPage() {
   const updateStopTyping = () => {
     socketIoInstance.emit('FE_STOP_TYPING', { productId, userId: currentUser._id })
     setIsTyping(false)
+  }
+
+  const [page, setPage] = useState(1)
+
+  const handlePaginate = (page) => {
+
   }
 
 
@@ -322,7 +330,7 @@ function ProductDetailPage() {
                   {product?.comments?.map((comment, index) =>
                     <div key={index}>
                       <div className="flex items-center gap-8 mb-4">
-                        <div className='flex gap-3 mb-1.5 w-[20%]'>
+                        <div className='flex gap-3 mb-1.5 w-[20%] min-w-40'>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -381,7 +389,22 @@ function ProductDetailPage() {
                     </div>
                   )}
                 </div>
-                {typingUsers.length > 0 && <div>Đang có {typingUsers.length} người đánh giá...</div>}
+                {typingUsers.length > 0 &&
+                  <div className='text-muted-foreground text-sm flex items-center gap-2 mt-10'>
+                    <div className="flex items-center space-x-1 bg-muted rounded-full p-2">
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0s]"></span>
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                    </div>
+
+                    Đang có {typingUsers.length} người đánh giá...
+                  </div>
+                }
+                <PaginationComponent
+                  currentPage={page}
+                  totalPages={1}
+                  handlePaginate={handlePaginate}
+                />
               </div>
             </div>
           </div>
@@ -462,7 +485,7 @@ function ProductDetailPage() {
                     fullSymbol={<FaStar />}
                     initialRating={product?.rating || 0}
                     readonly
-                    className='text-[#FBCA04] text-4xl leading-none'
+                    className='text-[#FBCA04] text-4xl leading-none flex-1'
                   />
                 </div>
                 <span className='text-gray-400 text-sm'>({product.comments?.length} đánh giá)</span>

@@ -21,6 +21,8 @@ export const DEFAULT_PAGE = 1
 
 export const COMMENTS = ['Rất không hài lòng', 'Không hài lòng', 'Bình thường', 'Hài lòng', 'Cực kì hài lòng']
 
+export const MAX_COMMENTS_PER_PAGE = 20
+
 export const GENDER = {
   MALE: 'male',
   FEMALE: 'female',
