@@ -44,22 +44,29 @@ function HomePage() {
   const handleClickCategory = (categoryId) => {
     //
   }
-  const targetTime = new Date().setHours(23, 59, 59, 999)
-  const [timeLeft, setTimeLeft] = useState(targetTime - Date.now())
+
+  const targetDate = new Date('2025-06-10T23:59:00').getTime()
+  const [timeLeft, setTimeLeft] = useState(targetDate - new Date().getTime())
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(targetTime - Date.now())
+      const now = new Date().getTime()
+      const difference = targetDate - now
+      setTimeLeft(difference)
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [targetTime])
+  }, [targetDate])
 
-  if (timeLeft <= 0) return <span>Hết giờ!</span>
+  const formatTime = (milliseconds) => {
+    const seconds = Math.floor((milliseconds / 1000) % 60)
+    const minutes = Math.floor((milliseconds / 1000 / 60) % 60)
+    const hours = Math.floor((milliseconds / (1000 * 60 * 60)) % 24)
+    const days = Math.floor(milliseconds / (1000 * 60 * 60 * 24))
+    return { days, hours, minutes, seconds }
+  }
 
-  const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24)
-  const minutes = Math.floor((timeLeft / (1000 * 60)) % 60)
-  const seconds = Math.floor((timeLeft / 1000) % 60)
+  const { days, hours, minutes, seconds } = formatTime(timeLeft)
 
   return (
     <div className="bg-[#F5F5FA]">
@@ -85,7 +92,7 @@ function HomePage() {
             <ul className='flex items-center gap-8'>
               <li className='flex flex-col items-start font-semibold'>
                 <span className='text-xs'>Ngày</span>
-                <span className='text-3xl'>00</span>
+                <span className='text-3xl'>{days < 10 ? `0${days}` : days}</span>
               </li>
               <li className='text-bold text-2xl text-red-500'>:</li>
               <li className='flex flex-col items-start font-semibold'>
@@ -95,12 +102,12 @@ function HomePage() {
               <li className='text-bold text-2xl text-red-500'>:</li>
               <li className='flex flex-col items-start font-semibold'>
                 <span className='text-xs'>Phút</span>
-                <span className='text-3xl'>{minutes}</span>
+                <span className='text-3xl'>{minutes < 10 ? `0${minutes}` : minutes}</span>
               </li>
               <li className='text-bold text-2xl text-red-500'>:</li>
               <li className='flex flex-col items-start font-semibold'>
                 <span className='text-xs'>Giây</span>
-                <span className='text-3xl'>{seconds}</span>
+                <span className='text-3xl'>{seconds < 10 ? `0${seconds}` : seconds}</span>
               </li>
             </ul>
           </div>
