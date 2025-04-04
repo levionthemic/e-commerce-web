@@ -84,7 +84,7 @@ function ProductDetailPage() {
     socketIoInstance.on('BE_NEW_REVIEW', (data) => {
       setProduct((prevProduct) => {
         const newProduct = cloneDeep(prevProduct)
-        newProduct.comments = data.review
+        newProduct.reviews = data.reviewList
         newProduct.rating = data.updatedProduct.rating
         return newProduct
       })
@@ -340,10 +340,10 @@ function ProductDetailPage() {
                   </div>
                 }
                 <div className='mt-4'>
-                  {(!product?.comments || product?.comments?.length === 0) &&
+                  {(!product?.reviews || product?.reviews?.length === 0) &&
                   <span className='pl-12 text-md font-medium text-gray-400'>Chưa có đánh giá!</span>
                   }
-                  {product?.comments[page - 1]?.map((comment, index) =>
+                  {product?.reviews[page - 1]?.comments.map((comment, index) =>
                     <div key={index}>
                       <div className="flex items-center gap-8 mb-4">
                         <div className='flex gap-3 mb-1.5 w-[20%] min-w-44'>
@@ -401,13 +401,13 @@ function ProductDetailPage() {
                           </div>
                         </div>
                       </div>
-                      {index < product?.comments[page - 1]?.length - 1 && <Separator className='my-6' />}
+                      {index < product?.reviews[page - 1]?.length - 1 && <Separator className='my-6' />}
                     </div>
                   )}
                 </div>
                 <PaginationComponent
                   currentPage={page}
-                  totalPages={product?.comments.length}
+                  totalPages={product?.reviews.length}
                   handlePaginate={handlePaginate}
                 />
               </div>
@@ -493,10 +493,10 @@ function ProductDetailPage() {
                     className='text-[#FBCA04] text-4xl leading-none flex-1'
                   />
                 </div>
-                <span className='text-gray-400 text-sm'>({product.comments?.length} đánh giá)</span>
+                <span className='text-gray-400 text-sm'>({product.reviews.map(review => review.comments).flat(1)?.length} đánh giá)</span>
               </div>
 
-              <ReviewRate comments={product?.comments} />
+              <ReviewRate comments={product.reviews.map(review => review.comments).flat(1)} />
             </div>
           </div>
         </div>
