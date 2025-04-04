@@ -1,6 +1,7 @@
 import { Banknote, CircleX, NotepadText, Truck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { fetchOrdersForSellerAPI } from '~/apis'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,26 +10,21 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '~/components/ui/breadcrumb'
+import { useTimeCount } from '~/hooks/use-time-count'
 import OrderTable from '~/pages/Seller/Orders/OrderTable'
 
 
 function Orders() {
-  const date = new Date(Date.now())
-  const formatter = new Intl.DateTimeFormat('vi-VN', {
-    weekday: 'long',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-  const [time, setTime] = useState(new Date().toLocaleTimeString('vi-VN'))
+  const { date, time } = useTimeCount()
+
+  const [orders, setOrders] = useState([])
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date()
-      const timeString = now.toLocaleTimeString('vi-VN')
-      setTime(timeString)
-    }, 1000)
-    return () => clearInterval(timer)
-  })
+    fetchOrdersForSellerAPI().then(data => setOrders(data))
+  }, [])
+
+  console.log(orders);
+
   return (
     <div className='px-6 py-4'>
       <div className="flex items-center justify-between mb-4 gap-8">
@@ -54,7 +50,7 @@ function Orders() {
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <span className="italic text-sm text-gray-500 text-right">{time}<br />{formatter.format(date)}</span>
+        <span className="italic text-sm text-gray-500 text-right">{time}<br />{date}</span>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
@@ -108,7 +104,7 @@ function Orders() {
         </div>
       </div>
 
-      <OrderTable />
+      <OrderTable data={orders} setData={setOrders} />
     </div>
 
   )

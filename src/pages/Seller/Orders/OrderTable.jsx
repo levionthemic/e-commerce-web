@@ -72,7 +72,7 @@ import {
   PlusIcon,
   TrashIcon
 } from 'lucide-react'
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 
 
 // Custom filter function for multi-column searching
@@ -112,30 +112,71 @@ const columns = [
     enableHiding: false
   },
   {
-    header: 'Name',
-    accessorKey: 'name',
-    cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>,
+    id: 'orderId',
+    header: 'Mã ĐH',
+    accessorKey: 'orderId',
+    cell: ({ row }) => <div className='text-ellipsis overflow-hidden'>{row.original._id}</div>
+  },
+  {
+    id: 'buyerName',
+    header: 'Tên người đặt',
+    accessorKey: 'buyerName',
+    cell: ({ row }) => <div className="font-medium">{row.getValue('buyerName')}</div>,
     size: 180,
     filterFn: multiColumnFilterFn,
     enableHiding: false
   },
   {
-    header: 'Email',
-    accessorKey: 'email',
+    id: 'shopId',
+    header: 'Mã cửa hàng',
+    accessorKey: 'shopId',
+    cell: ({ row }) => <div>{row.getValue('shopId')}</div>,
     size: 220
   },
   {
-    header: 'Location',
-    accessorKey: 'location',
+    id: 'orgPrice',
+    header: 'Giá gốc',
+    accessorKey: 'orgPrice',
     cell: ({ row }) => (
       <div>
-        <span className="text-lg leading-none">{row.original.flag}</span> {row.getValue('location')}
+        {row.getValue('orgPrice').toLocaleString('vi-vn')}<sup>đ</sup>
       </div>
     ),
     size: 180
   },
   {
-    header: 'Status',
+    id: 'finalPrice',
+    header: 'Giá cuối',
+    accessorKey: 'finalPrice',
+    cell: ({ row }) => (
+      <div>
+        {row.getValue('finalPrice').toLocaleString('vi-vn')}<sup>đ</sup>
+      </div>
+    ),
+    size: 180
+  },
+  {
+    id: 'shippingFee',
+    header: 'Phí vận chuyển',
+    accessorKey: 'shippingFee',
+    cell: ({ row }) => (
+      <div>
+        {row.getValue('shippingFee').toLocaleString('vi-vn')}<sup>đ</sup>
+      </div>
+    ),
+    size: 180
+  },
+  {
+    header: 'Tổng tiền',
+    accessorKey: 'totalPrice',
+    cell: ({ row }) => {
+      const total = parseInt(row.getValue('finalPrice')) + parseInt(row.getValue('shippingFee'))
+      return <div>{total.toLocaleString('vi-vn')}<sup>đ</sup></div>
+    },
+    size: 120
+  },
+  {
+    header: 'Trạng thái',
     accessorKey: 'status',
     cell: ({ row }) => (
       <Badge
@@ -150,32 +191,22 @@ const columns = [
     filterFn: statusFilterFn
   },
   {
-    header: 'Performance',
-    accessorKey: 'performance'
-  },
-  {
-    header: 'Balance',
-    accessorKey: 'balance',
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('balance'))
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(amount)
-      return formatted
-    },
-    size: 120
+    id: 'note',
+    header: 'Ghi chú',
+    accessorKey: 'note',
+    cell: ({ row }) => <div>{row.getValue('note')}</div>,
+    size: 180
   },
   {
     id: 'actions',
-    header: () => <span className="sr-only">Actions</span>,
+    header: 'Thao tác',
     cell: ({ row }) => <RowActions row={row} />,
     size: 60,
     enableHiding: false
   }
 ]
 
-export default function OrderTable() {
+export default function OrderTable({ data, setData }) {
   const id = useId()
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
@@ -191,18 +222,6 @@ export default function OrderTable() {
       desc: false
     }
   ])
-
-  const [data, setData] = useState([])
-  useEffect(() => {
-    async function fetchPosts() {
-      const res = await fetch(
-        'https://res.cloudinary.com/dlzlfasou/raw/upload/users-01_fertyx.json'
-      )
-      const data = await res.json()
-      setData(data)
-    }
-    fetchPosts()
-  }, [])
 
   const handleDeleteRows = () => {
     const selectedRows = table.getSelectedRowModel().rows
@@ -513,7 +532,7 @@ export default function OrderTable() {
         {/* Results per page */}
         <div className="flex items-center gap-3">
           <Label htmlFor={id} className="max-sm:sr-only">
-            Rows per page
+            Số dòng / trang
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
@@ -547,7 +566,7 @@ export default function OrderTable() {
                 table.getRowCount()
               )}
             </span>{' '}
-            of <span className="text-foreground">{table.getRowCount().toString()}</span>
+            trong <span className="text-foreground">{table.getRowCount().toString()}</span>
           </p>
         </div>
 
@@ -611,18 +630,6 @@ export default function OrderTable() {
           </Pagination>
         </div>
       </div>
-
-      <p className="text-muted-foreground mt-4 text-center text-sm">
-        Example of a more complex table made with{' '}
-        <a
-          className="hover:text-foreground underline"
-          href="https://tanstack.com/table"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          TanStack Table
-        </a>
-      </p>
     </div>
   )
 }
