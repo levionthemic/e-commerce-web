@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { IoMdAdd, IoMdStar, IoMdStarOutline } from 'react-icons/io'
 import { RiSubtractFill } from 'react-icons/ri'
 
-import { getProductDetailsAPI, getProductsAPI } from '~/apis'
+import { addCommentAPI, getProductDetailsAPI, getProductsAPI } from '~/apis'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Loader from '~/components/Loader/Loader'
 import { Button } from '~/components/ui/button'
@@ -34,6 +34,11 @@ import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Label } from '~/components/ui/label'
 import { MdAddShoppingCart } from 'react-icons/md'
 import { getAddressString } from '~/utils/helpers'
+import ReviewModal from './ReviewModal'
+import { socketIoInstance } from '~/socket'
+import { cloneDeep } from 'lodash'
+import { EllipsisIcon } from 'lucide-react'
+import PaginationComponent from '~/components/Pagination/PaginationComponent'
 
 
 function ProductDetailPage() {
@@ -69,15 +74,37 @@ function ProductDetailPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0)
+
+    socketIoInstance.emit('FE_JOIN_PRODUCT', productId)
+
+    socketIoInstance.on('BE_UPDATE_TYPING', ({ productId: id, users }) => {
+      if (id === productId) setTypingUsers(users.filter((id) => id !== currentUser._id))
+    })
+
+    socketIoInstance.on('BE_NEW_REVIEW', (data) => {
+      setProduct((prevProduct) => {
+        const newProduct = cloneDeep(prevProduct)
+        newProduct.reviews = data.reviewList
+        newProduct.rating = data.updatedProduct.rating
+        return newProduct
+      })
+    })
+
     getProductDetailsAPI(productId)
       .then((data) => {
         setProduct(data)
         setProductEndPrice(data?.avgPrice)
       })
+
+
+    return () => {
+      socketIoInstance.emit('FE_LEAVE_PRODUCT', productId)
+      socketIoInstance.off('BE_UPDATE_TYPING')
+    }
   }, [productId])
 
   useEffect(() => {
-    getAddressString(currentUser?.buyerAddress[0]).then(result => setAddress(result))
+    getAddressString(currentUser?.buyerAddress?.[0]).then(result => setAddress(result))
   }, [currentUser?.buyerAddress])
 
   const handleAddToCart = () => {
@@ -114,6 +141,53 @@ function ProductDetailPage() {
     }] } })
   }
 
+  const onSubmitReview = (data) => {
+    const reviewData = {
+      productId: product._id,
+      ...data,
+      medias: []
+    }
+
+    toast.promise(
+      addCommentAPI(reviewData),
+      {
+        loading: 'Đang gửi đánh giá...',
+        success: (res) => {
+          if (!res.error) {
+            return 'Đánh giá thành công!'
+          }
+          throw res
+        }
+      }
+    )
+  }
+  const [isTyping, setIsTyping] = useState(false)
+  const [typingUsers, setTypingUsers] = useState([])
+
+  const updateStartTyping = () => {
+    if (!isTyping) {
+      socketIoInstance.emit('FE_START_TYPING', { productId, userId: currentUser._id })
+      setIsTyping(true)
+    }
+  }
+
+  const updateStopTyping = () => {
+    socketIoInstance.emit('FE_STOP_TYPING', { productId, userId: currentUser._id })
+    setIsTyping(false)
+  }
+
+  const [page, setPage] = useState(1)
+  const sectionRef = useRef(null)
+
+  const handlePaginate = (page) => {
+    sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    setTimeout(() => {
+      window.scrollBy({ top: -120, behavior: 'smooth' })
+    }, 500)
+    setPage(page)
+  }
+
+
   if (!product) {
     return <Loader caption={'Đang tải...'} />
   }
@@ -140,7 +214,7 @@ function ProductDetailPage() {
         <div className='grid grid-cols-4 gap-6 relative'>
           <div className="col-span-3">
             <div className="grid grid-cols-3 gap-6 h-fit relative mb-6">
-              <div className="bg-white flex items-center justify-center h-fit rounded-lg p-4 pb-32 sticky top-36 left-0 max-h-fit">
+              <div className="bg-white flex items-center justify-center h-fit rounded-lg p-4 pb-32 sticky top-36 left-0">
                 <div className='rounded-2xl overflow-hidden border'>
                   <img
                     src={product?.avatar}
@@ -196,7 +270,7 @@ function ProductDetailPage() {
                         {product?.types?.map((type) => (
                           <div
                             key={type.typeId}
-                            className="border-input has-data-[state=checked]:border-ring has-data-[state=checked]:bg-accent relative flex flex-col gap-4 border px-4 py-3 outline-none first:rounded-t-md last:rounded-b-md has-data-[state=checked]:z-10"
+                            className="border-input has-[button[data-state=checked]]:border-mainColor1-200 has-[button[data-state=checked]]:bg-mainColor1-100/20 relative flex flex-col gap-4 border px-4 py-3 outline-none first:rounded-t-md last:rounded-b-md has-[button[data-state=checked]]:z-10"
                           >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
@@ -245,23 +319,39 @@ function ProductDetailPage() {
               </div>
             </div>
 
-            <div className="col-span-3">
-              <div className='rounded-lg bg-white p-4 mb-6 relative h-fit'>
-                <div className='text-xl font-semibold text-mainColor2-800'>Bình luận sản phẩm</div>
-                <p className='text-sm text-muted-foreground'>Bạn có thể xem các đánh giá từ các khách hàng khác.</p>
+            <div className="">
+              <div className='rounded-lg bg-white p-4 mb-6 relative h-fit' ref={sectionRef}>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <div className='text-xl font-semibold text-mainColor2-800'>Bình luận sản phẩm</div>
+                    <p className='text-sm text-muted-foreground'>Bạn có thể xem các đánh giá từ các khách hàng khác.</p>
+                  </div>
+                  <ReviewModal product={product} onSubmitReview={onSubmitReview} updateStopTyping={updateStopTyping} updateStartTyping={updateStartTyping} />
+                </div>
+                {typingUsers.length > 0 &&
+                  <div className='text-muted-foreground text-sm flex items-center justify-center gap-2 my-8'>
+                    <div className="flex items-center space-x-1 bg-muted rounded-full p-2">
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0s]"></span>
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                      <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                    </div>
+
+                    Đang có {typingUsers.length} người đánh giá...
+                  </div>
+                }
                 <div className='mt-4'>
-                  {(!product?.comments || product?.comments?.length === 0) &&
+                  {(!product?.reviews || product?.reviews?.length === 0) &&
                   <span className='pl-12 text-md font-medium text-gray-400'>Chưa có đánh giá!</span>
                   }
-                  {product?.comments?.map((comment, index) =>
+                  {product?.reviews[page - 1]?.comments.map((comment, index) =>
                     <div key={index}>
-                      <div className="flex items-center gap-10 mb-4">
-                        <div className='flex gap-3 mb-1.5'>
+                      <div className="flex items-center gap-8 mb-4">
+                        <div className='flex gap-3 mb-1.5 w-[20%] min-w-44'>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Avatar className='cursor-pointer'>
-                                  <AvatarImage src={currentUser?.avatar} />
+                                  <AvatarImage src={comment?.buyerAvatar} />
                                   <AvatarFallback>LV</AvatarFallback>
                                 </Avatar>
                               </TooltipTrigger>
@@ -288,8 +378,8 @@ function ProductDetailPage() {
                             </span>
                           </div>
                         </div>
-                        <div className="">
-                          <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-4">
                             <Rating
                               emptySymbol={<FaRegStar />}
                               fullSymbol={<FaStar />}
@@ -297,10 +387,10 @@ function ProductDetailPage() {
                               readonly
                               className='text-[#FBCA04] text-xl leading-none'
                             />
-                            <span className='text-xl font-semibold'>{COMMENTS[comment?.rating - 1]}</span>
+                            <span className='text-lg font-semibold leading-none'>{COMMENTS[comment?.rating - 1]}</span>
                           </div>
 
-                          <div className='block py-2 mt-1/2 mb-2 break-words'>
+                          <div className='block py-2 mt-1/2 mb-2 break-words text-sm'>
                             {comment?.content}
                           </div>
 
@@ -311,16 +401,21 @@ function ProductDetailPage() {
                           </div>
                         </div>
                       </div>
-                      {index < product?.comments?.length - 1 && <Separator className='my-6' />}
+                      {index < product?.reviews[page - 1]?.length - 1 && <Separator className='my-6' />}
                     </div>
                   )}
                 </div>
+                <PaginationComponent
+                  currentPage={page}
+                  totalPages={product?.reviews.length}
+                  handlePaginate={handlePaginate}
+                />
               </div>
             </div>
           </div>
 
 
-          <div className="sticky top-36 left-0 max-h-full h-fit">
+          <div className="sticky top-36 left-0 h-fit">
             <div className='rounded-lg bg-white p-4 mb-6'>
               <div className='text-xl font-semibold text-mainColor1-600 mb-2'>Tóm tắt</div>
 
@@ -395,13 +490,13 @@ function ProductDetailPage() {
                     fullSymbol={<FaStar />}
                     initialRating={product?.rating || 0}
                     readonly
-                    className='text-[#FBCA04] text-4xl leading-none'
+                    className='text-[#FBCA04] text-4xl leading-none flex-1'
                   />
                 </div>
-                <span className='text-gray-400 text-sm'>({product.comments?.length} đánh giá)</span>
+                <span className='text-gray-400 text-sm'>({product.reviews.map(review => review.comments).flat(1)?.length} đánh giá)</span>
               </div>
 
-              <ReviewRate comments={product?.comments} />
+              <ReviewRate comments={product.reviews.map(review => review.comments).flat(1)} />
             </div>
           </div>
         </div>
