@@ -23,12 +23,12 @@ import ProductsSeller from '~/pages/Seller/Products/Products'
 import OrdersSeller from '~/pages/Seller/Orders/Orders'
 import Promotion from '~/pages/Seller/Promotion/Promotion'
 import Comments from '~/pages/Seller/Comments/Comments'
-import Inventory from '~/pages/Seller/Store/Inventory/Inventory'
 import StoreProfile from './pages/Seller/Store/Profile/Profile'
 import Completion from './pages/Buyer/CheckoutPage/Completion'
 import CreateForm from './pages/Seller/Products/CreateForm/CreateForm'
 import { PAGE_TYPE } from './utils/constants'
 import Page401 from './pages/Page401'
+import StoreList from '~/pages/Seller/Store/StoreList/StoreList'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -84,7 +84,7 @@ function App() {
             <Route path='products/add' element={<CreateForm />} />
             <Route path='orders' element={<OrdersSeller />} />
             <Route path='store/profile' element={<StoreProfile />} />
-            <Route path='store/inventory' element={<Inventory />} />
+            <Route path='store/list-store' element={<StoreList />} />
             <Route path='promotion' element={<Promotion />} />
             <Route path='comment' element={<Comments />} />
           </Route>
