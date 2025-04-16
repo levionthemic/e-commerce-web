@@ -1,4 +1,4 @@
-import { ArrowRightIcon, Banknote, Box, NotebookText, SearchIcon, Store } from 'lucide-react'
+import { ArrowRightIcon, SearchIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '~/components/ui/breadcrumb'
 import { Button } from '~/components/ui/button'
@@ -6,6 +6,7 @@ import { Input } from '~/components/ui/input'
 import { useTimeCount } from '~/hooks/use-time-count'
 import StoreCard from '~/pages/Seller/Store/StoreList/StoreCard'
 import banner from '~/assets/banner.jpg'
+import OverviewStats from './OverviewStats'
 
 function StoreList() {
   const { date, time } = useTimeCount()
@@ -40,56 +41,7 @@ function StoreList() {
         <span className="italic text-sm text-gray-500 text-right">{time}<br />{date}</span>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="col-span-1 bg-white rounded-lg p-4 flex items-center justify-between">
-          <div className="">
-            <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Tổng số cửa hàng</span>
-            <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>2</span>
-              <span className="text-xs text-gray-600">cửa hàng</span>
-            </span>
-          </div>
-          <div className='bg-[#F0FAFF] text-blue-500 p-2 rounded-full'>
-            <Store />
-          </div>
-        </div>
-        <div className="col-span-1 bg-white rounded-lg p-4 flex items-center justify-between">
-          <div className="">
-            <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Tổng số sản phẩm</span>
-            <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>214</span>
-              <span className="text-xs text-gray-600">sản phẩm</span>
-            </span>
-          </div>
-          <div className='bg-[#FFFAEF] text-yellow-500 p-2 rounded-full'>
-            <Box />
-          </div>
-        </div>
-        <div className="col-span-1 bg-white rounded-lg p-4 flex items-center justify-between">
-          <div className="">
-            <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Tổng đơn hàng trong tháng</span>
-            <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>148</span>
-              <span className="text-xs text-gray-600">đơn hàng</span>
-            </span>
-          </div>
-          <div className='bg-[#F1FCF6] text-green-600 p-2 rounded-full'>
-            <NotebookText />
-          </div>
-        </div>
-        <div className="col-span-1 bg-white rounded-lg p-4 flex items-center justify-between">
-          <div className="">
-            <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Doanh thu tháng này</span>
-            <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>32.500.000</span>
-              <span className="text-xs text-gray-600">VND</span>
-            </span>
-          </div>
-          <div className='bg-[#E8E8E8] text-gray-500 p-2 rounded-full'>
-            <Banknote />
-          </div>
-        </div>
-      </div>
+      <OverviewStats />
 
       {/* Toolbar */}
       <div className="bg-white p-3 rounded-lg flex items-center justify-between gap-20 mb-8">

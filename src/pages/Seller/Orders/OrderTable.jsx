@@ -20,12 +20,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '~/components/ui/dropdown-menu'
 import { Input } from '~/components/ui/input'
@@ -66,6 +62,7 @@ import {
   CircleAlertIcon,
   CircleXIcon,
   Columns3Icon,
+  DeleteIcon,
   EllipsisIcon,
   FilterIcon,
   ListFilterIcon,
@@ -73,6 +70,7 @@ import {
   TrashIcon
 } from 'lucide-react'
 import { useId, useMemo, useRef, useState } from 'react'
+import dayjs from 'dayjs'
 
 
 // Custom filter function for multi-column searching
@@ -113,16 +111,22 @@ const columns = [
   },
   {
     id: 'orderId',
-    header: 'Mã ĐH',
+    header: 'Mã đơn hàng',
     accessorKey: 'orderId',
     cell: ({ row }) => <div className='text-ellipsis overflow-hidden'>{row.original._id}</div>
+  },
+  {
+    id: 'createdAt',
+    header: 'Ngày đặt hàng',
+    accessorKey: 'createdAt',
+    cell: ({ row }) => <div className='text-ellipsis overflow-hidden'>{dayjs(row.getValue('createdAt')).format('DD-MM-YYYY')}</div>
   },
   {
     id: 'buyerName',
     header: 'Tên người đặt',
     accessorKey: 'buyerName',
     cell: ({ row }) => <div className="font-medium">{row.getValue('buyerName')}</div>,
-    size: 180,
+    size: 160,
     filterFn: multiColumnFilterFn,
     enableHiding: false
   },
@@ -130,48 +134,14 @@ const columns = [
     id: 'shopId',
     header: 'Mã cửa hàng',
     accessorKey: 'shopId',
-    cell: ({ row }) => <div>{row.getValue('shopId')}</div>,
-    size: 220
-  },
-  {
-    id: 'orgPrice',
-    header: 'Giá gốc',
-    accessorKey: 'orgPrice',
-    cell: ({ row }) => (
-      <div>
-        {row.getValue('orgPrice').toLocaleString('vi-vn')}<sup>đ</sup>
-      </div>
-    ),
-    size: 180
-  },
-  {
-    id: 'finalPrice',
-    header: 'Giá cuối',
-    accessorKey: 'finalPrice',
-    cell: ({ row }) => (
-      <div>
-        {row.getValue('finalPrice').toLocaleString('vi-vn')}<sup>đ</sup>
-      </div>
-    ),
-    size: 180
-  },
-  {
-    id: 'shippingFee',
-    header: 'Phí vận chuyển',
-    accessorKey: 'shippingFee',
-    cell: ({ row }) => (
-      <div>
-        {row.getValue('shippingFee').toLocaleString('vi-vn')}<sup>đ</sup>
-      </div>
-    ),
-    size: 180
+    cell: ({ row }) => <div className='text-ellipsis overflow-hidden'>{row.getValue('shopId')}</div>
   },
   {
     header: 'Tổng tiền',
     accessorKey: 'totalPrice',
     cell: ({ row }) => {
-      const total = parseInt(row.getValue('finalPrice')) + parseInt(row.getValue('shippingFee'))
-      return <div>{total.toLocaleString('vi-vn')}<sup>đ</sup></div>
+      const total = parseInt(row.original.finalPrice) + parseInt(row.original.shippingFee)
+      return <div className='font-bold text-red-500'>{total.toLocaleString('vi-vn')}<sup>đ</sup></div>
     },
     size: 120
   },
@@ -201,7 +171,7 @@ const columns = [
     id: 'actions',
     header: 'Thao tác',
     cell: ({ row }) => <RowActions row={row} />,
-    size: 60,
+    size: 70,
     enableHiding: false
   }
 ]
@@ -306,10 +276,10 @@ export default function OrderTable({ data, setData }) {
               ref={inputRef}
               className={cn(
                 'peer min-w-80 ps-9',
-                Boolean(table.getColumn('name')?.getFilterValue()) && 'pe-9'
+                Boolean(table.getColumn('buyerName')?.getFilterValue()) && 'pe-9'
               )}
-              value={(table.getColumn('name')?.getFilterValue() ?? '')}
-              onChange={(e) => table.getColumn('name')?.setFilterValue(e.target.value)}
+              value={(table.getColumn('buyerName')?.getFilterValue() ?? '')}
+              onChange={(e) => table.getColumn('buyerName')?.setFilterValue(e.target.value)}
               placeholder="Lọc theo mã đơn hàng..."
               type="text"
               aria-label="Lọc theo mã đơn hàng"
@@ -317,12 +287,12 @@ export default function OrderTable({ data, setData }) {
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
               <ListFilterIcon size={16} aria-hidden="true" />
             </div>
-            {Boolean(table.getColumn('name')?.getFilterValue()) && (
+            {Boolean(table.getColumn('buyerName')?.getFilterValue()) && (
               <button
                 className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Clear filter"
                 onClick={() => {
-                  table.getColumn('name')?.setFilterValue('')
+                  table.getColumn('buyerName')?.setFilterValue('')
                   if (inputRef.current) {
                     inputRef.current.focus()
                   }
@@ -647,42 +617,23 @@ function RowActions() {
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <span>Edit</span>
+            <span>Chi tiết</span>
             <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span>Duplicate</span>
-            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <span>Archive</span>
+            <span>Xác nhận đơn hàng</span>
             <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Move to project</DropdownMenuItem>
-                <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Advanced options</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
+          <DropdownMenuItem className="text-destructive focus:text-destructive">
+            <span>Hủy đơn hàng</span>
+            <DropdownMenuShortcut><DeleteIcon size={16}/></DropdownMenuShortcut>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Add to favorites</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
-          <span>Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

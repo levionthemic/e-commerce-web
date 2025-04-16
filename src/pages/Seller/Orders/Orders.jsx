@@ -23,8 +23,6 @@ function Orders() {
     fetchOrdersForSellerAPI().then(data => setOrders(data))
   }, [])
 
-  console.log(orders);
-
   return (
     <div className='px-6 py-4'>
       <div className="flex items-center justify-between mb-4 gap-8">

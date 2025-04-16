@@ -126,7 +126,7 @@ const columns = [
     id: 'categoryId',
     header: 'Danh mục',
     accessorKey: 'categoryId',
-    cell: ({ row }) => <div className='line-clamp-4 text-wrap font-medium'>{row.original.category.name}</div>,
+    cell: ({ row }) => <div className='line-clamp-4 text-wrap'>{row.original.category.name}</div>,
     size: 100,
     enableSorting: false
   },
@@ -134,7 +134,7 @@ const columns = [
     id: 'brandId',
     header: 'Thương hiệu',
     accessorKey: 'brandId',
-    cell: ({ row }) => <div className='line-clamp-4 text-wrap font-medium'>{row.original.brand.name}</div>,
+    cell: ({ row }) => <div className='line-clamp-4 text-wrap'>{row.original.brand.name}</div>,
     size: 100,
     enableSorting: false
   },
@@ -431,7 +431,7 @@ export default function ProductTable({ data, setData }) {
       </div>
 
       {/* Table */}
-      <div className='bg-white overflow-hidden border rounded-lg font-lexend'>
+      <div className='bg-white overflow-hidden border rounded-lg font-lexend font-light'>
         <Table
           className="table-fixed"
           // style={{
