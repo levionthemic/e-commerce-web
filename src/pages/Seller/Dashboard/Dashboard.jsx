@@ -1,5 +1,6 @@
 import { Coins, Layers, MoreHorizontal, Package2, Percent, TrendingDown, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import CountUp from 'react-countup'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import logo from '~/assets/ghn-logo.png'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
@@ -12,6 +13,7 @@ import {
   TableHeader,
   TableRow
 } from '~/components/ui/table'
+import { useTimeCount } from '~/hooks/use-time-count'
 
 const items = [
   {
@@ -57,23 +59,7 @@ const items = [
 ]
 
 function Dashboard () {
-  const date = new Date(Date.now())
-  const formatter = new Intl.DateTimeFormat('vi-VN', {
-    weekday: 'long',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-
-  const [time, setTime] = useState(new Date().toLocaleTimeString('vi-VN'))
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date()
-      const timeString = now.toLocaleTimeString('vi-VN')
-      setTime(timeString)
-    }, 1000)
-    return () => clearInterval(timer)
-  })
+  const { date, time } = useTimeCount()
 
   const data = [
     {
@@ -128,7 +114,7 @@ function Dashboard () {
           <div className="font-bold text-xl">Dashboard</div>
           <p className="text-sm text-gray-500">Tổng quan về cửa hàng của bạn trong tuần này</p>
         </div>
-        <span className="italic text-sm text-gray-500 text-right">{time}<br />{formatter.format(date)}</span>
+        <span className="italic text-sm text-gray-500 text-right">{time}<br />{date}</span>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -139,7 +125,7 @@ function Dashboard () {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold flex flex-col gap-1/2">
-              <span>2.158.000</span>
+              <CountUp end={2158000} start={1.5} separator='.' />
               <span className="text-xs text-gray-600">VNĐ</span>
             </span>
             <div className="flex flex-col items-end">
@@ -163,7 +149,7 @@ function Dashboard () {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold flex flex-col gap-1/2">
-              <span>488</span>
+              <CountUp end={488} start={1.5} />
               <span className="text-xs text-gray-600">sản phẩm</span>
             </span>
             <div className="flex flex-col items-end">
@@ -187,7 +173,7 @@ function Dashboard () {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold flex flex-col gap-1/2">
-              <span>123</span>
+              <CountUp end={123} start={1.5} />
               <span className="text-xs text-gray-600">đơn hàng</span>
             </span>
             <div className="flex flex-col items-end">
@@ -211,7 +197,7 @@ function Dashboard () {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold flex flex-col gap-1/2">
-              <span>5.03</span>
+              <CountUp end={5.03} start={1.5} decimals={2} />
               <span className="text-xs text-gray-600">%</span>
             </span>
             <div className="flex flex-col items-end">
