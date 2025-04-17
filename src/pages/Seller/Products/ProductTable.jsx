@@ -69,6 +69,7 @@ import {
 import { useId, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ProductDetailDialog from './ProductDetailDialog'
+import { useLoading } from '~/contexts/LoadingContext'
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn = (row, columnId, filterValue) => {
@@ -193,6 +194,7 @@ const columns = [
 export default function ProductTable({ data, setData }) {
   const navigate = useNavigate()
   const id = useId()
+  const { isDataLoading } = useLoading()
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [pagination, setPagination] = useState({
@@ -529,7 +531,7 @@ export default function ProductTable({ data, setData }) {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                Không có kết quả
+                  {isDataLoading ? 'Đang tải dữ liệu...' : 'Không có kết quả' }
                 </TableCell>
               </TableRow>
             )}

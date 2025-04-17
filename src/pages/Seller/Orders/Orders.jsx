@@ -1,5 +1,6 @@
 import { Banknote, CircleX, NotepadText, Truck } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import CountUp from 'react-countup'
 import { Link } from 'react-router-dom'
 import { fetchOrdersForSellerAPI } from '~/apis'
 import {
@@ -10,18 +11,21 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '~/components/ui/breadcrumb'
+import { useLoading } from '~/contexts/LoadingContext'
 import { useTimeCount } from '~/hooks/use-time-count'
 import OrderTable from '~/pages/Seller/Orders/OrderTable'
 
 
 function Orders() {
   const { date, time } = useTimeCount()
+  const { setDataLoading } = useLoading()
 
   const [orders, setOrders] = useState([])
 
   useEffect(() => {
-    fetchOrdersForSellerAPI().then(data => setOrders(data))
-  }, [])
+    setDataLoading(true)
+    fetchOrdersForSellerAPI().then(data => setOrders(data)).finally(() => setDataLoading(false))
+  }, [setDataLoading])
 
   return (
     <div className='px-6 py-4'>
@@ -56,7 +60,7 @@ function Orders() {
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Tổng Đơn hàng đã nhận</span>
             <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>173</span>
+              <CountUp end={173} duration={1.5} separator='.' className='leading-none' />
               <span className="text-xs text-gray-600">đơn hàng</span>
             </span>
           </div>
@@ -68,7 +72,7 @@ function Orders() {
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Đơn hàng đang vận chuyển</span>
             <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>14</span>
+              <CountUp end={14} duration={1.5} separator='.' className='leading-none' />
               <span className="text-xs text-gray-600">đơn hàng</span>
             </span>
           </div>
@@ -80,7 +84,7 @@ function Orders() {
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Đơn hàng thành công</span>
             <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>150</span>
+              <CountUp end={150} duration={1.5} separator='.' className='leading-none' />
               <span className="text-xs text-gray-600">đơn hàng</span>
             </span>
           </div>
@@ -92,7 +96,7 @@ function Orders() {
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Đơn hàng đã hủy</span>
             <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>9</span>
+              <CountUp end={9} duration={1.5} separator='.' className='leading-none' />
               <span className="text-xs text-gray-600">đơn hàng</span>
             </span>
           </div>

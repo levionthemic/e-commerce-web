@@ -1,5 +1,6 @@
 import { Banknote, PackageOpen, RotateCcw, Truck } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import CountUp from 'react-countup'
 import { Link } from 'react-router-dom'
 import { getProductsAPI } from '~/apis'
 import {
@@ -10,16 +11,19 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator
 } from '~/components/ui/breadcrumb'
+import { useLoading } from '~/contexts/LoadingContext'
 import { useTimeCount } from '~/hooks/use-time-count'
 import ProductTable from '~/pages/Seller/Products/ProductTable'
 
 function Products() {
   const { date, time } = useTimeCount()
+  const { setDataLoading } = useLoading()
 
   const [products, setProducts] = useState([])
   useEffect(() => {
-    getProductsAPI().then(data => setProducts(data?.products))
-  }, [])
+    setDataLoading(true)
+    getProductsAPI().then(data => setProducts(data?.products)).finally(() => { setDataLoading(false) })
+  }, [setDataLoading])
 
   return (
     <div className='px-6 py-4'>
@@ -56,7 +60,7 @@ function Products() {
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Tổng Sản phẩm trong kho</span>
             <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>1461</span>
+              <CountUp end={1461} duration={1.5} separator='.' className='leading-none' />
               <span className="text-xs text-gray-600">sản phẩm</span>
             </span>
           </div>
@@ -68,7 +72,7 @@ function Products() {
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Sản phẩm trong đơn hàng</span>
             <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>214</span>
+              <CountUp end={214} duration={1.5} separator='.' className='leading-none' />
               <span className="text-xs text-gray-600">sản phẩm</span>
             </span>
           </div>
@@ -80,7 +84,7 @@ function Products() {
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Sản phẩm đã bán</span>
             <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>148</span>
+              <CountUp end={148} duration={1.5} separator='.' className='leading-none' />
               <span className="text-xs text-gray-600">sản phẩm</span>
             </span>
           </div>
@@ -92,7 +96,7 @@ function Products() {
           <div className="">
             <span className="font-medium text-sm text-gray-500 mb-2 inline-block">Sản phẩm hoàn trả</span>
             <span className="text-2xl font-bold flex items-end gap-1">
-              <span className='leading-none'>50</span>
+              <CountUp end={50} duration={1.5} separator='.' className='leading-none' />
               <span className="text-xs text-gray-600">sản phẩm</span>
             </span>
           </div>

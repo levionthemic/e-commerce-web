@@ -1,5 +1,4 @@
 import { Coins, Layers, MoreHorizontal, Package2, Percent, TrendingDown, TrendingUp } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import CountUp from 'react-countup'
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import logo from '~/assets/ghn-logo.png'
@@ -131,7 +130,7 @@ function Dashboard () {
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-sm text-green-600">
                 <TrendingUp />
-                <span>+6.00%</span>
+                <span>+<CountUp end={6.00} start={1.5} decimals={2} />%</span>
               </div>
               <span className="text-xs text-gray-400">so với tuần trước</span>
             </div>
@@ -155,7 +154,7 @@ function Dashboard () {
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-sm text-red-600">
                 <TrendingDown />
-                <span>+6.00%</span>
+                <span>-<CountUp end={6.00} start={1.5} decimals={2} />%</span>
               </div>
               <span className="text-xs text-gray-400">so với tuần trước</span>
             </div>
@@ -179,7 +178,7 @@ function Dashboard () {
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-sm text-red-600">
                 <TrendingDown />
-                <span>+6.00%</span>
+                <span>-<CountUp end={6.00} start={1.5} decimals={2} />%</span>
               </div>
               <span className="text-xs text-gray-400">so với tuần trước</span>
             </div>
@@ -203,7 +202,7 @@ function Dashboard () {
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-sm text-red-600">
                 <TrendingDown />
-                <span>+6.00%</span>
+                <span>-<CountUp end={5.03} start={1.5} decimals={2} />%</span>
               </div>
               <span className="text-xs text-gray-400">so với tuần trước</span>
             </div>
