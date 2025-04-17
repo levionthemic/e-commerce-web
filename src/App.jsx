@@ -72,8 +72,10 @@ function App() {
         </Route>
 
         {/* Admin pages */}
-        <Route path='/admin' element={<AdminLayout />}>
-          <Route index element={<DashboardAdmin />} />
+        <Route element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.SELLER}/>}>
+          <Route path='/admin' element={<AdminLayout />}>
+            <Route index element={<DashboardAdmin />} />
+          </Route>
         </Route>
 
         {/* Seller pages */}
