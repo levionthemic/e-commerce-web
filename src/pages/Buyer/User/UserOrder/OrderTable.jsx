@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { cn } from '~/lib/utils'
 import {
   AlertDialog,
@@ -68,7 +69,7 @@ import { useId, useMemo, useRef, useState } from 'react'
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn = (row, columnId, filterValue) => {
-  const searchableRowContent = `${row.original.name} ${row.original.email}`.toLowerCase()
+  const searchableRowContent = `${row.original._id} ${row.original.email}`.toLowerCase()
   const searchTerm = (filterValue ?? '').toLowerCase()
   return searchableRowContent.includes(searchTerm)
 }
@@ -98,7 +99,7 @@ const columns = [
         aria-label="Select row"
       />
     ),
-    size: 28,
+    size: 20,
     enableSorting: false,
     enableHiding: false
   },
@@ -106,50 +107,69 @@ const columns = [
     id: '_id',
     header: 'Mã đơn hàng',
     accessorKey: '_id',
-    cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>,
-    size: 180,
+    cell: ({ row }) => <div className="font-medium text-ellipsis overflow-x-hidden">{row.getValue('_id')}</div>,
     filterFn: multiColumnFilterFn,
-    enableHiding: false
+    enableHiding: false,
+    size: 80
   },
   {
     id: 'sellerId',
     header: 'Người bán',
-    accessorKey: 'sellerId'
+    accessorKey: 'sellerId',
+    cell: ({ row }) => <div className="font-medium text-ellipsis overflow-x-hidden">{row.getValue('sellerId')}</div>,
+    size: 80
   },
   {
     id: 'itemList',
     header: 'Danh sách sản phẩm',
-    accessorKey: 'itemList'
+    accessorKey: 'itemList',
+    size: 200,
+    cell: ({ row }) => (
+      <>
+        {row.getValue('itemList').slice(0, 2).map((item, index) => (
+          <div key={item._id} className={`flex items-center gap-2 ${index != row.getValue('itemList').length - 1 && 'mb-2'}`}>
+            <div>
+              <img src={item.avatar} alt="" className='size-10 rounded-md border border-gray-300 p-0.5' />
+            </div>
+            <div className='flex-1'>
+              <div className='line-clamp-1'>{item.productName}</div>
+              <div className='line-clamp-1 text-xs text-muted-foreground'>Loại: {item.typeName}</div>
+            </div>
+          </div>
+        ))}
+        {row.getValue('itemList').length > 2 && <div className='mt-2 text-muted-foreground'>+ {row.getValue('itemList').length - 2} sản phẩm</div>}
+      </>
+    )
   },
   {
     id: 'shippingMethod',
-    header: 'Đơn vị vận chuyển',
-    accessorKey: 'shippingMethod'
+    header: <div className='text-center flex-1'>Đơn vị vận chuyển</div>,
+    accessorKey: 'shippingMethod',
+    size: 80,
+    cell: ({ row }) => <div className='text-center'>{row.getValue('shippingMethod') === 'ghn' ? 'Giao hàng nhanh' : 'Giao hàng tiết kiệm'}</div>
   },
   {
-    id: 'paymentMethod',
-    header: 'Phương thức thanh toán',
-    accessorKey: 'paymentMethod'
-  },
-  {
-    id: 'shippingAddress',
+    id: 'buyerAddress',
     header: 'Địa chỉ nhận hàng',
-    accessorKey: 'shippingAddress'
+    accessorKey: 'buyerAddress'
   },
   {
     id: 'status',
-    header: 'Trạng thái',
+    header: <div className='text-center flex-1'>Trạng thái</div>,
     accessorKey: 'status',
     cell: ({ row }) => (
-      <Badge
-        className={cn(
-          row.getValue('status') === 'Inactive' && 'bg-muted-foreground/60 text-primary-foreground'
-        )}
-      >
-        {row.getValue('status')}
-      </Badge>
+      <div className='flex justify-center'>
+        <Badge
+          className={cn(
+            row.getValue('status') === 'Inactive' && 'bg-muted-foreground/60 text-primary-foreground'
+          )}
+        >
+          {row.getValue('status')}
+        </Badge>
+      </div>
+
     ),
-    size: 100,
+    size: 70,
     filterFn: statusFilterFn
   },
   {
@@ -162,15 +182,15 @@ const columns = [
         style: 'currency',
         currency: 'VND'
       }).format(amount)
-      return formatted
+      return <div className='font-bold text-lg text-red-500'>{formatted}</div>
     },
-    size: 120
+    size: 80
   },
   {
     id: 'actions',
-    header: 'Thao tác',
-    cell: ({ row }) => <RowActions row={row} />,
-    size: 60,
+    header: <div className='text-center'>Thao tác</div>,
+    cell: <RowActions />,
+    size: 30,
     enableHiding: false
   }
 ]
@@ -231,19 +251,19 @@ export default function OrderTable({ data, setData }) {
     const values = Array.from(statusColumn.getFacetedUniqueValues().keys())
 
     return values.sort()
-  }, [table])
+  }, [data])
 
   // Get counts for each status
   const statusCounts = useMemo(() => {
     const statusColumn = table.getColumn('status')
     if (!statusColumn) return new Map()
     return statusColumn.getFacetedUniqueValues()
-  }, [table])
+  }, [data])
 
   const selectedStatuses = useMemo(() => {
     const filterValue = table.getColumn('status')?.getFilterValue()
     return filterValue ?? []
-  }, [table])
+  }, [data])
 
   const handleStatusChange = (checked, value) => {
     const filterValue = table.getColumn('status')?.getFilterValue()
@@ -284,12 +304,12 @@ export default function OrderTable({ data, setData }) {
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
               <ListFilterIcon size={16} aria-hidden="true" />
             </div>
-            {Boolean(table.getColumn('name')?.getFilterValue()) && (
+            {Boolean(table.getColumn('_id')?.getFilterValue()) && (
               <button
                 className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Clear filter"
                 onClick={() => {
-                  table.getColumn('name')?.setFilterValue('')
+                  table.getColumn('_id')?.setFilterValue('')
                   if (inputRef.current) {
                     inputRef.current.focus()
                   }
@@ -355,12 +375,11 @@ export default function OrderTable({ data, setData }) {
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className="capitalize"
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                       onSelect={(event) => event.preventDefault()}
                     >
-                      {column.columnDef.header}
+                      {column.columnDef.header?.props?.children || column.columnDef.header}
                     </DropdownMenuCheckboxItem>
                   )
                 })}
@@ -603,7 +622,7 @@ export default function OrderTable({ data, setData }) {
 
 function RowActions() {
   return (
-    <div className="flex justify-end">
+    <div className="flex justify-center">
       <Button size="icon" variant="ghost" className="shadow-none" aria-label="Edit item">
         <EllipsisIcon size={16} aria-hidden="true" />
       </Button>

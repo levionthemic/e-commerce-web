@@ -75,7 +75,7 @@ import dayjs from 'dayjs'
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn = (row, columnId, filterValue) => {
-  const searchableRowContent = `${row.original.name} ${row.original.email}`.toLowerCase()
+  const searchableRowContent = `${row.original.buyerName} ${row.original.email}`.toLowerCase()
   const searchTerm = (filterValue ?? '').toLowerCase()
   return searchableRowContent.includes(searchTerm)
 }
@@ -188,7 +188,7 @@ export default function OrderTable({ data, setData }) {
 
   const [sorting, setSorting] = useState([
     {
-      id: 'name',
+      id: 'buyerName',
       desc: false
     }
   ])

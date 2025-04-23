@@ -2,13 +2,19 @@ import OrderTable from '~/pages/Buyer/User/UserOrder/OrderTable'
 import { CheckCheck, Loader, Package, TrendingDown, TrendingUp, Truck } from 'lucide-react'
 import UserHeader from '~/pages/Buyer/User/UserHeader'
 import { useEffect, useState } from 'react'
-import { fetchOrdersAPI } from '~/apis'
+import { fetchOrdersForBuyerAPI } from '~/apis'
+import { getAddressString } from '~/utils/helpers'
 
 function UserOrder() {
   const [orderData, setOrderData] = useState([])
 
   useEffect(() => {
-    fetchOrdersAPI().then(data => setOrderData(data))
+    fetchOrdersForBuyerAPI().then(data => {
+      Promise.all(data.map(async d => {
+        d.buyerAddress = await getAddressString(d.buyerAddress)
+        return d
+      })).then((res) => setOrderData(res))
+    })
   }, [])
 
   return (
