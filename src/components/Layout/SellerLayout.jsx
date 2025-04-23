@@ -21,7 +21,7 @@ function SellerLayout() {
     return () => clearTimeout(timeout)
   }, [location.pathname, setPageLoading])
   return (
-    <div className='font-roboto'>
+    <div className='font-nunito'>
       <NProgress isAnimating={isDataLoading || isPageLoading} key={location.key} />
       <SidebarProvider>
         <SellerSidebar />

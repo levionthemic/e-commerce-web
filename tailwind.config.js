@@ -20,7 +20,11 @@ export default {
         lexend: [
   				'Lexend',
   				'sans-serif'
-  			]
+  			],
+        nunito: [
+          'Nunito',
+          'sans-serif'
+        ]
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
