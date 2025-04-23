@@ -22,11 +22,13 @@ import { toast } from 'sonner'
 import { ChevronDown, ChevronUp, EllipsisIcon, Store, Trash2Icon } from 'lucide-react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alert-dialog'
 import { useState } from 'react'
+import { selectCurrentUser } from '~/redux/user/userSlice'
 
 function CartPage() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const cart = useSelector(selectCurrentCart)
+  const currentUser = useSelector(selectCurrentUser)
 
   const handleDecreaseQuantity = (productId, typeId) => {
     const cloneCart = cloneDeep(cart)
@@ -42,7 +44,7 @@ function CartPage() {
 
     dispatch(setCart(cloneCart))
 
-    dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
+    if (currentUser) dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
   }
 
   const handleIncreaseQuantity = (productId, typeId) => {
@@ -56,7 +58,8 @@ function CartPage() {
     })
 
     dispatch(setCart(cloneCart))
-    dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
+
+    if (currentUser) dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
   }
 
   const handleDeleteItemCart = (product) => {
@@ -72,23 +75,22 @@ function CartPage() {
 
     dispatch(setCart(updateCart))
 
-    toast.promise(
-      dispatch(deleteItemAPI({
-        productId: product._id,
-        typeId: product.type.typeId
-      })),
-      {
-        loading: 'Đang xóa...',
-        success: (res) => {
-          if (!res.error)
-            return 'Xóa sản phẩm khỏi giỏ hàng thành công!'
-          throw res
+    if (currentUser) {
+      toast.promise(
+        dispatch(deleteItemAPI({
+          productId: product._id,
+          typeId: product.type.typeId
+        })),
+        {
+          loading: 'Đang xóa...',
+          success: (res) => {
+            if (!res.error)
+              return 'Xóa sản phẩm khỏi giỏ hàng thành công!'
+            throw res
+          }
         }
-      }
-    )
-
-
-    // Call API
+      )
+    }
   }
 
   const columns = [
@@ -141,7 +143,7 @@ function CartPage() {
       accessorKey: 'price',
       cell: ({ row }) => (
         <div>
-          {row.original.type.price.toLocaleString('vi-VN')}<sup>đ</sup>
+          {row.original?.type?.price.toLocaleString('vi-VN')}<sup>đ</sup>
         </div>
       ),
       size: 80
@@ -151,7 +153,7 @@ function CartPage() {
       accessorKey: 'type',
       cell: ({ row }) => (
         <div>
-          {row.original.type.typeName}
+          {row.original?.type?.typeName}
         </div>
       )
     },
@@ -167,7 +169,7 @@ function CartPage() {
               onClick={() => { handleDecreaseQuantity(row.original._id, row.original.type.typeId) }}
             />
             <input
-              value={cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId)?.quantity}
+              value={cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type?.typeId)?.quantity}
               readOnly
               className='w-[30px] text-center mx-1.5 border-none outline-none text-md bg-transparent'
             />
@@ -184,7 +186,7 @@ function CartPage() {
       header: () => <div className="text-right">Thành tiền</div>,
       accessorKey: 'totalPrice',
       cell: ({ row }) => {
-        return <div className="text-right font-semibold">{(row.original.type.price * cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId)?.quantity).toLocaleString('vi-VN')}
+        return <div className="text-right font-semibold">{(row.original.type?.price * cart?.itemList?.find((product) => product.productId === row.original._id && product.typeId === row.original.type?.typeId)?.quantity).toLocaleString('vi-VN')}
           <sup>đ</sup></div>
       },
       size: 80
@@ -225,7 +227,7 @@ function CartPage() {
   const [grouping, setGrouping] = useState(['sellerId'])
 
   const table = useReactTable({
-    data: cart.fullProducts,
+    data: cart?.fullProducts || [],
     columns,
     getSubRows: row => row.subRows,
     getCoreRowModel: getCoreRowModel(),
@@ -242,10 +244,11 @@ function CartPage() {
   })
 
   const totalPrice = () => {
+    if (!cart) return 0
     const rows = table.getRowModel().rows
     const result = rows.reduce((sum, row) => {
       let temp = 0
-      if (row.getIsSelected()) {
+      if (row.getIsSelected() && !row.getIsGrouped()) {
         temp += row.original.type.price * cart.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId).quantity
       }
       return sum + temp
@@ -263,6 +266,11 @@ function CartPage() {
       toast.error('Bạn chưa chọn sản phẩm!')
       return
     }
+
+    if (!currentUser) {
+      toast.error('Bạn phải đăng nhập để có thể thực hiện thanh toán!', { position: 'top-right' })
+      return
+    }
     navigate('/buyer/checkout', { state: { selectedRows: selectedRows } })
   }
 
@@ -271,7 +279,7 @@ function CartPage() {
       <div className="grid grid-cols-4 gap-5 relative max-h-full my-4">
         <div className="col-span-3 py-4 h-fit">
           <div className='font-semibold text-2xl text-mainColor2-800 mb-6'>Giỏ Hàng Của Bạn</div>
-          {!cart || !cart?.itemList.length
+          {!cart || !cart?.itemList?.length
             ? <p>Giỏ hàng của bạn đang trống.</p>
             : <div>
               <Table className='table-fixed'>
@@ -291,7 +299,7 @@ function CartPage() {
                   ))}
                 </TableHeader>
                 <TableBody>
-                  {table.getRowModel().rows?.length ? (
+                  {table?.getRowModel().rows?.length ? (
                     table.getRowModel().rows.map((row) => {
                       if (row.getIsGrouped()) {
                         // Nếu là hàng nhóm, hiển thị tiêu đề nhóm
@@ -355,7 +363,7 @@ function CartPage() {
             </div>
           }
         </div>
-        <div className="col-span-1 bg-[#ECEEF6] sticky top-32 rounded-lg left-0 max-h-[80%]">
+        <div className="col-span-1 bg-[#ECEEF6] sticky top-32 rounded-lg left-0 max-h-[80%] min-h-fit">
           <div className='bg-white rounded-lg m-4 p-4'>
             <div className='uppercase tracking-wide text-sm font-semibold text-mainColor1-600 text-center py-4'>Tóm tắt</div>
 
