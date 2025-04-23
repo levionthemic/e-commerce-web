@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { clearCart, fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
+import { addToCartAPI, clearCart, fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
 
 import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
 import { Input } from '~/components/ui/input'
@@ -12,7 +12,7 @@ import { IoNotificationsOutline } from 'react-icons/io5'
 import MenuBar from './MenuBar'
 
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
-import { ArrowRightIcon, SearchIcon } from 'lucide-react'
+import { ArrowRightIcon, LogInIcon, SearchIcon } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -70,8 +70,14 @@ function HeaderBuyer() {
   const inputRef = useRef()
 
   useEffect(() => {
-    dispatch(fetchCurrentCartAPI())
-  }, [dispatch])
+    if (currentUser) {
+      if (currentCart && !currentCart.buyerId) {
+        Promise.all(currentCart?.itemList.map(item => dispatch(addToCartAPI(item)))).then(() => dispatch(fetchCurrentCartAPI()))
+      } else {
+        dispatch(fetchCurrentCartAPI())
+      }
+    }
+  }, [currentUser, dispatch])
 
 
   const handleSearch = (event) => {
@@ -179,7 +185,7 @@ function HeaderBuyer() {
                   <SheetHeader className='my-3'>
                     <SheetTitle>
                       Giỏ hàng của bạn {' '}
-                      <span className='text-sm text-gray-700'>({currentCart?.itemList.length})</span>
+                      <span className='text-sm text-gray-700'>({currentCart?.itemList.length || 0})</span>
                     </SheetTitle>
                     <SheetDescription className='!m-0'>
                       Sơ lược các sản phẩm trong giỏ hàng.
@@ -200,10 +206,10 @@ function HeaderBuyer() {
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
-                          <p className='line-clamp-1 text-xs text-gray-400 mb-0.5'>Loại: {product.type.typeName}</p>
+                          <p className='line-clamp-1 text-xs text-gray-400 mb-0.5'>Loại: {product?.type?.typeName}</p>
                           <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
                             <Badge className='bg-mainColor2-800/90'>{currentCart.itemList[index].quantity} sản phẩm</Badge>
-                            <span className='text-[0.8rem] text-muted-foreground'>x {product?.type.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
+                            <span className='text-[0.8rem] text-muted-foreground'>x {product?.type?.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
                           </div>
                         </div>
                       </div>
@@ -220,54 +226,57 @@ function HeaderBuyer() {
                     </SheetClose>
                   </SheetFooter>
                 </SheetContent>
-
               </Sheet>
 
-              <DropdownMenu open={open} onOpenChange={setOpen}>
-                <DropdownMenuTrigger asChild>
-                  <div className='flex items-center gap-3 cursor-pointer'>
-                    <Avatar>
-                      <AvatarImage src={currentUser?.avatar} />
-                      <AvatarFallback>LV</AvatarFallback>
-                    </Avatar>
-                    <div className='text-sm text-gray-500'>Xin chào, <br></br><b className='text-gray-900'>{currentUser?.username}</b></div>
-                  </div>
+              {currentUser
+                ? <DropdownMenu open={open} onOpenChange={setOpen}>
+                  <DropdownMenuTrigger asChild>
+                    <div className='flex items-center gap-3 cursor-pointer'>
+                      <Avatar>
+                        <AvatarImage src={currentUser?.avatar} />
+                        <AvatarFallback>LV</AvatarFallback>
+                      </Avatar>
+                      <div className='text-sm text-gray-500'>Xin chào, <br></br><b className='text-gray-900'>{currentUser?.username}</b></div>
+                    </div>
 
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-40">
-                  <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={() => navigate('/user/profile')} className='cursor-pointer'>Hồ sơ</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/user/order')} className='cursor-pointer'>Đơn hàng</DropdownMenuItem>
-                    <DropdownMenuItem>Cài đặt</DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <DropdownMenuItem
-                        className='text-red-600 font-medium hover:bg-red-100 hover:text-red-600 cursor-pointer'
-                        onSelect={(event) => {event.preventDefault()}}
-                      >
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40">
+                    <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem onClick={() => navigate('/user/profile')} className='cursor-pointer'>Hồ sơ</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/user/order')} className='cursor-pointer'>Đơn hàng</DropdownMenuItem>
+                      <DropdownMenuItem>Cài đặt</DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <DropdownMenuItem
+                          className='text-red-600 font-medium hover:bg-red-100 hover:text-red-600 cursor-pointer'
+                          onSelect={(event) => {event.preventDefault()}}
+                        >
                         Đăng xuất
-                      </DropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Bạn có chắc chắn muốn đăng xuất?</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        </DropdownMenuItem>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Bạn có chắc chắn muốn đăng xuất?</AlertDialogTitle>
+                          <AlertDialogDescription>
                           Bạn sẽ cần phải đăng nhập lại trước khi truy cập vào hệ thống.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setOpen(false)}>Hủy</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleLogout}>Đăng xuất</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel onClick={() => setOpen(false)}>Hủy</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleLogout}>Đăng xuất</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
 
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                : <div className='flex items-center gap-2 text-mainColor1-600 cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform' onClick={() => navigate('/login')}><LogInIcon />Đăng nhập</div>
+              }
             </div>
           </div>
         </div>

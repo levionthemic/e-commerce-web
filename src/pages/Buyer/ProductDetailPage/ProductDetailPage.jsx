@@ -29,7 +29,7 @@ import { FaRegCommentDots, FaRegStar, FaRegThumbsUp, FaStar } from 'react-icons/
 import { IoBagCheckOutline, IoShareSocialOutline } from 'react-icons/io5'
 import { COMMENTS, DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
 import Product from '~/components/Product/Product'
-import { addToCartAPI, fetchCurrentCartAPI } from '~/redux/cart/cartSlice'
+import { addToCartAPI, fetchCurrentCartAPI, selectCurrentCart, setCart } from '~/redux/cart/cartSlice'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import { Label } from '~/components/ui/label'
 import { MdAddShoppingCart } from 'react-icons/md'
@@ -37,7 +37,6 @@ import { getAddressString } from '~/utils/helpers'
 import ReviewModal from './ReviewModal'
 import { socketIoInstance } from '~/socket'
 import { cloneDeep } from 'lodash'
-import { EllipsisIcon } from 'lucide-react'
 import PaginationComponent from '~/components/Pagination/PaginationComponent'
 
 
@@ -69,6 +68,7 @@ function ProductDetailPage() {
   }, [product?.types, typeId])
 
   const currentUser = useSelector(selectCurrentUser)
+  const currentCart = useSelector(selectCurrentCart)
 
   const [address, setAddress] = useState('')
 
@@ -78,7 +78,7 @@ function ProductDetailPage() {
     socketIoInstance.emit('FE_JOIN_PRODUCT', productId)
 
     socketIoInstance.on('BE_UPDATE_TYPING', ({ productId: id, users }) => {
-      if (id === productId) setTypingUsers(users.filter((id) => id !== currentUser._id))
+      if (id === productId) setTypingUsers(users.filter((id) => id !== currentUser?._id))
     })
 
     socketIoInstance.on('BE_NEW_REVIEW', (data) => {
@@ -113,6 +113,32 @@ function ProductDetailPage() {
       return
     }
     const data = { productId, typeId, quantity }
+    if (!currentUser) {
+      let itemList = cloneDeep(currentCart?.itemList) || []
+      let fullProducts = cloneDeep(currentCart?.fullProducts) || []
+
+      let isExistedItem = false
+      itemList.forEach(item => {
+        if (!isExistedItem && item.productId.toString() === data.productId && item.typeId.toString() === data.typeId) {
+          item.quantity += quantity
+          isExistedItem = true
+        }
+      })
+      if (!isExistedItem) {
+        itemList.push(data)
+        const newProduct = cloneDeep(product)
+        newProduct.type = newProduct.types.find(t => t.typeId.toString() === data.typeId)
+        newProduct.sellerId = newProduct.seller._id
+        fullProducts.push(newProduct)
+      }
+
+      const newCart = { itemList, fullProducts }
+
+      dispatch(setCart(newCart))
+      toast.success('Thêm vào giỏ hàng thành công!')
+      return
+    }
+
     toast.promise(
       dispatch(addToCartAPI(data)).unwrap(),
       {
@@ -129,6 +155,11 @@ function ProductDetailPage() {
   }
 
   const handleCheckout = () => {
+    if (!currentUser) {
+      toast.error('Bạn phải đăng nhập để có thể thực hiện thanh toán!', { position: 'top-right' })
+      return
+    }
+
     if (!typeId) {
       toast.error('Bạn chưa chọn loại sản phẩm!', { position: 'top-right' })
       return
@@ -166,13 +197,13 @@ function ProductDetailPage() {
 
   const updateStartTyping = () => {
     if (!isTyping) {
-      socketIoInstance.emit('FE_START_TYPING', { productId, userId: currentUser._id })
+      socketIoInstance.emit('FE_START_TYPING', { productId, userId: currentUser?._id })
       setIsTyping(true)
     }
   }
 
   const updateStopTyping = () => {
-    socketIoInstance.emit('FE_STOP_TYPING', { productId, userId: currentUser._id })
+    socketIoInstance.emit('FE_STOP_TYPING', { productId, userId: currentUser?._id })
     setIsTyping(false)
   }
 
