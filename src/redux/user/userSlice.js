@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'sonner'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
-import { ACCOUNT_STATUS, API_ROOT, PAGE_TYPE } from '~/utils/constants'
+import { API_ROOT, PAGE_TYPE } from '~/utils/constants'
 
 export const loginUserAPI = createAsyncThunk(
   'user/loginUserAPI',

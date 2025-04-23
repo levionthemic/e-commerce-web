@@ -24,12 +24,17 @@ import { useState } from 'react'
 import { RiSubtractFill } from 'react-icons/ri'
 import { IoMdAdd } from 'react-icons/io'
 import { toast } from 'sonner'
-import { useDispatch } from 'react-redux'
-import { addToCartAPI, fetchCurrentCartAPI } from '~/redux/cart/cartSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { addToCartAPI, fetchCurrentCartAPI, selectCurrentCart, setCart } from '~/redux/cart/cartSlice'
+import { selectCurrentUser } from '~/redux/user/userSlice'
+import { cloneDeep } from 'lodash'
 
 function Product({ product, loading }) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+
+  const currentUser = useSelector(selectCurrentUser)
+  const currentCart = useSelector(selectCurrentCart)
 
   const [typeId, setTypeId] = useState(null)
   const [quantity, setQuantity] = useState(1)
@@ -41,6 +46,34 @@ function Product({ product, loading }) {
       return
     }
     const data = { productId: product?._id, typeId, quantity }
+
+    if (!currentUser) {
+      let itemList = cloneDeep(currentCart?.itemList) || []
+      let fullProducts = cloneDeep(currentCart?.fullProducts) || []
+
+      let isExistedItem = false
+      itemList.forEach(item => {
+        if (!isExistedItem && item.productId.toString() === data.productId && item.typeId.toString() === data.typeId) {
+          item.quantity += quantity
+          isExistedItem = true
+        }
+      })
+      if (!isExistedItem) {
+        itemList.push(data)
+        const newProduct = cloneDeep(product)
+        newProduct.type = newProduct.types.find(t => t.typeId.toString() === data.typeId)
+        newProduct.sellerId = newProduct.seller._id
+        fullProducts.push(newProduct)
+      }
+
+      const newCart = { itemList, fullProducts }
+
+      dispatch(setCart(newCart))
+      setIsAddToCart(false)
+      toast.success('Thêm vào giỏ hàng thành công!')
+      return
+    }
+
     toast.promise(
       dispatch(addToCartAPI(data)).unwrap(),
       {
@@ -58,6 +91,11 @@ function Product({ product, loading }) {
   }
 
   const handleCheckout = () => {
+    if (!currentUser) {
+      toast.error('Bạn phải đăng nhập để có thể thực hiện thanh toán!', { position: 'top-right' })
+      return
+    }
+
     if (!typeId) {
       toast.error('Bạn chưa chọn loại sản phẩm!', { position: 'top-right' })
       return

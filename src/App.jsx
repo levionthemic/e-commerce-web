@@ -51,14 +51,18 @@ function App() {
       <Route path='/register' element={<Auth />} />
       <Route path='/verify-account' element={<AccountVerification />} />
 
+      {/* Public pages */}
+      <Route path='/buyer' element={<BuyerLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path='search' element={<SearchPage />} />
+        <Route path='product/:productId' element={<ProductDetailPage />} />
+        <Route path='cart' element={<CartPage />} />
+      </Route>
+
       <Route element={<PrivateRoute user={currentUser} />}>
         {/* Buyer pages */}
         <Route element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.BUYER} />}>
           <Route path='/buyer' element={<BuyerLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path='search' element={<SearchPage />} />
-            <Route path='product/:productId' element={<ProductDetailPage />} />
-            <Route path='cart' element={<CartPage />} />
             <Route path='checkout' element={<CheckoutPage />} />
             <Route path='checkout/complete' element={<Completion />} />
           </Route>
