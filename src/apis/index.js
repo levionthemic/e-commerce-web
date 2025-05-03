@@ -3,7 +3,12 @@ import { API_ROOT } from '~/utils/constants'
 
 // Auth APIs
 export const registerUserAPI = async (data) => {
-  const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/auth/register`, data)
+  let response = null
+  if (data.access_token) {
+    response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/auth/register/google/callback`, data)
+  } else {
+    response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/auth/register`, data)
+  }
   return response.data
 }
 

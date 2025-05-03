@@ -20,6 +20,8 @@ import { PAGE_TYPE } from '~/utils/constants'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { registerUserAPI } from '~/apis'
+import { FaGoogle } from 'react-icons/fa'
+import { useGoogleLogin } from '@react-oauth/google'
 
 const formSchema = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).messages({
@@ -67,11 +69,31 @@ function Register() {
       }
     )
   }
+  const submitRegisterWithGoogle = (data) => {
+    toast.promise(
+      registerUserAPI(data),
+      {
+        loading: 'Đang đăng ký...',
+        success: (res) => {
+          if (!res.error) {
+            navigate('/login')
+            return 'Đăng ký thành công!'
+          }
+          throw res
+        }
+      }
+    )
+  }
+
+  const handleRegisterWithGoogle = useGoogleLogin({
+    onSuccess: (codeResponse) => { submitRegisterWithGoogle(codeResponse) },
+    onError: (error) => toast.error(error)
+  })
 
   return (
     <div className='w-[100vw] h-[100vh] bg-[url("~/assets/background-auth.jpg")] bg-cover bg-no-repeat bg-center'>
       <div className='w-full h-full bg-gray-900 bg-opacity-60 flex items-center justify-center animate-fadeIn'>
-        <div className='min-w-[500px] min-h-[700px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-2 animate-fadeInTop backdrop-blur-sm'>
+        <div className='min-w-[500px] min-h-[700px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-4 animate-fadeInTop backdrop-blur-sm'>
           <div className='text-center font-semibold uppercase text-4xl text-white mt-10'>SIGN UP</div>
 
           <Form {...form}>
@@ -148,9 +170,9 @@ function Register() {
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="flex gap-2 text-white"
+                        className="flex gap-2 text-white justify-center"
                       >
-                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer">
+                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer has-[button[data-state=checked]]:bg-mainColor2-800/50">
                           <FormControl>
                             <RadioGroupItem value={PAGE_TYPE.BUYER} className='border-white bg-white' />
                           </FormControl>
@@ -158,19 +180,13 @@ function Register() {
                             Người mua
                           </FormLabel>
                         </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer">
+                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer has-[button[data-state=checked]]:bg-mainColor2-800/50">
                           <FormControl>
                             <RadioGroupItem value={PAGE_TYPE.SELLER} className='border-white bg-white' />
                           </FormControl>
                           <FormLabel className="font-normal cursor-pointer">
                             Người bán
                           </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer">
-                          <FormControl>
-                            <RadioGroupItem value={PAGE_TYPE.ADMIN} className='border-white bg-white' />
-                          </FormControl>
-                          <FormLabel className="font-normal cursor-pointer">Quản trị viên</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
@@ -183,6 +199,17 @@ function Register() {
             </form>
           </Form>
 
+          {form.getValues('role') === PAGE_TYPE.BUYER &&
+          <div className='text-white mt-6 text-sm flex items-center justify-center gap-6'>
+            <span>hoặc đăng ký bằng: </span>
+            <div className='flex items-center justify-between gap-2'>
+              <div onClick={handleRegisterWithGoogle} className='border border-white rounded-full p-1.5 cursor-pointer hover:bg-mainColor1-600 hover:border-[2px] hover:scale-105 hover:duration-300 hover:ease-in-out transition-transform'>
+                <FaGoogle />
+              </div>
+              <span className='text-muted text-xs'>(Chỉ cho Người mua)</span>
+            </div>
+          </div>
+          }
           <div className='mt-8 text-xs text-center text-white'>Đã có tài khoản? <div className='underline cursor-pointer scale-100 font-semibold hover:scale-110 hover:transition-transform hover:ease-in-out hover:duration-200' onClick={() => navigate('/login')}>Đăng nhập</div></div>
 
         </div>

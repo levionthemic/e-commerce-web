@@ -165,9 +165,9 @@ function Login() {
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="flex gap-2 text-white"
+                        className="flex gap-2 text-white items-center justify-center"
                       >
-                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer">
+                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer has-[button[data-state=checked]]:bg-mainColor2-800/50">
                           <FormControl>
                             <RadioGroupItem value={PAGE_TYPE.BUYER} className='border-white bg-white' />
                           </FormControl>
@@ -175,19 +175,13 @@ function Login() {
                             Người mua
                           </FormLabel>
                         </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer">
+                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer has-[button[data-state=checked]]:bg-mainColor2-800/50">
                           <FormControl>
                             <RadioGroupItem value={PAGE_TYPE.SELLER} className='border-white bg-white' />
                           </FormControl>
                           <FormLabel className="font-normal cursor-pointer">
                             Người bán
                           </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer">
-                          <FormControl>
-                            <RadioGroupItem value={PAGE_TYPE.ADMIN} className='border-white bg-white' />
-                          </FormControl>
-                          <FormLabel className="font-normal cursor-pointer">Quản trị viên</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
