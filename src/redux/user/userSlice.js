@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'sonner'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'

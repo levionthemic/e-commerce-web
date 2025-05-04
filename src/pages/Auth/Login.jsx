@@ -33,6 +33,9 @@ import { loginUserAPI } from '~/redux/user/userSlice'
 import { toast } from 'sonner'
 import { useGoogleLogin } from '@react-oauth/google'
 import { FaGoogle } from 'react-icons/fa'
+import { asyncHandler } from '~/utils/asyncHandler'
+import { Checkbox } from '~/components/ui/checkbox'
+import { useState } from 'react'
 
 const formSchema = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).messages({
@@ -61,22 +64,23 @@ function Login({ role }) {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
+  const [rememberMeCheck, setRememberMeCheck] = useState(false)
+
   const [searchParams] = useSearchParams()
   const registeredEmail = searchParams.get('registeredEmail')
   const verifiedEmail = searchParams.get('verifiedEmail')
 
-  const submitLogIn = (data) => {
-    toast.promise(dispatch(loginUserAPI(data)).unwrap(), {
-      loading: 'Đang đăng nhập...',
-      success: (res) => {
-        if (!res.error) {
-          if (res.role === PAGE_TYPE.BUYER) navigate('/buyer')
-          else navigate('/seller')
-          return 'Đăng nhập thành công!'
-        }
-        throw res
-      }
-    })
+  const submitLogIn = async (data) => {
+    const [res] = await asyncHandler(
+      dispatch(loginUserAPI({ ...data, rememberMe: rememberMeCheck })),
+      'Đang đăng nhập...'
+    )
+
+    if (res) {
+      if (res.payload.role === PAGE_TYPE.BUYER) navigate('/buyer')
+      else navigate('/seller')
+      toast.success('Đăng nhập thành công!')
+    }
   }
 
   const handleLoginWithGoogle = useGoogleLogin({
@@ -172,12 +176,29 @@ function Login({ role }) {
                       />
                     </FormControl>
                     <FormMessage />
-                    <Link
-                      to='/forgot-password'
-                      className='block text-right text-white text-xs cursor-pointer hover:underline'
-                    >
-                      Quên mật khẩu?
-                    </Link>
+                    <div className='flex items-center justify-between'>
+                      <div className='flex items-center gap-1.5 text-white mt-1/2'>
+                        <Checkbox
+                          id='remember-me'
+                          className='border-white'
+                          value={rememberMeCheck}
+                          onChange={setRememberMeCheck}
+                        />
+                        <label
+                          htmlFor='remember-me'
+                          className='text-sm leading-none cursor-pointer hover:underline'
+                        >
+                          Lưu mật khẩu trong 14 ngày
+                        </label>
+                      </div>
+
+                      <Link
+                        to='/forgot-password'
+                        className='text-right text-white text-xs cursor-pointer hover:underline'
+                      >
+                        Quên mật khẩu?
+                      </Link>
+                    </div>
                   </FormItem>
                 )}
               />

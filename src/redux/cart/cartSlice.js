@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
-import { API_ROOT } from '~/utils/constants'
 
 export const fetchCurrentCartAPI = createAsyncThunk(
   'cart/fetchCurrentCartAPI',
