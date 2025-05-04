@@ -1,11 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
-import { API_ROOT } from '~/utils/constants'
 
 export const fetchCurrentCartAPI = createAsyncThunk(
   'cart/fetchCurrentCartAPI',
   async () => {
-    const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/cart`)
+    const response = await authorizedAxiosInstance.get('/cart')
     return response.data
   }
 )
@@ -13,7 +12,7 @@ export const fetchCurrentCartAPI = createAsyncThunk(
 export const addToCartAPI = createAsyncThunk(
   'cart/addToCartAPI',
   async (data) => {
-    const response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/cart/add`, data)
+    const response = await authorizedAxiosInstance.post('/cart/add`', data)
     return response.data
   }
 )
@@ -21,7 +20,7 @@ export const addToCartAPI = createAsyncThunk(
 export const updateCartQuantityAPI = createAsyncThunk(
   'cart/updateCartQuantityAPI',
   async (data) => {
-    const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/cart/update`, data)
+    const response = await authorizedAxiosInstance.put('/cart/update', data)
     return response.data
   }
 )
@@ -29,7 +28,7 @@ export const updateCartQuantityAPI = createAsyncThunk(
 export const deleteItemAPI = createAsyncThunk(
   'cart/deleteItemAPI',
   async (data) => {
-    const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/cart/delete`, data)
+    const response = await authorizedAxiosInstance.put('/cart/delete', data)
     return response.data
   }
 )
@@ -50,11 +49,11 @@ const cartSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchCurrentCartAPI.fulfilled, (state, action) => {
       state.currentCart = action.payload
-    }),
+    })
     builder.addCase(addToCartAPI.fulfilled, (state, action) => {
       state.currentCart = action.payload
-    }),
-    builder.addCase(updateCartQuantityAPI.fulfilled, () => {}),
+    })
+    builder.addCase(updateCartQuantityAPI.fulfilled, () => {})
     builder.addCase(deleteItemAPI.fulfilled, () => {})
   }
 })

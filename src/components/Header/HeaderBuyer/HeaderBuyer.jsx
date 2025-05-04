@@ -93,7 +93,10 @@ function HeaderBuyer() {
   const handleLogout = async () => {
     dispatch(clearCart())
     toast.promise(dispatch(logoutUserAPI()), {
-      loading: 'Đang đăng xuất...'
+      loading: 'Đang đăng xuất...',
+      success: () => {
+        return 'Đăng xuất thành công!'
+      }
     })
   }
 

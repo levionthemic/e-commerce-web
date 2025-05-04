@@ -8,9 +8,9 @@ import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
 const rootPersistConfig = {
-  key: 'root', // key của persist do chúng ta chỉ định, cứ để mặc định là root
-  storage: storage, // Biến storage ở trên - lưu vào localStorage
-  whiteList: ['user', 'cart'] // định nghĩa các slice dữ liệu được phép duy trì qua mỗi lần F5 trình duyệt
+  key: 'root',
+  storage: storage,
+  whiteList: ['user', 'cart']
 }
 
 const reducers = combineReducers({
@@ -22,5 +22,6 @@ const persistedReducers = persistReducer(rootPersistConfig, reducers)
 
 export const store = configureStore({
   reducer: persistedReducers,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false })
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false })
 })

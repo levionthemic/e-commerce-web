@@ -2,13 +2,19 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { refreshTokenAPI } from '~/apis'
 import { logoutUserAPI } from '~/redux/user/userSlice'
+import { API_ROOT } from '~/utils/constants'
 
-let authorizedAxiosInstance = axios.create()
-authorizedAxiosInstance.defaults.timeout = 1000 * 60 * 10
-authorizedAxiosInstance.defaults.withCredentials = true
+let authorizedAxiosInstance = axios.create({
+  baseURL: `${API_ROOT}/v1`,
+  timeout: 1000 * 60 * 10,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
 
 let axiosReduxStore
-export const injectStore = mainStore => axiosReduxStore = mainStore
+export const injectStore = (mainStore) => (axiosReduxStore = mainStore)
 
 authorizedAxiosInstance.interceptors.request.use(
   (config) => {
@@ -21,9 +27,10 @@ authorizedAxiosInstance.interceptors.request.use(
 
 let refreshTokenPromise = null
 authorizedAxiosInstance.interceptors.response.use(
-  (response) => { return response },
+  (response) => {
+    return response
+  },
   (error) => {
-
     if (error.response?.status === 401) {
       axiosReduxStore.dispatch(logoutUserAPI(false))
     }
@@ -35,8 +42,8 @@ authorizedAxiosInstance.interceptors.response.use(
           .then((data) => {
             return data?.accessToken
           })
-          .catch(_error => {
-            axiosReduxStore.dispatch(logoutUserAPI(false))
+          .catch((_error) => {
+            axiosReduxStore.dispatch(logoutUserAPI())
             return Promise.reject(_error)
           })
           .finally(() => {

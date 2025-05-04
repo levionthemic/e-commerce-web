@@ -29,6 +29,8 @@ import Completion from './pages/Buyer/CheckoutPage/Completion'
 import CreateForm from './pages/Seller/Products/CreateForm/CreateForm'
 import { PAGE_TYPE } from './utils/constants'
 import Page401 from './pages/Page401'
+import ForgotPassword from './pages/Auth/ForgotPassword'
+import ResetPassword from './pages/Auth/ResetPassword'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -50,6 +52,8 @@ function App() {
       <Route path='/login' element={<Auth />} />
       <Route path='/register' element={<Auth />} />
       <Route path='/verify-account' element={<AccountVerification />} />
+      <Route path='/forgot-password' element={<ForgotPassword />} />
+      <Route path='/reset-password' element={<ResetPassword />} />
 
       {/* Public pages */}
       <Route path='/buyer' element={<BuyerLayout />}>

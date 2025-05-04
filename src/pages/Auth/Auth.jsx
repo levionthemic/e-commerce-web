@@ -11,6 +11,8 @@ function Auth() {
   const isLogin = location.pathname === '/login'
   const isRegister = location.pathname === '/register'
 
+  const role = location?.state?.role
+
   const currentUser = useSelector(selectCurrentUser)
   if (currentUser) {
     if (currentUser.role === PAGE_TYPE.BUYER)
@@ -20,7 +22,7 @@ function Auth() {
 
   return (
     <div className='flex items-center justify-center w-[100vw] h-[100vh]'>
-      {isLogin && <Login />}
+      {isLogin && <Login role={role} />}
       {isRegister && <Register />}
     </div>
   )
