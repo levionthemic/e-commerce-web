@@ -93,11 +93,11 @@ function Register() {
   return (
     <div className='w-[100vw] h-[100vh] bg-[url("~/assets/background-auth.jpg")] bg-cover bg-no-repeat bg-center'>
       <div className='w-full h-full bg-gray-900 bg-opacity-60 flex items-center justify-center animate-fadeIn'>
-        <div className='min-w-[500px] min-h-[700px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-4 animate-fadeInTop backdrop-blur-sm'>
+        <div className='min-w-[500px] min-h-[600px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-4 animate-fadeInTop backdrop-blur-sm'>
           <div className='text-center font-semibold uppercase text-4xl text-white mt-10'>SIGN UP</div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(submitRegister)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(submitRegister)} className="space-y-6">
               <FormField
                 control={form.control}
                 name="email"
@@ -111,9 +111,6 @@ function Register() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription className='text-white'>
-                      Mỗi user chỉ có duy nhất 1 email không trùng lặp.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -132,9 +129,6 @@ function Register() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription className='text-white'>
-                      Mật khẩu phải có ít nhất 8 kí tự, 1 chữ cái và 1 chữ số.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -153,9 +147,6 @@ function Register() {
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription className='text-white'>
-                      Mật khẩu xác nhận phải trùng khớp.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
