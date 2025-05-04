@@ -55,6 +55,18 @@ export const verifyOtpAPI = async (data) => {
   }
 }
 
+export const resetPasswordAPI = async (data) => {
+  try {
+    const response = await authorizedAxiosInstance.put(
+      '/auth/reset-password',
+      data
+    )
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
 // Products APIs
 export const getProductsAPI = async (searchPath = '') => {
   const response = await authorizedAxiosInstance.get(`/products${searchPath}`)

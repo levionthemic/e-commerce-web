@@ -13,15 +13,14 @@ import { Input } from '~/components/ui/input'
 import Joi from 'joi'
 import { joiResolver } from '@hookform/resolvers/joi'
 import {
-  EMAIL_RULE,
-  EMAIL_RULE_MESSAGE,
   FIELD_REQUIRED_MESSAGE,
   PASSWORD_RULE,
   PASSWORD_RULE_MESSAGE
 } from '~/utils/validators'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { forgotPasswordAPI } from '~/apis'
+import { resetPasswordAPI } from '~/apis'
+import { asyncHandler } from '~/utils/asyncHandler'
 
 const formSchema = Joi.object({
   password: Joi.string().required().pattern(PASSWORD_RULE).messages({
@@ -49,9 +48,31 @@ function ResetPassword() {
   })
 
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
 
-  const handleChangePassword = (data) => {
-    console.log(data)
+  const handleChangePassword = async (data) => {
+    const toastId = toast.loading('Đang cập nhật...')
+
+    const [res] = await asyncHandler(
+      resetPasswordAPI({
+        password: data.password,
+        resetToken: searchParams.get('token')
+      })
+    )
+
+    if (res) {
+      toast.success(
+        <div>
+          <p className='font-bold'>Cập nhật mật khẩu thành công!</p>
+          <p className='text-xs font-light'>
+            Vui lòng đăng nhập lại để tiếp tục.
+          </p>
+        </div>
+      )
+      navigate('/login', { replace: true })
+    }
+
+    toast.dismiss(toastId)
   }
 
   return (
