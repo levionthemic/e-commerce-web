@@ -72,7 +72,6 @@ function App() {
             <Route path='profile' element={<UserProfile />} />
             <Route path='order' element={<UserOrder />} />
           </Route>
-
         </Route>
 
         {/* Admin pages */}

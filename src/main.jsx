@@ -26,7 +26,7 @@ root.render(
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
           <App />
         </GoogleOAuthProvider>
-        <Toaster richColors/>
+        <Toaster richColors />
       </PersistGate>
     </Provider>
   </BrowserRouter>
