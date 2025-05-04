@@ -43,11 +43,11 @@ function ForgotPassword() {
   const navigate = useNavigate()
 
   const handleForgotPassword = async (data) => {
-    toast.loading('Đang xử lý...')
+    const toastId = toast.loading('Đang xử lý...')
 
     const [res] = await asyncHandler(forgotPasswordAPI(data))
 
-    toast.dismiss()
+    toast.dismiss(toastId)
 
     if (res) {
       setOpen(true)

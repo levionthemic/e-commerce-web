@@ -1,16 +1,19 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import { toast } from 'sonner'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
-import { API_ROOT, PAGE_TYPE } from '~/utils/constants'
+import { PAGE_TYPE } from '~/utils/constants'
 
 export const loginUserAPI = createAsyncThunk(
   'user/loginUserAPI',
   async (userData) => {
     let response = {}
     if (userData.access_token) {
-      response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/auth/login/google/callback`, userData)
+      response = await authorizedAxiosInstance.post(
+        '/auth/login/google/callback',
+        userData
+      )
     } else {
-      response = await authorizedAxiosInstance.post(`${API_ROOT}/v1/auth/login`, userData)
+      response = await authorizedAxiosInstance.post('/auth/login', userData)
     }
     return response.data
   }
@@ -19,7 +22,7 @@ export const loginUserAPI = createAsyncThunk(
 export const logoutUserAPI = createAsyncThunk(
   'user/logoutUserAPI',
   async (showToastMessage = true) => {
-    const response = await authorizedAxiosInstance.delete(`${API_ROOT}/v1/auth/logout`)
+    const response = await authorizedAxiosInstance.delete('/auth/logout')
     if (showToastMessage) {
       toast.success('Đăng xuất thành công!')
     }
@@ -35,11 +38,17 @@ export const updateUserAPI = createAsyncThunk(
     if (role === PAGE_TYPE.BUYER) {
       delete data['role']
       data.delete('role')
-      response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/buyer/profile/update`, data)
+      response = await authorizedAxiosInstance.put(
+        '/buyer/profile/update',
+        data
+      )
     } else if (role === PAGE_TYPE.SELLER) {
       delete data['role']
       data.delete('role')
-      response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/seller/profile/update`, data)
+      response = await authorizedAxiosInstance.put(
+        '/seller/profile/update',
+        data
+      )
     }
     return response.data
   }
@@ -57,7 +66,7 @@ const userSlice = createSlice({
     })
     builder.addCase(logoutUserAPI.fulfilled, (state) => {
       state.currentUser = null
-    }),
+    })
     builder.addCase(updateUserAPI.fulfilled, (state, action) => {
       state.currentUser = action.payload
     })
