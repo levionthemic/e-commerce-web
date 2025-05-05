@@ -1,6 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteItemAPI, selectCurrentCart, setCart, updateCartQuantityAPI } from '~/redux/cart/cartSlice'
+import {
+  deleteItemAPI,
+  selectCurrentCart,
+  setCart,
+  updateCartQuantityAPI
+} from '~/redux/cart/cartSlice'
 
 import {
   Table,
@@ -15,12 +20,34 @@ import { Separator } from '~/components/ui/separator'
 import { RiSubtractFill } from 'react-icons/ri'
 import { IoMdAdd } from 'react-icons/io'
 import { Checkbox } from '~/components/ui/checkbox'
-import { flexRender, getCoreRowModel, getExpandedRowModel, getGroupedRowModel, useReactTable } from '@tanstack/react-table'
+import {
+  flexRender,
+  getCoreRowModel,
+  getExpandedRowModel,
+  getGroupedRowModel,
+  useReactTable
+} from '@tanstack/react-table'
 import { cloneDeep } from 'lodash'
 import { Button } from '~/components/ui/button'
 import { toast } from 'sonner'
-import { ChevronDown, ChevronUp, EllipsisIcon, Store, Trash2Icon } from 'lucide-react'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alert-dialog'
+import {
+  ChevronDown,
+  ChevronUp,
+  EllipsisIcon,
+  Store,
+  Trash2Icon
+} from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '~/components/ui/alert-dialog'
 import { useState } from 'react'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 
@@ -44,7 +71,10 @@ function CartPage() {
 
     dispatch(setCart(cloneCart))
 
-    if (currentUser) dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
+    if (currentUser)
+      dispatch(
+        updateCartQuantityAPI({ productId, typeId, quantity: newQuantity })
+      )
   }
 
   const handleIncreaseQuantity = (productId, typeId) => {
@@ -59,15 +89,24 @@ function CartPage() {
 
     dispatch(setCart(cloneCart))
 
-    if (currentUser) dispatch(updateCartQuantityAPI({ productId, typeId, quantity: newQuantity }))
+    if (currentUser)
+      dispatch(
+        updateCartQuantityAPI({ productId, typeId, quantity: newQuantity })
+      )
   }
 
   const handleDeleteItemCart = (product) => {
     let itemList = cloneDeep(cart.itemList)
     let fullProducts = cloneDeep(cart.fullProducts)
 
-    itemList = itemList.filter(item => !(item.productId === product._id && item.typeId === product.type.typeId))
-    fullProducts = fullProducts.filter(item => !(item._id === product._id && item.type.typeId === product.type.typeId))
+    itemList = itemList.filter(
+      (item) =>
+        !(item.productId === product._id && item.typeId === product.type.typeId)
+    )
+    fullProducts = fullProducts.filter(
+      (item) =>
+        !(item._id === product._id && item.type.typeId === product.type.typeId)
+    )
 
     let updateCart = cloneDeep(cart)
     updateCart.itemList = itemList
@@ -77,15 +116,16 @@ function CartPage() {
 
     if (currentUser) {
       toast.promise(
-        dispatch(deleteItemAPI({
-          productId: product._id,
-          typeId: product.type.typeId
-        })),
+        dispatch(
+          deleteItemAPI({
+            productId: product._id,
+            typeId: product.type.typeId
+          })
+        ),
         {
           loading: 'Đang xóa...',
           success: (res) => {
-            if (!res.error)
-              return 'Xóa sản phẩm khỏi giỏ hàng thành công!'
+            if (!res.error) return 'Xóa sản phẩm khỏi giỏ hàng thành công!'
             throw res
           }
         }
@@ -99,17 +139,18 @@ function CartPage() {
       header: ({ table }) => (
         <Checkbox
           checked={
-            table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
+          aria-label='Select all'
         />
       ),
       cell: ({ row }) => (
         <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
+          aria-label='Select row'
         />
       ),
       size: 30
@@ -118,7 +159,11 @@ function CartPage() {
       id: 'sellerId',
       header: 'Người bán',
       accessorKey: 'sellerId',
-      cell: ({ row }) => <div className='line-clamp-1 text-ellipsis'>{row.getValue('sellerId')}</div>,
+      cell: ({ row }) => (
+        <div className='line-clamp-1 text-ellipsis'>
+          {row.getValue('sellerId')}
+        </div>
+      ),
       size: 60,
       enableGrouping: true,
       enableHiding: true
@@ -126,24 +171,29 @@ function CartPage() {
     {
       header: 'Ảnh',
       accessorKey: 'avatar',
-      cell: ({ row }) => <img
-        src={row.getValue('avatar')}
-        alt={row.getValue('name')}
-        className='w-16 h-16 rounded'
-      />,
+      cell: ({ row }) => (
+        <img
+          src={row.getValue('avatar')}
+          alt={row.getValue('name')}
+          className='w-16 h-16 rounded'
+        />
+      ),
       size: 60
     },
     {
       header: 'Tên sản phẩm',
       accessorKey: 'name',
-      cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>
+      cell: ({ row }) => (
+        <div className='font-medium'>{row.getValue('name')}</div>
+      )
     },
     {
       header: 'Giá sản phẩm',
       accessorKey: 'price',
       cell: ({ row }) => (
         <div>
-          {row.original?.type?.price.toLocaleString('vi-VN')}<sup>đ</sup>
+          {row.original?.type?.price.toLocaleString('vi-VN')}
+          <sup>đ</sup>
         </div>
       ),
       size: 80
@@ -151,11 +201,7 @@ function CartPage() {
     {
       header: 'Loại sản phẩm',
       accessorKey: 'type',
-      cell: ({ row }) => (
-        <div>
-          {row.original?.type?.typeName}
-        </div>
-      )
+      cell: ({ row }) => <div>{row.original?.type?.typeName}</div>
     },
     {
       id: 'quantity',
@@ -166,16 +212,32 @@ function CartPage() {
           <div className='flex items-center justify-between rounded-lg p-1 border border-gray-300 w-fit'>
             <RiSubtractFill
               className='cursor-pointer text-xl hover:bg-mainColor2-800/40 rounded-md'
-              onClick={() => { handleDecreaseQuantity(row.original._id, row.original.type.typeId) }}
+              onClick={() => {
+                handleDecreaseQuantity(
+                  row.original._id,
+                  row.original.type.typeId
+                )
+              }}
             />
             <input
-              value={cart?.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type?.typeId)?.quantity}
+              value={
+                cart?.itemList.find(
+                  (product) =>
+                    product.productId === row.original._id &&
+                    product.typeId === row.original.type?.typeId
+                )?.quantity
+              }
               readOnly
               className='w-[30px] text-center mx-1.5 border-none outline-none text-md bg-transparent'
             />
             <IoMdAdd
               className='cursor-pointer text-xl hover:bg-mainColor2-800/40 rounded-md'
-              onClick={() => { handleIncreaseQuantity(row.original._id, row.original.type.typeId) }}
+              onClick={() => {
+                handleIncreaseQuantity(
+                  row.original._id,
+                  row.original.type.typeId
+                )
+              }}
             />
           </div>
         )
@@ -183,11 +245,22 @@ function CartPage() {
       size: 80
     },
     {
-      header: () => <div className="text-right">Thành tiền</div>,
+      header: () => <div className='text-right'>Thành tiền</div>,
       accessorKey: 'totalPrice',
       cell: ({ row }) => {
-        return <div className="text-right font-semibold">{(row.original.type?.price * cart?.itemList?.find((product) => product.productId === row.original._id && product.typeId === row.original.type?.typeId)?.quantity).toLocaleString('vi-VN')}
-          <sup>đ</sup></div>
+        return (
+          <div className='text-right font-semibold'>
+            {(
+              row.original.type?.price *
+              cart?.itemList?.find(
+                (product) =>
+                  product.productId === row.original._id &&
+                  product.typeId === row.original.type?.typeId
+              )?.quantity
+            ).toLocaleString('vi-VN')}
+            <sup>đ</sup>
+          </div>
+        )
       },
       size: 80
     },
@@ -211,12 +284,19 @@ function CartPage() {
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Hủy</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleDeleteItemCart(row.original)}>Xóa</AlertDialogAction>
+                <AlertDialogAction
+                  onClick={() => handleDeleteItemCart(row.original)}
+                >
+                  Xóa
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          <div className='hover:bg-gray-200 p-1.5 rounded-md cursor-pointer transition-all hover:ease-in-out hover:duration-300' onClick={() => navigate(`/buyer/product/${row.original._id}`)}>
-            <EllipsisIcon className='size-4'/>
+          <div
+            className='hover:bg-gray-200 p-1.5 rounded-md cursor-pointer transition-all hover:ease-in-out hover:duration-300'
+            onClick={() => navigate(`/buyer/product/${row.original._id}`)}
+          >
+            <EllipsisIcon className='size-4' />
           </div>
         </div>
       ),
@@ -229,7 +309,7 @@ function CartPage() {
   const table = useReactTable({
     data: cart?.fullProducts || [],
     columns,
-    getSubRows: row => row.subRows,
+    getSubRows: (row) => row.subRows,
     getCoreRowModel: getCoreRowModel(),
     getGroupedRowModel: getGroupedRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
@@ -249,7 +329,13 @@ function CartPage() {
     const result = rows.reduce((sum, row) => {
       let temp = 0
       if (row.getIsSelected() && !row.getIsGrouped()) {
-        temp += row.original.type.price * cart.itemList.find((product) => product.productId === row.original._id && product.typeId === row.original.type.typeId).quantity
+        temp +=
+          row.original.type.price *
+          cart.itemList.find(
+            (product) =>
+              product.productId === row.original._id &&
+              product.typeId === row.original.type.typeId
+          ).quantity
       }
       return sum + temp
     }, 0)
@@ -258,17 +344,21 @@ function CartPage() {
 
   const handleCheckout = () => {
     const rows = table.getRowModel().rows
-    const selectedRows = rows.filter(row => row.getIsSelected()).map(row => ({
-      ...row.original,
-      quantity: cart.itemList[row.index].quantity
-    }))
+    const selectedRows = rows
+      .filter((row) => row.getIsSelected())
+      .map((row) => ({
+        ...row.original,
+        quantity: cart.itemList[row.index].quantity
+      }))
     if (!selectedRows.length) {
       toast.error('Bạn chưa chọn sản phẩm!')
       return
     }
 
     if (!currentUser) {
-      toast.error('Bạn phải đăng nhập để có thể thực hiện thanh toán!', { position: 'top-right' })
+      toast.error('Bạn phải đăng nhập để có thể thực hiện thanh toán!', {
+        position: 'top-right'
+      })
       return
     }
     navigate('/buyer/checkout', { state: { selectedRows: selectedRows } })
@@ -276,22 +366,34 @@ function CartPage() {
 
   return (
     <div className='container mx-auto'>
-      <div className="grid grid-cols-4 gap-5 relative max-h-full my-4">
-        <div className="col-span-3 py-4 h-fit">
-          <div className='font-semibold text-2xl text-mainColor2-800 mb-6'>Giỏ Hàng Của Bạn</div>
-          {!cart || !cart?.itemList?.length
-            ? <p>Giỏ hàng của bạn đang trống.</p>
-            : <div>
+      <div className='grid grid-cols-4 gap-5 relative max-h-full my-4'>
+        <div className='col-span-3 py-4 h-fit'>
+          <div className='font-semibold text-2xl text-mainColor2-800 mb-6'>
+            Giỏ Hàng Của Bạn
+          </div>
+          {!cart || !cart?.itemList?.length ? (
+            <p>Giỏ hàng của bạn đang trống.</p>
+          ) : (
+            <div>
               <Table className='table-fixed'>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                    <TableRow
+                      key={headerGroup.id}
+                      className='hover:bg-transparent'
+                    >
                       {headerGroup.headers.map((header) => {
                         return (
-                          <TableHead key={header.id} style={{ width: `${header.getSize()}px` }}>
+                          <TableHead
+                            key={header.id}
+                            style={{ width: `${header.getSize()}px` }}
+                          >
                             {header.isPlaceholder
                               ? null
-                              : flexRender(header.column.columnDef.header, header.getContext())}
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
                           </TableHead>
                         )
                       })}
@@ -312,31 +414,46 @@ function CartPage() {
                             <TableCell colSpan={1}>
                               <Checkbox
                                 checked={row.getIsSelected()}
-                                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                                aria-label="Select row"
+                                onCheckedChange={(value) =>
+                                  row.toggleSelected(!!value)
+                                }
+                                aria-label='Select row'
                               />
                             </TableCell>
                             <TableCell colSpan={columns.length - 3}>
                               <div className='flex items-center gap-2'>
                                 <Store />
-                                <span>{row.groupingColumnId}: {row.groupingValue} <b>({row.subRows.length} sản phẩm)</b></span>
+                                <span>
+                                  {row.groupingColumnId}: {row.groupingValue}{' '}
+                                  <b>({row.subRows.length} sản phẩm)</b>
+                                </span>
                               </div>
                             </TableCell>
                             <TableCell>
-                              {row.getCanExpand() &&
+                              {row.getCanExpand() && (
                                 <div className='flex justify-end'>
-                                  {row.getIsExpanded() ? <ChevronUp /> : <ChevronDown />}
+                                  {row.getIsExpanded() ? (
+                                    <ChevronUp />
+                                  ) : (
+                                    <ChevronDown />
+                                  )}
                                 </div>
-                              }
+                              )}
                             </TableCell>
                           </TableRow>
                         )
                       }
                       return (
-                        <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                        <TableRow
+                          key={row.id}
+                          data-state={row.getIsSelected() && 'selected'}
+                        >
                           {row.getVisibleCells().map((cell) => (
                             <TableCell key={cell.id}>
-                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
                             </TableCell>
                           ))}
                         </TableRow>
@@ -344,52 +461,78 @@ function CartPage() {
                     })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={columns.length} className="h-24 text-center">
+                      <TableCell
+                        colSpan={columns.length}
+                        className='h-24 text-center'
+                      >
                         No results.
                       </TableCell>
                     </TableRow>
                   )}
                 </TableBody>
-                <TableFooter className="bg-transparent">
-                  <TableRow className="hover:bg-transparent">
+                <TableFooter className='bg-transparent'>
+                  <TableRow className='hover:bg-transparent'>
                     <TableCell colSpan={6}>Tổng thành tiền</TableCell>
-                    <TableCell className="text-right">
-                      <div className="total-price text-right font-bold text-lg">{totalPrice()?.toLocaleString('vi-VN') || 0}
-                        <sup>đ</sup></div>
+                    <TableCell className='text-right'>
+                      <div className='total-price text-right font-bold text-lg'>
+                        {totalPrice()?.toLocaleString('vi-VN') || 0}
+                        <sup>đ</sup>
+                      </div>
                     </TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
             </div>
-          }
+          )}
         </div>
-        <div className="col-span-1 bg-[#ECEEF6] sticky top-32 rounded-lg left-0 max-h-[80%] min-h-fit">
+        <div className='col-span-1 bg-[#ECEEF6] sticky top-32 rounded-lg left-0 max-h-[80%] min-h-fit'>
           <div className='bg-white rounded-lg m-4 p-4'>
-            <div className='uppercase tracking-wide text-sm font-semibold text-mainColor1-600 text-center py-4'>Tóm tắt</div>
+            <div className='uppercase tracking-wide text-sm font-semibold text-mainColor1-600 text-center py-4'>
+              Tóm tắt
+            </div>
 
             <Separator />
 
             <div className='flex justify-between my-4 text-sm'>
-              <div className="flex flex-col gap-1.5">
+              <div className='flex flex-col gap-1.5'>
                 <span>Tổng thành tiền</span>
                 <span>Phí vận chuyển</span>
                 <span>Giảm giá</span>
               </div>
-              <div className="flex flex-col gap-1.5 items-end">
-                <span>{totalPrice()?.toLocaleString('vi-VN') || 0}<sup>đ</sup></span>
-                <span>{(0).toLocaleString('vi-VN')}<sup>đ</sup></span>
-                <span>{(0).toLocaleString('vi-VN')}<sup>đ</sup></span>
+              <div className='flex flex-col gap-1.5 items-end'>
+                <span>
+                  {totalPrice()?.toLocaleString('vi-VN') || 0}
+                  <sup>đ</sup>
+                </span>
+                <span>
+                  {(0).toLocaleString('vi-VN')}
+                  <sup>đ</sup>
+                </span>
+                <span>
+                  {(0).toLocaleString('vi-VN')}
+                  <sup>đ</sup>
+                </span>
               </div>
             </div>
 
             <Separator />
 
-            <div className="my-4 flex items-end justify-between">
-              <span className='font-semibold text-mainColor1-600'>Tổng tiền</span>
-              <span className='font-bold text-xl text-mainColor1-800'>{totalPrice()?.toLocaleString('vi-VN') || 0}<sup>đ</sup></span>
+            <div className='my-4 flex items-end justify-between'>
+              <span className='font-semibold text-mainColor1-600'>
+                Tổng tiền
+              </span>
+              <span className='font-bold text-xl text-mainColor1-800'>
+                {totalPrice()?.toLocaleString('vi-VN') || 0}
+                <sup>đ</sup>
+              </span>
             </div>
 
-            <Button onClick={handleCheckout} className='bg-mainColor1-800 w-full text-white uppercase py-4 text-center rounded-xl font-bold hover:drop-shadow-xl hover:scale-[102%] hover:duration-300 hover:bg-mainColor1-600 transition-all'>Thanh toán</Button>
+            <Button
+              onClick={handleCheckout}
+              className='bg-mainColor1-800 w-full text-white uppercase py-4 text-center rounded-xl font-bold hover:drop-shadow-xl hover:scale-[102%] hover:duration-300 hover:bg-mainColor1-600 transition-all'
+            >
+              Thanh toán
+            </Button>
           </div>
         </div>
       </div>

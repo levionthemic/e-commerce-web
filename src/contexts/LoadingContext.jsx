@@ -7,8 +7,23 @@ export const LoadingProvider = ({ children }) => {
   const [isPageLoading, setPageLoading] = useState(false)
   const [isDataLoading, setDataLoading] = useState(false)
 
+  const [apiLoadingCount, setApiLoadingCount] = useState(0)
+
+  const startLoading = () => setApiLoadingCount((count) => count + 1)
+  const endLoading = () => setApiLoadingCount((count) => Math.max(0, count - 1))
+
   return (
-    <LoadingContext.Provider value={{ isPageLoading, setPageLoading, isDataLoading, setDataLoading }}>
+    <LoadingContext.Provider
+      value={{
+        isPageLoading,
+        setPageLoading,
+        isDataLoading,
+        setDataLoading,
+        apiLoadingCount,
+        startLoading,
+        endLoading
+      }}
+    >
       {children}
     </LoadingContext.Provider>
   )
