@@ -32,9 +32,12 @@ import StoreList from '~/pages/Seller/Store/StoreList/StoreList'
 import ForgotPassword from './pages/Auth/ForgotPassword'
 import ResetPassword from './pages/Auth/ResetPassword'
 import LoginAdmin from '~/pages/Admin/Auth/LoginAdmin'
+import { message } from 'antd'
+import { useEffect } from 'react'
+import { setMessageApi } from './utils/messageInstance'
 
 const PrivateRoute = ({ user }) => {
-  if (!user) return <Navigate to='/login' replace={true} />
+  if (!user) return <Navigate to='/' replace={true} />
   return <Outlet />
 }
 
@@ -46,69 +49,88 @@ const ProtectedRoute = ({ user, role }) => {
 function App() {
   const currentUser = useSelector(selectCurrentUser)
 
+  const [messageApi, contextHolder] = message.useMessage()
+
+  useEffect(() => {
+    setMessageApi(messageApi)
+  }, [messageApi])
+
   return (
-    <Routes>
-      <Route path='/' element={<LandingPage />} />
+    <>
+      {contextHolder}
+      <Routes>
+        <Route path='/' element={<LandingPage />} />
 
-      <Route path='/login' element={<Auth />} />
-      <Route path='/register' element={<Auth />} />
-      <Route path='/verify-account' element={<AccountVerification />} />
-      <Route path='/forgot-password' element={<ForgotPassword />} />
-      <Route path='/reset-password' element={<ResetPassword />} />
+        <Route path='/login' element={<Auth />} />
+        <Route path='/register' element={<Auth />} />
+        <Route path='/verify-account' element={<AccountVerification />} />
+        <Route path='/forgot-password' element={<ForgotPassword />} />
+        <Route path='/reset-password' element={<ResetPassword />} />
 
-      {/* Public pages */}
-      <Route path='/buyer' element={<BuyerLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path='search' element={<SearchPage />} />
-        <Route path='product/:productId' element={<ProductDetailPage />} />
-        <Route path='cart' element={<CartPage />} />
-      </Route>
+        {/* Public pages */}
+        <Route path='/buyer' element={<BuyerLayout />}>
+          <Route index element={<HomePage />} />
+          <Route path='search' element={<SearchPage />} />
+          <Route path='product/:productId' element={<ProductDetailPage />} />
+          <Route path='cart' element={<CartPage />} />
+        </Route>
 
-      {/* Admin pages */}
-      <Route path='/admin-x7e9gqk2f3l' element={<LoginAdmin />} />
-      <Route path='/admin' element={<AdminLayout />}>
-        <Route index element={<DashboardAdmin />} />
-      </Route>
+        {/* Admin pages */}
+        <Route path='/admin-x7e9gqk2f3l' element={<LoginAdmin />} />
 
-      <Route element={<PrivateRoute user={currentUser} />}>
-        {/* Buyer pages */}
-        <Route
-          element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.BUYER} />}
-        >
-          <Route path='/buyer' element={<BuyerLayout />}>
-            <Route path='checkout' element={<CheckoutPage />} />
-            <Route path='checkout/complete' element={<Completion />} />
+        <Route element={<PrivateRoute user={currentUser} />}>
+          {/* Buyer pages */}
+          <Route
+            element={
+              <ProtectedRoute user={currentUser} role={PAGE_TYPE.BUYER} />
+            }
+          >
+            <Route path='/buyer' element={<BuyerLayout />}>
+              <Route path='checkout' element={<CheckoutPage />} />
+              <Route path='checkout/complete' element={<Completion />} />
+            </Route>
+
+            {/* User pages (Buyer Module) */}
+            <Route path='/user' element={<UserLayout />}>
+              <Route path='profile' element={<UserProfile />} />
+              <Route path='order' element={<UserOrder />} />
+            </Route>
           </Route>
 
-          {/* User pages (Buyer Module) */}
-          <Route path='/user' element={<UserLayout />}>
-            <Route path='profile' element={<UserProfile />} />
-            <Route path='order' element={<UserOrder />} />
+          {/* Seller pages */}
+          <Route
+            element={
+              <ProtectedRoute user={currentUser} role={PAGE_TYPE.SELLER} />
+            }
+          >
+            <Route path='/seller' element={<SellerLayout />}>
+              <Route index element={<DashboardSeller />} />
+              <Route path='products' element={<ProductsSeller />} />
+              <Route path='products/add' element={<CreateForm />} />
+              <Route path='orders' element={<OrdersSeller />} />
+              <Route path='store/profile' element={<StoreProfile />} />
+              <Route path='store/list-store' element={<StoreList />} />
+              <Route path='promotion' element={<Promotion />} />
+              <Route path='comment' element={<Comments />} />
+            </Route>
+          </Route>
+
+          {/* Admin pages */}
+          <Route
+            element={
+              <ProtectedRoute user={currentUser} role={PAGE_TYPE.ADMIN} />
+            }
+          >
+            <Route path='/admin' element={<AdminLayout />}>
+              <Route index element={<DashboardAdmin />} />
+            </Route>
           </Route>
         </Route>
 
-        {/* Seller pages */}
-        <Route
-          element={
-            <ProtectedRoute user={currentUser} role={PAGE_TYPE.SELLER} />
-          }
-        >
-          <Route path='/seller' element={<SellerLayout />}>
-            <Route index element={<DashboardSeller />} />
-            <Route path='products' element={<ProductsSeller />} />
-            <Route path='products/add' element={<CreateForm />} />
-            <Route path='orders' element={<OrdersSeller />} />
-            <Route path='store/profile' element={<StoreProfile />} />
-            <Route path='store/list-store' element={<StoreList />} />
-            <Route path='promotion' element={<Promotion />} />
-            <Route path='comment' element={<Comments />} />
-          </Route>
-        </Route>
-      </Route>
-
-      {/* 404 not found page */}
-      <Route path='*' element={<Page404 />} />
-    </Routes>
+        {/* 404 not found page */}
+        <Route path='*' element={<Page404 />} />
+      </Routes>
+    </>
   )
 }
 

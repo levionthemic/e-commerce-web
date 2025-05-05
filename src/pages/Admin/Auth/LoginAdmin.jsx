@@ -12,12 +12,40 @@ import {
   PASSWORD_RULE,
   PASSWORD_RULE_MESSAGE
 } from '~/utils/validators'
+import { asyncHandler } from '~/utils/asyncHandler'
+import { useDispatch } from 'react-redux'
+import { loginUserAPI } from '~/redux/user/userSlice'
+import { useNavigate } from 'react-router-dom'
+import { PAGE_TYPE } from '~/utils/constants'
+import { getMessageApi } from '~/utils/messageInstance'
+import { useState } from 'react'
 
 const { Title, Text, Link } = Typography
 
 const LoginAdmin = () => {
-  const onFinish = (values) => {
-    console.log('Login success:', values)
+  const [loading, setLoading] = useState(false)
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  const onFinish = async (values) => {
+    setLoading(true)
+
+    const hide = getMessageApi().loading('Đang xử lý...', 0)
+
+    asyncHandler(
+      dispatch(
+        loginUserAPI({ ...values, role: PAGE_TYPE.ADMIN, rememberMe: false })
+      )
+    )
+      .then(([res]) => {
+        hide()
+        if (res) {
+          getMessageApi().success('Đăng nhập thành công')
+          navigate('/admin')
+        }
+      })
+      .finally(() => setLoading(false))
   }
 
   return (
@@ -70,12 +98,20 @@ const LoginAdmin = () => {
                   message: PASSWORD_RULE_MESSAGE
                 }
               ]}
+              hasFeedback
+              validateDebounce={200}
             >
               <Input.Password prefix={<LockOutlined />} />
             </Form.Item>
 
             <Form.Item>
-              <Button type='primary' htmlType='submit' block>
+              <Button
+                type='primary'
+                htmlType='submit'
+                block
+                size='large'
+                loading={loading}
+              >
                 Đăng nhập
               </Button>
             </Form.Item>
