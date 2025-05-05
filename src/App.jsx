@@ -31,6 +31,7 @@ import Page401 from './pages/Page401'
 import StoreList from '~/pages/Seller/Store/StoreList/StoreList'
 import ForgotPassword from './pages/Auth/ForgotPassword'
 import ResetPassword from './pages/Auth/ResetPassword'
+import LoginAdmin from '~/pages/Admin/Auth/LoginAdmin'
 
 const PrivateRoute = ({ user }) => {
   if (!user) return <Navigate to='/login' replace={true} />
@@ -63,9 +64,17 @@ function App() {
         <Route path='cart' element={<CartPage />} />
       </Route>
 
+      {/* Admin pages */}
+      <Route path='/admin-x7e9gqk2f3l' element={<LoginAdmin />} />
+      <Route path='/admin' element={<AdminLayout />}>
+        <Route index element={<DashboardAdmin />} />
+      </Route>
+
       <Route element={<PrivateRoute user={currentUser} />}>
         {/* Buyer pages */}
-        <Route element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.BUYER} />}>
+        <Route
+          element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.BUYER} />}
+        >
           <Route path='/buyer' element={<BuyerLayout />}>
             <Route path='checkout' element={<CheckoutPage />} />
             <Route path='checkout/complete' element={<Completion />} />
@@ -78,15 +87,12 @@ function App() {
           </Route>
         </Route>
 
-        {/* Admin pages */}
-        <Route element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.SELLER}/>}>
-          <Route path='/admin' element={<AdminLayout />}>
-            <Route index element={<DashboardAdmin />} />
-          </Route>
-        </Route>
-
         {/* Seller pages */}
-        <Route element={<ProtectedRoute user={currentUser} role={PAGE_TYPE.SELLER} />}>
+        <Route
+          element={
+            <ProtectedRoute user={currentUser} role={PAGE_TYPE.SELLER} />
+          }
+        >
           <Route path='/seller' element={<SellerLayout />}>
             <Route index element={<DashboardSeller />} />
             <Route path='products' element={<ProductsSeller />} />
@@ -98,10 +104,10 @@ function App() {
             <Route path='comment' element={<Comments />} />
           </Route>
         </Route>
-
-        {/* 404 not found page */}
-        <Route path='*' element={<Page404 />} />
       </Route>
+
+      {/* 404 not found page */}
+      <Route path='*' element={<Page404 />} />
     </Routes>
   )
 }
