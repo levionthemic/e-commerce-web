@@ -29,7 +29,7 @@ root.render(
             <App />
           </LoadingProvider>
         </GoogleOAuthProvider>
-        <Toaster richColors/>
+        <Toaster richColors />
       </PersistGate>
     </Provider>
   </BrowserRouter>
