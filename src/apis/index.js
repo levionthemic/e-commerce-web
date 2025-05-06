@@ -100,8 +100,13 @@ export const getCategoriesAPI = async () => {
 }
 
 // Orders APIS
-export const fetchOrdersAPI = async () => {
-  const response = await authorizedAxiosInstance.get('/orders')
+export const fetchOrdersForBuyerAPI = async () => {
+  const response = await authorizedAxiosInstance.get('/order/get-all')
+  return response.data
+}
+
+export const fetchOrdersForSellerAPI = async () => {
+  const response = await authorizedAxiosInstance.get('/order/seller/get-all')
   return response.data
 }
 

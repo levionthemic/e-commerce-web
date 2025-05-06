@@ -69,6 +69,7 @@ import {
 import { useId, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ProductDetailDialog from './ProductDetailDialog'
+import { useLoading } from '~/contexts/LoadingContext'
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn = (row, columnId, filterValue) => {
@@ -126,7 +127,7 @@ const columns = [
     id: 'categoryId',
     header: 'Danh mục',
     accessorKey: 'categoryId',
-    cell: ({ row }) => <div className='line-clamp-4 text-wrap font-medium'>{row.original.category.name}</div>,
+    cell: ({ row }) => <div className='line-clamp-4 text-wrap'>{row.original.category.name}</div>,
     size: 100,
     enableSorting: false
   },
@@ -134,7 +135,7 @@ const columns = [
     id: 'brandId',
     header: 'Thương hiệu',
     accessorKey: 'brandId',
-    cell: ({ row }) => <div className='line-clamp-4 text-wrap font-medium'>{row.original.brand.name}</div>,
+    cell: ({ row }) => <div className='line-clamp-4 text-wrap'>{row.original.brand.name}</div>,
     size: 100,
     enableSorting: false
   },
@@ -193,6 +194,7 @@ const columns = [
 export default function ProductTable({ data, setData }) {
   const navigate = useNavigate()
   const id = useId()
+  const { isDataLoading } = useLoading()
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
   const [pagination, setPagination] = useState({
@@ -431,7 +433,7 @@ export default function ProductTable({ data, setData }) {
       </div>
 
       {/* Table */}
-      <div className='bg-white overflow-hidden border rounded-lg font-lexend'>
+      <div className='bg-white overflow-hidden border rounded-lg font-lexend font-light'>
         <Table
           className="table-fixed"
           // style={{
@@ -529,7 +531,7 @@ export default function ProductTable({ data, setData }) {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                Không có kết quả
+                  {isDataLoading ? 'Đang tải dữ liệu...' : 'Không có kết quả' }
                 </TableCell>
               </TableRow>
             )}

@@ -20,12 +20,8 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '~/components/ui/dropdown-menu'
 import { Input } from '~/components/ui/input'
@@ -66,18 +62,20 @@ import {
   CircleAlertIcon,
   CircleXIcon,
   Columns3Icon,
+  DeleteIcon,
   EllipsisIcon,
   FilterIcon,
   ListFilterIcon,
   PlusIcon,
   TrashIcon
 } from 'lucide-react'
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
+import dayjs from 'dayjs'
 
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn = (row, columnId, filterValue) => {
-  const searchableRowContent = `${row.original.name} ${row.original.email}`.toLowerCase()
+  const searchableRowContent = `${row.original.buyerName} ${row.original.email}`.toLowerCase()
   const searchTerm = (filterValue ?? '').toLowerCase()
   return searchableRowContent.includes(searchTerm)
 }
@@ -112,30 +110,43 @@ const columns = [
     enableHiding: false
   },
   {
-    header: 'Name',
-    accessorKey: 'name',
-    cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>,
-    size: 180,
+    id: 'orderId',
+    header: 'Mã đơn hàng',
+    accessorKey: 'orderId',
+    cell: ({ row }) => <div className='text-ellipsis overflow-hidden'>{row.original._id}</div>
+  },
+  {
+    id: 'createdAt',
+    header: 'Ngày đặt hàng',
+    accessorKey: 'createdAt',
+    cell: ({ row }) => <div className='text-ellipsis overflow-hidden'>{dayjs(row.getValue('createdAt')).format('DD-MM-YYYY')}</div>
+  },
+  {
+    id: 'buyerName',
+    header: 'Tên người đặt',
+    accessorKey: 'buyerName',
+    cell: ({ row }) => <div className="font-medium">{row.getValue('buyerName')}</div>,
+    size: 160,
     filterFn: multiColumnFilterFn,
     enableHiding: false
   },
   {
-    header: 'Email',
-    accessorKey: 'email',
-    size: 220
+    id: 'shopId',
+    header: 'Mã cửa hàng',
+    accessorKey: 'shopId',
+    cell: ({ row }) => <div className='text-ellipsis overflow-hidden'>{row.getValue('shopId')}</div>
   },
   {
-    header: 'Location',
-    accessorKey: 'location',
-    cell: ({ row }) => (
-      <div>
-        <span className="text-lg leading-none">{row.original.flag}</span> {row.getValue('location')}
-      </div>
-    ),
-    size: 180
+    header: 'Tổng tiền',
+    accessorKey: 'totalPrice',
+    cell: ({ row }) => {
+      const total = parseInt(row.original.finalPrice) + parseInt(row.original.shippingFee)
+      return <div className='font-bold text-red-500'>{total.toLocaleString('vi-vn')}<sup>đ</sup></div>
+    },
+    size: 120
   },
   {
-    header: 'Status',
+    header: 'Trạng thái',
     accessorKey: 'status',
     cell: ({ row }) => (
       <Badge
@@ -150,32 +161,22 @@ const columns = [
     filterFn: statusFilterFn
   },
   {
-    header: 'Performance',
-    accessorKey: 'performance'
-  },
-  {
-    header: 'Balance',
-    accessorKey: 'balance',
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('balance'))
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(amount)
-      return formatted
-    },
-    size: 120
+    id: 'note',
+    header: 'Ghi chú',
+    accessorKey: 'note',
+    cell: ({ row }) => <div>{row.getValue('note')}</div>,
+    size: 180
   },
   {
     id: 'actions',
-    header: () => <span className="sr-only">Actions</span>,
+    header: 'Thao tác',
     cell: ({ row }) => <RowActions row={row} />,
-    size: 60,
+    size: 70,
     enableHiding: false
   }
 ]
 
-export default function OrderTable() {
+export default function OrderTable({ data, setData }) {
   const id = useId()
   const [columnFilters, setColumnFilters] = useState([])
   const [columnVisibility, setColumnVisibility] = useState({})
@@ -187,22 +188,10 @@ export default function OrderTable() {
 
   const [sorting, setSorting] = useState([
     {
-      id: 'name',
+      id: 'buyerName',
       desc: false
     }
   ])
-
-  const [data, setData] = useState([])
-  useEffect(() => {
-    async function fetchPosts() {
-      const res = await fetch(
-        'https://res.cloudinary.com/dlzlfasou/raw/upload/users-01_fertyx.json'
-      )
-      const data = await res.json()
-      setData(data)
-    }
-    fetchPosts()
-  }, [])
 
   const handleDeleteRows = () => {
     const selectedRows = table.getSelectedRowModel().rows
@@ -287,10 +276,10 @@ export default function OrderTable() {
               ref={inputRef}
               className={cn(
                 'peer min-w-80 ps-9',
-                Boolean(table.getColumn('name')?.getFilterValue()) && 'pe-9'
+                Boolean(table.getColumn('buyerName')?.getFilterValue()) && 'pe-9'
               )}
-              value={(table.getColumn('name')?.getFilterValue() ?? '')}
-              onChange={(e) => table.getColumn('name')?.setFilterValue(e.target.value)}
+              value={(table.getColumn('buyerName')?.getFilterValue() ?? '')}
+              onChange={(e) => table.getColumn('buyerName')?.setFilterValue(e.target.value)}
               placeholder="Lọc theo mã đơn hàng..."
               type="text"
               aria-label="Lọc theo mã đơn hàng"
@@ -298,12 +287,12 @@ export default function OrderTable() {
             <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
               <ListFilterIcon size={16} aria-hidden="true" />
             </div>
-            {Boolean(table.getColumn('name')?.getFilterValue()) && (
+            {Boolean(table.getColumn('buyerName')?.getFilterValue()) && (
               <button
                 className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label="Clear filter"
                 onClick={() => {
-                  table.getColumn('name')?.setFilterValue('')
+                  table.getColumn('buyerName')?.setFilterValue('')
                   if (inputRef.current) {
                     inputRef.current.focus()
                   }
@@ -513,7 +502,7 @@ export default function OrderTable() {
         {/* Results per page */}
         <div className="flex items-center gap-3">
           <Label htmlFor={id} className="max-sm:sr-only">
-            Rows per page
+            Số dòng / trang
           </Label>
           <Select
             value={table.getState().pagination.pageSize.toString()}
@@ -547,7 +536,7 @@ export default function OrderTable() {
                 table.getRowCount()
               )}
             </span>{' '}
-            of <span className="text-foreground">{table.getRowCount().toString()}</span>
+            trong <span className="text-foreground">{table.getRowCount().toString()}</span>
           </p>
         </div>
 
@@ -611,18 +600,6 @@ export default function OrderTable() {
           </Pagination>
         </div>
       </div>
-
-      <p className="text-muted-foreground mt-4 text-center text-sm">
-        Example of a more complex table made with{' '}
-        <a
-          className="hover:text-foreground underline"
-          href="https://tanstack.com/table"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          TanStack Table
-        </a>
-      </p>
     </div>
   )
 }
@@ -640,42 +617,23 @@ function RowActions() {
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <span>Edit</span>
+            <span>Chi tiết</span>
             <DropdownMenuShortcut>⌘E</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span>Duplicate</span>
-            <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-          </DropdownMenuItem>
         </DropdownMenuGroup>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <span>Archive</span>
+            <span>Xác nhận đơn hàng</span>
             <DropdownMenuShortcut>⌘A</DropdownMenuShortcut>
           </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>More</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Move to project</DropdownMenuItem>
-                <DropdownMenuItem>Move to folder</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Advanced options</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
+          <DropdownMenuItem className="text-destructive focus:text-destructive">
+            <span>Hủy đơn hàng</span>
+            <DropdownMenuShortcut><DeleteIcon size={16}/></DropdownMenuShortcut>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Add to favorites</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-destructive focus:text-destructive">
-          <span>Delete</span>
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

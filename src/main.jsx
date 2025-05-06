@@ -14,6 +14,8 @@ import { injectStore } from './utils/authorizedAxios.js'
 
 import { Toaster } from 'sonner'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import { LoadingProvider } from '~/contexts/LoadingContext'
+import { ConfigProvider } from 'antd'
 
 const persistor = persistStore(store)
 injectStore(store)
@@ -24,7 +26,17 @@ root.render(
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-          <App />
+          <LoadingProvider>
+            <ConfigProvider
+              theme={{
+                token: {
+                  fontFamily: 'Roboto, sans-serif'
+                }
+              }}
+            >
+              <App />
+            </ConfigProvider>
+          </LoadingProvider>
         </GoogleOAuthProvider>
         <Toaster richColors />
       </PersistGate>

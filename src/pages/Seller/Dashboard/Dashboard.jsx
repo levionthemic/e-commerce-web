@@ -1,6 +1,5 @@
 import { Coins, Layers, MoreHorizontal, Package2, Percent, TrendingDown, TrendingUp } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import CountUp from 'react-countup'
 import logo from '~/assets/ghn-logo.png'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
@@ -12,6 +11,9 @@ import {
   TableHeader,
   TableRow
 } from '~/components/ui/table'
+import { useTimeCount } from '~/hooks/use-time-count'
+import { MultiLineChartComponent } from '~/pages/Seller/Dashboard/MultiLineChartComponent'
+import { PieChartComponent } from '~/pages/Seller/Dashboard/PieChartComponent'
 
 const items = [
   {
@@ -57,69 +59,7 @@ const items = [
 ]
 
 function Dashboard () {
-  const date = new Date(Date.now())
-  const formatter = new Intl.DateTimeFormat('vi-VN', {
-    weekday: 'long',
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  })
-
-  const [time, setTime] = useState(new Date().toLocaleTimeString('vi-VN'))
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date()
-      const timeString = now.toLocaleTimeString('vi-VN')
-      setTime(timeString)
-    }, 1000)
-    return () => clearInterval(timer)
-  })
-
-  const data = [
-    {
-      'name': 'Page A',
-      'Tổng số đơn hàng': 4000,
-      'Tổng doanh thu': 2400,
-      'amt': 2400
-    },
-    {
-      'name': 'Page B',
-      'Tổng số đơn hàng': 3000,
-      'Tổng doanh thu': 1398,
-      'amt': 2210
-    },
-    {
-      'name': 'Page C',
-      'Tổng số đơn hàng': 2000,
-      'Tổng doanh thu': 9800,
-      'amt': 2290
-    },
-    {
-      'name': 'Page D',
-      'Tổng số đơn hàng': 2780,
-      'Tổng doanh thu': 3908,
-      'amt': 2000
-    },
-    {
-      'name': 'Page E',
-      'Tổng số đơn hàng': 1890,
-      'Tổng doanh thu': 4800,
-      'amt': 2181
-    },
-    {
-      'name': 'Page F',
-      'Tổng số đơn hàng': 2390,
-      'Tổng doanh thu': 3800,
-      'amt': 2500
-    },
-    {
-      'name': 'Page G',
-      'Tổng số đơn hàng': 3490,
-      'Tổng doanh thu': 4300,
-      'amt': 2100
-    }
-  ]
-
+  const { date, time } = useTimeCount()
 
   return (
     <div className="py-4 px-6">
@@ -128,7 +68,7 @@ function Dashboard () {
           <div className="font-bold text-xl">Dashboard</div>
           <p className="text-sm text-gray-500">Tổng quan về cửa hàng của bạn trong tuần này</p>
         </div>
-        <span className="italic text-sm text-gray-500 text-right">{time}<br />{formatter.format(date)}</span>
+        <span className="italic text-sm text-gray-500 text-right">{time}<br />{date}</span>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -139,13 +79,13 @@ function Dashboard () {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold flex flex-col gap-1/2">
-              <span>2.158.000</span>
+              <CountUp end={2158000} start={1.5} separator='.' />
               <span className="text-xs text-gray-600">VNĐ</span>
             </span>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-sm text-green-600">
                 <TrendingUp />
-                <span>+6.00%</span>
+                <span>+<CountUp end={6.00} start={1.5} decimals={2} />%</span>
               </div>
               <span className="text-xs text-gray-400">so với tuần trước</span>
             </div>
@@ -163,13 +103,13 @@ function Dashboard () {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold flex flex-col gap-1/2">
-              <span>488</span>
+              <CountUp end={488} start={1.5} />
               <span className="text-xs text-gray-600">sản phẩm</span>
             </span>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-sm text-red-600">
                 <TrendingDown />
-                <span>+6.00%</span>
+                <span>-<CountUp end={6.00} start={1.5} decimals={2} />%</span>
               </div>
               <span className="text-xs text-gray-400">so với tuần trước</span>
             </div>
@@ -187,13 +127,13 @@ function Dashboard () {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold flex flex-col gap-1/2">
-              <span>123</span>
+              <CountUp end={123} start={1.5} />
               <span className="text-xs text-gray-600">đơn hàng</span>
             </span>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-sm text-red-600">
                 <TrendingDown />
-                <span>+6.00%</span>
+                <span>-<CountUp end={6.00} start={1.5} decimals={2} />%</span>
               </div>
               <span className="text-xs text-gray-400">so với tuần trước</span>
             </div>
@@ -211,13 +151,13 @@ function Dashboard () {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-2xl font-bold flex flex-col gap-1/2">
-              <span>5.03</span>
+              <CountUp end={5.03} start={1.5} decimals={2} />
               <span className="text-xs text-gray-600">%</span>
             </span>
             <div className="flex flex-col items-end">
               <div className="flex items-center gap-2 text-sm text-red-600">
                 <TrendingDown />
-                <span>+6.00%</span>
+                <span>-<CountUp end={5.03} start={1.5} decimals={2} />%</span>
               </div>
               <span className="text-xs text-gray-400">so với tuần trước</span>
             </div>
@@ -231,23 +171,16 @@ function Dashboard () {
 
       <div className="grid grid-cols-10 gap-4 mb-4">
         <div className="col-span-7 bg-white rounded-lg p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div className='font-semibold text-lg'>Tổng quan</div>
             <MoreHorizontal className='text-gray-400 cursor-pointer'/>
           </div>
 
-          <ResponsiveContainer height='90%'>
-            <LineChart width={730} height={500} data={data}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="2 3"/>
-              <XAxis dataKey="name" />
-              <YAxis tickCount={5}/>
-              <Tooltip />
-              <Legend verticalAlign="top" height={36} align='right' fontWeight='bold' fontSize={'0.875rem'}/>
-              <Line type="monotone" dataKey="Tổng doanh thu" stroke="#8884d8" strokeWidth={2}/>
-              <Line type="monotone" dataKey="Tổng số đơn hàng" stroke="#82ca9d" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className='grid grid-cols-2 gap-6'>
+            <MultiLineChartComponent />
+            <PieChartComponent />
+          </div>
+
 
         </div>
 

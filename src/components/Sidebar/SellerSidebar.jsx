@@ -81,14 +81,14 @@ function SellerSidebar() {
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
                     <SidebarMenuButton asChild className='text-white hover:bg-white/15 hover:text-white hover:rounded-lg'>
-                      <Link to='/seller/store/profile'>Hồ sơ cửa hàng</Link>
+                      <Link to='/seller/store/profile'>Hồ sơ người bán</Link>
                     </SidebarMenuButton>
                   </SidebarMenuSubItem>
                 </SidebarMenuSub>
                 <SidebarMenuSub>
                   <SidebarMenuSubItem>
                     <SidebarMenuButton asChild className='text-white hover:bg-white/15 hover:text-white hover:rounded-lg'>
-                      <Link to='/seller/store/inventory'>Quản lý kho hàng</Link>
+                      <Link to='/seller/store/list-store'>Danh sách cửa hàng</Link>
                     </SidebarMenuButton>
                   </SidebarMenuSubItem>
                 </SidebarMenuSub>

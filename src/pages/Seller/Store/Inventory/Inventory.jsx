@@ -29,7 +29,7 @@ function Inventory() {
       <Tabs defaultValue="1">
         <div className="flex items-center justify-between mb-4 gap-8">
           <div className="">
-            <div className="font-bold text-xl mb-2">Quản lý kho hàng</div>
+            <div className="font-bold text-xl mb-2">Quản lý cửa hàng</div>
             <Breadcrumb>
               <BreadcrumbList className='text-sm'>
                 <BreadcrumbItem>
@@ -45,7 +45,7 @@ function Inventory() {
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
-                  <BreadcrumbPage>Quản lý kho hàng</BreadcrumbPage>
+                  <BreadcrumbPage>Quản lý cửa hàng</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>

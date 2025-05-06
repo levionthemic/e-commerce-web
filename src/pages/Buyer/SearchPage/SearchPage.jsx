@@ -7,19 +7,33 @@ import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
 import Loader from '~/components/Loader/Loader'
 import PaginationComponent from '~/components/Pagination/PaginationComponent'
 import { useForm } from 'react-hook-form'
-import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel
+} from '~/components/ui/form'
 import { Button } from '~/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '~/components/ui/select'
 import Rating from 'react-rating'
 import { FaRegStar, FaStar } from 'react-icons/fa'
+import { useLoading } from '~/contexts/LoadingContext'
 
 function SearchPage() {
   const [products, setProducts] = useState([])
   const [totalProducts, setTotalProducts] = useState(1)
   const [categories, setCategories] = useState([])
   const [brands, setBrands] = useState([])
-  const [loading, setLoading] = useState(false)
+
+  const { startLoading, endLoading, apiLoadingCount } = useLoading()
 
   const [searchParams, setSearchParams] = useSearchParams()
   const keyword = searchParams.get('keyword')
@@ -31,30 +45,50 @@ function SearchPage() {
   const [filterByBrand, setFilterByBrand] = useState()
 
   const getPriceRange = (rate) => {
-    let minPrice = 0, maxPrice = 0
+    let minPrice = 0,
+      maxPrice = 0
     switch (rate) {
-    case '1': minPrice = 0; maxPrice = 500000; break
-    case '500': minPrice = 500000; maxPrice = 1000000; break
-    case '1000': minPrice = 1000000; maxPrice = 5000000; break
-    case '5000': minPrice = 5000000; maxPrice = 10000000; break
-    case '10000': minPrice = 10000000; maxPrice = 1000000000; break
-    default: break
+      case '1':
+        minPrice = 0
+        maxPrice = 500000
+        break
+      case '500':
+        minPrice = 500000
+        maxPrice = 1000000
+        break
+      case '1000':
+        minPrice = 1000000
+        maxPrice = 5000000
+        break
+      case '5000':
+        minPrice = 5000000
+        maxPrice = 10000000
+        break
+      case '10000':
+        minPrice = 10000000
+        maxPrice = 1000000000
+        break
+      default:
+        break
     }
     return { minPrice, maxPrice }
   }
 
-  const handlePaginate = useCallback((page) => {
-    searchParams.set('page', page)
-    setSearchParams(searchParams)
-  }, [searchParams, setSearchParams])
+  const handlePaginate = useCallback(
+    (page) => {
+      searchParams.set('page', page)
+      setSearchParams(searchParams)
+    },
+    [searchParams, setSearchParams]
+  )
 
   useEffect(() => {
     // const { sortKey, sortValue } = defineSort(sortOption)
-    setLoading(true)
+    startLoading()
 
     const searchObject = {
       'q[name]': keyword,
-      'page': page
+      page: page
     }
 
     let filterFlag = false
@@ -88,7 +122,10 @@ function SearchPage() {
           setCategories(data?.categories || [])
           setBrands(data?.brands || [])
         })
-        .finally(() => { setLoading(false), window.scrollTo(top) })
+        .finally(() => {
+          window.scrollTo(top)
+          endLoading()
+        })
     } else {
       handlePaginate(1)
       getProductsWithFiltersAPI(searchPath)
@@ -96,11 +133,20 @@ function SearchPage() {
           setProducts(data?.products || [])
           setTotalProducts(data?.totalProducts || 0)
         })
-        .finally(() => { setLoading(false), window.scrollTo(top) })
+        .finally(() => {
+          window.scrollTo(top)
+          endLoading()
+        })
     }
-
-  }, [page, keyword, filterByRate, filterByPrice, filterByCategory, filterByBrand, handlePaginate])
-
+  }, [
+    page,
+    keyword,
+    filterByRate,
+    filterByPrice,
+    filterByCategory,
+    filterByBrand,
+    handlePaginate,
+  ])
 
   const form = useForm({
     defaultValues: {
@@ -116,45 +162,58 @@ function SearchPage() {
     setFilterByBrand(data.filterByBrand)
   }
 
-  if (loading) {
-    return <Loader caption={'Đang tải...'} />
-  }
+  // if (loading) {
+  //   return <Loader caption={'Đang tải...'} />
+  // }
 
   return (
     <div className='container mx-auto my-6'>
       <div className='flex gap-6 h-full relative'>
         <div className='w-[20%] px-6 h-full sticky top-36 left-0 max-h-full'>
-          <div className='text-mainColor2-800 font-medium text-xl'>Bộ lọc sản phẩm</div>
+          <div className='text-mainColor2-800 font-medium text-xl'>
+            Bộ lọc sản phẩm
+          </div>
 
           <div className='mt-4'>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleFilter)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(handleFilter)}
+                className='space-y-6'
+              >
                 <FormField
                   control={form.control}
-                  name="filterByRate"
+                  name='filterByRate'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className='text-base'>Số sao đánh giá</FormLabel>
+                      <FormLabel className='text-base'>
+                        Số sao đánh giá
+                      </FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={field.onChange}
                           defaultValue={field.value}
-                          className="flex flex-col gap-2"
+                          className='flex flex-col gap-2'
                         >
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'all'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'all'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">
+                            <FormLabel className='font-normal cursor-pointer'>
                               Tất cả
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'5'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'5'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer flex items-center gap-1.5">
+                            <FormLabel className='font-normal cursor-pointer flex items-center gap-1.5'>
                               <Rating
                                 emptySymbol={<FaRegStar />}
                                 fullSymbol={<FaStar />}
@@ -166,11 +225,14 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'4'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'4'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer flex items-center gap-1.5">
+                            <FormLabel className='font-normal cursor-pointer flex items-center gap-1.5'>
                               <Rating
                                 emptySymbol={<FaRegStar />}
                                 fullSymbol={<FaStar />}
@@ -182,11 +244,14 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'3'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'3'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer flex items-center gap-1.5">
+                            <FormLabel className='font-normal cursor-pointer flex items-center gap-1.5'>
                               <Rating
                                 emptySymbol={<FaRegStar />}
                                 fullSymbol={<FaStar />}
@@ -205,7 +270,7 @@ function SearchPage() {
 
                 <FormField
                   control={form.control}
-                  name="filterByPrice"
+                  name='filterByPrice'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className='text-base'>Khoảng giá</FormLabel>
@@ -213,54 +278,78 @@ function SearchPage() {
                         <RadioGroup
                           onValueChange={field.onChange}
                           defaultValue={field.value}
-                          className="flex flex-col gap-2"
+                          className='flex flex-col gap-2'
                         >
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'all'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'all'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">
+                            <FormLabel className='font-normal cursor-pointer'>
                               Tất cả
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'1'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'1'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">
+                            <FormLabel className='font-normal cursor-pointer'>
                               {'< 500.000đ'}
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'500'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'500'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">
+                            <FormLabel className='font-normal cursor-pointer'>
                               500.000đ - 1.000.000đ
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'1000'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'1000'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">1.000.000đ - 5.000.000đ</FormLabel>
+                            <FormLabel className='font-normal cursor-pointer'>
+                              1.000.000đ - 5.000.000đ
+                            </FormLabel>
                           </FormItem>
 
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'5000'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'5000'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">5.000.000đ - 10.000.000đ</FormLabel>
+                            <FormLabel className='font-normal cursor-pointer'>
+                              5.000.000đ - 10.000.000đ
+                            </FormLabel>
                           </FormItem>
 
-                          <FormItem className="flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer">
+                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
                             <FormControl>
-                              <RadioGroupItem value={'10000'} className='bg-white' />
+                              <RadioGroupItem
+                                value={'10000'}
+                                className='bg-white'
+                              />
                             </FormControl>
-                            <FormLabel className="font-normal cursor-pointer">{'> 10.000.000đ'}</FormLabel>
+                            <FormLabel className='font-normal cursor-pointer'>
+                              {'> 10.000.000đ'}
+                            </FormLabel>
                           </FormItem>
                         </RadioGroup>
                       </FormControl>
@@ -270,20 +359,28 @@ function SearchPage() {
 
                 <FormField
                   control={form.control}
-                  name="filterByCategory"
+                  name='filterByCategory'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Danh mục sản phẩm</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Chọn danh mục sản phẩm" />
+                            <SelectValue placeholder='Chọn danh mục sản phẩm' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categories?.map(category =>
-                            <SelectItem key={category?._id} value={category?._id}>{category?.name}</SelectItem>
-                          )}
+                          {categories?.map((category) => (
+                            <SelectItem
+                              key={category?._id}
+                              value={category?._id}
+                            >
+                              {category?.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </FormItem>
@@ -292,27 +389,34 @@ function SearchPage() {
 
                 <FormField
                   control={form.control}
-                  name="filterByBrand"
+                  name='filterByBrand'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Thương hiệu</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Chọn thương hiệu" />
+                            <SelectValue placeholder='Chọn thương hiệu' />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {brands?.map(brand =>
-                            <SelectItem key={brand?._id} value={brand?._id}>{brand?.name}</SelectItem>
-                          )}
+                          {brands?.map((brand) => (
+                            <SelectItem key={brand?._id} value={brand?._id}>
+                              {brand?.name}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </FormItem>
                   )}
                 />
 
-                <Button type="submit" className='w-full bg-mainColor2-800'>Lọc</Button>
+                <Button type='submit' className='w-full bg-mainColor2-800'>
+                  Lọc
+                </Button>
               </form>
             </Form>
           </div>
@@ -321,15 +425,17 @@ function SearchPage() {
         <div className='flex-1'>
           <div>
             <div className='flex items-end justify-between mb-4'>
-              <span className='font-medium text-xl text-mainColor2-800'>Kết quả tìm kiếm cho &quot;{keyword}&quot;</span>
+              <span className='font-medium text-xl text-mainColor2-800'>
+                Kết quả tìm kiếm cho &quot;{keyword}&quot;
+              </span>
               <span>Trang {page}</span>
             </div>
 
             <div className='grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3'>
-              {loading ? (
+              {apiLoadingCount > 0 ? (
                 <>
                   {Array.from({ length: 40 }).map((_, index) => (
-                    <Product product={null} loading={true} key={index}/>
+                    <Product product={null} loading={true} key={index} />
                   ))}
                 </>
               ) : (
@@ -349,7 +455,12 @@ function SearchPage() {
                   ) : (
                     <>
                       {products.map((product, index) => (
-                        <Product product={product} loading={false} key={index} width={'minmax(250px, 1fr)'}/>
+                        <Product
+                          product={product}
+                          loading={false}
+                          key={index}
+                          width={'minmax(250px, 1fr)'}
+                        />
                       ))}
                     </>
                   )}

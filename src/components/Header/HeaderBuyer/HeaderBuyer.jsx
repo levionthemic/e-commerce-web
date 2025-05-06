@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { addToCartAPI, clearCart, fetchCurrentCartAPI, selectCurrentCart } from '~/redux/cart/cartSlice'
+import {
+  addToCartAPI,
+  clearCart,
+  fetchCurrentCartAPI,
+  selectCurrentCart
+} from '~/redux/cart/cartSlice'
 
 import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
 import { Input } from '~/components/ui/input'
@@ -58,7 +63,7 @@ import {
 } from '~/components/ui/alert-dialog'
 import { getProductsAPI } from '~/apis'
 import { useDebounceFn } from '~/hooks/use-debounce'
-
+import { useLoading } from '~/contexts/LoadingContext'
 
 function HeaderBuyer() {
   const navigate = useNavigate()
@@ -67,24 +72,30 @@ function HeaderBuyer() {
   const currentCart = useSelector(selectCurrentCart)
   const dispatch = useDispatch()
 
+  const { startLoading, endLoading } = useLoading()
+
   const inputRef = useRef()
 
   useEffect(() => {
     if (currentUser) {
+      startLoading()
       if (currentCart && !currentCart.buyerId) {
-        Promise.all(currentCart?.itemList.map(item => dispatch(addToCartAPI(item)))).then(() => dispatch(fetchCurrentCartAPI()))
+        Promise.all(
+          currentCart?.itemList.map((item) => dispatch(addToCartAPI(item)))
+        )
+          .then(() => dispatch(fetchCurrentCartAPI()))
+          .finally(() => endLoading())
       } else {
-        dispatch(fetchCurrentCartAPI())
+        dispatch(fetchCurrentCartAPI()).finally(() => endLoading())
       }
     }
   }, [currentUser, dispatch])
-
 
   const handleSearch = (event) => {
     event.preventDefault()
     const searchValue = inputRef.current.value
     if (searchValue) {
-      navigate(`/buyer/search?${createSearchParams({ 'keyword': searchValue })}`)
+      navigate(`/buyer/search?${createSearchParams({ keyword: searchValue })}`)
       handleBlur()
       window.scrollTo(0, 0)
     }
@@ -105,7 +116,6 @@ function HeaderBuyer() {
   const [loading, setLoading] = useState(false)
 
   const [showBackgroundOverlay, setShowBackgroundOverlay] = useState(false)
-
 
   const handleFocus = () => {
     setShowBackgroundOverlay(true)
@@ -134,23 +144,27 @@ function HeaderBuyer() {
       .then((data) => {
         setSearchProducts(data?.products || [])
       })
-      .finally(() => { setLoading(false) })
+      .finally(() => {
+        setLoading(false)
+      })
   }, 1000)
-
 
   return (
     <>
       <div className='sticky top-0 left-0 bg-white z-50'>
         <div className='container mx-auto pt-6 pb-4'>
-          <div className="flex items-center justify-between">
+          <div className='flex items-center justify-between'>
             <div
               className='text-4xl font-medium text-mainColor1-600 cursor-pointer hover:scale-105 transition-transform hover:duration-500'
               onClick={() => navigate('/')}
             >
-            LEVI
+              LEVI
             </div>
-            <div className="flex-1">
-              <form onSubmit={handleSearch} className="relative w-[80%] mx-auto">
+            <div className='flex-1'>
+              <form
+                onSubmit={handleSearch}
+                className='relative w-[80%] mx-auto'
+              >
                 <Input
                   className='peer ps-9 pe-9 w-full placeholder:text-sm placeholder:text-mainColor1-100 rounded-full border-mainColor1-800 text-mainColor1-600 hover:border-[2px] focus:border-[2px] flex-1'
                   placeholder='Bạn cần tìm gì?'
@@ -159,15 +173,15 @@ function HeaderBuyer() {
                   onChange={handleChange}
                   ref={inputRef}
                 />
-                <div className="text-mainColor1-600/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+                <div className='text-mainColor1-600/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
                   <SearchIcon size={16} />
                 </div>
                 <button
-                  className="text-mainColor1-600/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                  aria-label="Submit search"
-                  type="submit"
+                  className='text-mainColor1-600/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-none focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'
+                  aria-label='Submit search'
+                  type='submit'
                 >
-                  <ArrowRightIcon size={16} aria-hidden="true" />
+                  <ArrowRightIcon size={16} aria-hidden='true' />
                 </button>
               </form>
             </div>
@@ -179,7 +193,7 @@ function HeaderBuyer() {
                 <SheetTrigger asChild>
                   <div className='relative cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform'>
                     <LuShoppingCart className='text-mainColor1-600 text-xl' />
-                    <Badge className="w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-600">
+                    <Badge className='w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-600'>
                       {currentCart?.itemList?.length || 0}
                     </Badge>
                   </div>
@@ -187,32 +201,48 @@ function HeaderBuyer() {
                 <SheetContent side={'right'}>
                   <SheetHeader className='my-3'>
                     <SheetTitle>
-                      Giỏ hàng của bạn {' '}
-                      <span className='text-sm text-gray-700'>({currentCart?.itemList.length || 0})</span>
+                      Giỏ hàng của bạn{' '}
+                      <span className='text-sm text-gray-700'>
+                        ({currentCart?.itemList.length || 0})
+                      </span>
                     </SheetTitle>
                     <SheetDescription className='!m-0'>
                       Sơ lược các sản phẩm trong giỏ hàng.
                     </SheetDescription>
                   </SheetHeader>
-                  <div className="py-4 max-h-[89%] overflow-auto">
+                  <div className='py-4 max-h-[89%] overflow-auto'>
                     {currentCart?.fullProducts?.map((product, index) => (
                       <div key={index} className='flex items-center gap-2 my-6'>
-                        <img src={product?.avatar} alt="" width={40} height={40} />
+                        <img
+                          src={product?.avatar}
+                          alt=''
+                          width={40}
+                          height={40}
+                        />
                         <div className='flex flex-col gap-1'>
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className='text-sm line-clamp-1 text-mainColor2-800 leading-none'>{product?.name}</span>
+                                <span className='text-sm line-clamp-1 text-mainColor2-800 leading-none'>
+                                  {product?.name}
+                                </span>
                               </TooltipTrigger>
                               <TooltipContent>
                                 <p>{product?.name}</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
-                          <p className='line-clamp-1 text-xs text-gray-400 mb-0.5'>Loại: {product?.type?.typeName}</p>
+                          <p className='line-clamp-1 text-xs text-gray-400 mb-0.5'>
+                            Loại: {product?.type?.typeName}
+                          </p>
                           <div className='flex flex-col lg:flex-row lg:items-center lg:gap-4'>
-                            <Badge className='bg-mainColor2-800/90'>{currentCart.itemList[index].quantity} sản phẩm</Badge>
-                            <span className='text-[0.8rem] text-muted-foreground'>x {product?.type?.price.toLocaleString('vi-VN')}<sup>đ</sup></span>
+                            <Badge className='bg-mainColor2-800/90'>
+                              {currentCart.itemList[index].quantity} sản phẩm
+                            </Badge>
+                            <span className='text-[0.8rem] text-muted-foreground'>
+                              x {product?.type?.price.toLocaleString('vi-VN')}
+                              <sup>đ</sup>
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -231,24 +261,36 @@ function HeaderBuyer() {
                 </SheetContent>
               </Sheet>
 
-              {currentUser
-                ? <DropdownMenu open={open} onOpenChange={setOpen}>
+              {currentUser ? (
+                <DropdownMenu open={open} onOpenChange={setOpen}>
                   <DropdownMenuTrigger asChild>
                     <div className='flex items-center gap-3 cursor-pointer'>
                       <Avatar>
                         <AvatarImage src={currentUser?.avatar} />
                         <AvatarFallback>LV</AvatarFallback>
                       </Avatar>
-                      <div className='text-sm text-gray-500'>Xin chào, <br></br><b className='text-gray-900'>{currentUser?.username}</b></div>
+                      <div className='text-sm text-gray-500'>
+                        Xin chào, <br></br>
+                        <b className='text-gray-900'>{currentUser?.username}</b>
+                      </div>
                     </div>
-
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-40">
+                  <DropdownMenuContent className='w-40'>
                     <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
-                      <DropdownMenuItem onClick={() => navigate('/user/profile')} className='cursor-pointer'>Hồ sơ</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/user/order')} className='cursor-pointer'>Đơn hàng</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate('/user/profile')}
+                        className='cursor-pointer'
+                      >
+                        Hồ sơ
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => navigate('/user/order')}
+                        className='cursor-pointer'
+                      >
+                        Đơn hàng
+                      </DropdownMenuItem>
                       <DropdownMenuItem>Cài đặt</DropdownMenuItem>
                     </DropdownMenuGroup>
                     <DropdownMenuSeparator />
@@ -256,36 +298,50 @@ function HeaderBuyer() {
                       <AlertDialogTrigger asChild>
                         <DropdownMenuItem
                           className='text-red-600 font-medium hover:bg-red-100 hover:text-red-600 cursor-pointer'
-                          onSelect={(event) => {event.preventDefault()}}
+                          onSelect={(event) => {
+                            event.preventDefault()
+                          }}
                         >
-                        Đăng xuất
+                          Đăng xuất
                         </DropdownMenuItem>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Bạn có chắc chắn muốn đăng xuất?</AlertDialogTitle>
+                          <AlertDialogTitle>
+                            Bạn có chắc chắn muốn đăng xuất?
+                          </AlertDialogTitle>
                           <AlertDialogDescription>
-                          Bạn sẽ cần phải đăng nhập lại trước khi truy cập vào hệ thống.
+                            Bạn sẽ cần phải đăng nhập lại trước khi truy cập vào
+                            hệ thống.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel onClick={() => setOpen(false)}>Hủy</AlertDialogCancel>
-                          <AlertDialogAction onClick={handleLogout}>Đăng xuất</AlertDialogAction>
+                          <AlertDialogCancel onClick={() => setOpen(false)}>
+                            Hủy
+                          </AlertDialogCancel>
+                          <AlertDialogAction onClick={handleLogout}>
+                            Đăng xuất
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
-
                   </DropdownMenuContent>
                 </DropdownMenu>
-
-                : <div className='flex items-center gap-2 text-mainColor1-600 cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform' onClick={() => navigate('/login')}><LogInIcon />Đăng nhập</div>
-              }
+              ) : (
+                <div
+                  className='flex items-center gap-2 text-mainColor1-600 cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform'
+                  onClick={() => navigate('/login')}
+                >
+                  <LogInIcon />
+                  Đăng nhập
+                </div>
+              )}
             </div>
           </div>
         </div>
         <MenuBar />
       </div>
-      {showBackgroundOverlay &&
+      {showBackgroundOverlay && (
         <>
           <div className='w-[100vw] h-[100vh] fixed z-50 top-20 bg-black opacity-80'></div>
           <div
@@ -296,27 +352,27 @@ function HeaderBuyer() {
           >
             {loading && 'Đang tìm kiếm...'}
             {!loading && searchProducts.length
-              ? searchProducts.map(prod => (
-                <div
-                  key={prod._id}
-                  className='flex items-center gap-4 hover:bg-gray-100 px-1 rounded-sm my-1 cursor-pointer py-2'
-                  onMouseDown={() => {navigate(`/buyer/product/${prod._id}`)}}
-                >
-                  <div>
-                    <img src={prod?.avatar} alt="" className='w-10 h-10'/>
+              ? searchProducts.map((prod) => (
+                  <div
+                    key={prod._id}
+                    className='flex items-center gap-4 hover:bg-gray-100 px-1 rounded-sm my-1 cursor-pointer py-2'
+                    onMouseDown={() => {
+                      navigate(`/buyer/product/${prod._id}`)
+                    }}
+                  >
+                    <div>
+                      <img src={prod?.avatar} alt='' className='w-10 h-10' />
+                    </div>
+                    <div>
+                      <span className='text-sm'>{prod?.name}</span>
+                    </div>
                   </div>
-                  <div>
-                    <span className='text-sm'>{prod?.name}</span>
-                  </div>
-                </div>
-              ))
-              : 'Không có kết quả.'
-            }
+                ))
+              : 'Không có kết quả.'}
           </div>
         </>
-      }
+      )}
     </>
-
   )
 }
 
