@@ -4,6 +4,7 @@ import { refreshTokenAPI } from '~/apis'
 import { logoutUserAPI } from '~/redux/user/userSlice'
 import { API_ROOT, PAGE_TYPE } from '~/utils/constants'
 import { getMessageApi } from './messageInstance'
+import { clearCart } from '~/redux/cart/cartSlice'
 
 let authorizedAxiosInstance = axios.create({
   baseURL: `${API_ROOT}/v1`,
@@ -36,6 +37,7 @@ authorizedAxiosInstance.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
+      axiosReduxStore.dispatch(clearCart())
       axiosReduxStore.dispatch(logoutUserAPI(false))
     }
 
@@ -47,6 +49,7 @@ authorizedAxiosInstance.interceptors.response.use(
             return data?.accessToken
           })
           .catch((_error) => {
+            axiosReduxStore.dispatch(clearCart())
             axiosReduxStore.dispatch(logoutUserAPI())
             return Promise.reject(_error)
           })
