@@ -48,7 +48,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '~/components/ui/alert-dialog'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 
 function CartPage() {
@@ -56,6 +56,19 @@ function CartPage() {
   const dispatch = useDispatch()
   const cart = useSelector(selectCurrentCart)
   const currentUser = useSelector(selectCurrentUser)
+
+  const changesRef = useRef(new Map())
+  const timerRef = useRef()
+
+  const updateQuantity = () => {
+    const updates = Array.from(changesRef.current.values())
+
+    Promise.all(
+      updates.map((update) => dispatch(updateCartQuantityAPI(update)))
+    ).then(() => {
+      changesRef.current.clear()
+    })
+  }
 
   const handleDecreaseQuantity = (productId, typeId) => {
     const cloneCart = cloneDeep(cart)
@@ -71,10 +84,20 @@ function CartPage() {
 
     dispatch(setCart(cloneCart))
 
-    if (currentUser)
-      dispatch(
-        updateCartQuantityAPI({ productId, typeId, quantity: newQuantity })
-      )
+    if (currentUser) {
+      const key = `${productId}-${typeId}`
+      changesRef.current.set(key, {
+        productId,
+        typeId,
+        quantity: newQuantity
+      })
+
+      if (timerRef.current) clearTimeout(timerRef.current)
+
+      timerRef.current = setTimeout(() => {
+        updateQuantity()
+      }, 1000)
+    }
   }
 
   const handleIncreaseQuantity = (productId, typeId) => {
@@ -89,10 +112,20 @@ function CartPage() {
 
     dispatch(setCart(cloneCart))
 
-    if (currentUser)
-      dispatch(
-        updateCartQuantityAPI({ productId, typeId, quantity: newQuantity })
-      )
+    if (currentUser) {
+      const key = `${productId}-${typeId}`
+      changesRef.current.set(key, {
+        productId,
+        typeId,
+        quantity: newQuantity
+      })
+
+      if (timerRef.current) clearTimeout(timerRef.current)
+
+      timerRef.current = setTimeout(() => {
+        updateQuantity()
+      }, 1000)
+    }
   }
 
   const handleDeleteItemCart = (product) => {
