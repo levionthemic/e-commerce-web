@@ -167,7 +167,7 @@ const columns = [
     accessorKey: 'itemList',
     size: 200,
     cell: ({ row }) => (
-      <>
+      <div>
         {row
           .getValue('itemList')
           .slice(0, 2)
@@ -196,7 +196,7 @@ const columns = [
             + {row.getValue('itemList').length - 2} sản phẩm
           </div>
         )}
-      </>
+      </div>
     )
   },
   {
@@ -458,7 +458,7 @@ export default function OrderTable({ data, setData }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
-              <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+              <DropdownMenuLabel>Hiển thị cột</DropdownMenuLabel>
               {table
                 .getAllColumns()
                 .filter((column) => column.getCanHide())
@@ -466,14 +466,15 @@ export default function OrderTable({ data, setData }) {
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
-                      className='capitalize'
+                      // className='capitalize'
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
                       }
                       onSelect={(event) => event.preventDefault()}
                     >
-                      {column.id}
+                      {column.columnDef.header?.props?.children ||
+                        column.columnDef.header}
                     </DropdownMenuCheckboxItem>
                   )
                 })}

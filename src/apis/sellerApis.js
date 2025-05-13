@@ -5,6 +5,27 @@ import authorizedAxiosInstance from '~/utils/authorizedAxios'
  * Dashboard APIs
  * @author taiki and levi
  */
+export const getLatestOrdersAPI = async () => {
+  try {
+    const response = await authorizedAxiosInstance.get(
+      '/order/seller/get-all?latest=1'
+    )
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const getBestSoldProductsAPI = async () => {
+  try {
+    const response = await authorizedAxiosInstance.get(
+      '/products/seller/get-all?q[sold]=-1'
+    )
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
 
 /**
  * Store APIs
