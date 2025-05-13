@@ -57,8 +57,11 @@ export const fetchOrdersAPI = async () => {
   return response.data
 }
 
-export const addOrderAPI = async (data) => {
-  const response = await authorizedAxiosInstance.post('/order/add', data)
+export const addOrderAPI = async (data, buyNow = false) => {
+  const response = await authorizedAxiosInstance.post(
+    `/order/add${buyNow && '?buyNow=1'}`,
+    data
+  )
   return response.data
 }
 

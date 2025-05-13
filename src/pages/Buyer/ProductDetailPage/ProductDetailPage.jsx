@@ -207,7 +207,8 @@ function ProductDetailPage() {
             type: product.types.find((t) => t.typeId.toString() === typeId),
             quantity: quantity
           }
-        ]
+        ],
+        buyNow: true
       }
     })
   }

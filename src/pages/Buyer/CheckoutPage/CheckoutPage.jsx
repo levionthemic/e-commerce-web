@@ -18,6 +18,7 @@ function CheckoutPage() {
   const [clusterOrders, setClusterOrders] = useState([])
 
   const listCheckoutProducts = useLocation()?.state?.selectedRows
+  const buyNow = useLocation()?.state?.buyNow
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -76,17 +77,22 @@ function CheckoutPage() {
       return result
     })
 
-    toast.promise(Promise.all(checkoutData.map((data) => addOrderAPI(data))), {
-      loading: 'Đang xử lý...',
-      success: (res) => {
-        if (!res.error) {
-          navigate('/buyer/checkout/complete', { state: { checkoutData: res } })
-          return 'Đặt hàng thành công!'
-        }
-        throw res
-      },
-      error: 'Đặt hàng thất bại!'
-    })
+    toast.promise(
+      Promise.all(checkoutData.map((data) => addOrderAPI(data, buyNow))),
+      {
+        loading: 'Đang xử lý...',
+        success: (res) => {
+          if (!res.error) {
+            navigate('/buyer/checkout/complete', {
+              state: { checkoutData: res }
+            })
+            return 'Đặt hàng thành công!'
+          }
+          throw res
+        },
+        error: 'Đặt hàng thất bại!'
+      }
+    )
   }
 
   const timelineItems = [

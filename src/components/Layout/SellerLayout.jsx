@@ -20,6 +20,7 @@ function SellerLayout() {
 
     return () => clearTimeout(timeout)
   }, [location.pathname, setPageLoading])
+
   return (
     <div className='font-quicksand'>
       <NProgress
@@ -28,10 +29,12 @@ function SellerLayout() {
       />
       <SidebarProvider>
         <SellerSidebar />
+        {/* <SidebarInset> */}
         <div className='flex-1 bg-slate-100 w-[100vh-256px] overflow-x-hidden'>
           <Header type={PAGE_TYPE.SELLER} />
           <Outlet />
         </div>
+        {/* </SidebarInset> */}
       </SidebarProvider>
     </div>
   )
