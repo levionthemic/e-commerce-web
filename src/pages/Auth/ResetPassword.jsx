@@ -19,7 +19,7 @@ import {
 } from '~/utils/validators'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { resetPasswordAPI } from '~/apis'
+import { resetPasswordAPI } from '~/apis/authApis'
 import { asyncHandler } from '~/utils/asyncHandler'
 
 const formSchema = Joi.object({

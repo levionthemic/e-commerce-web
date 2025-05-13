@@ -61,7 +61,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '~/components/ui/alert-dialog'
-import { getProductsAPI } from '~/apis'
+import { getProductsAPI } from '~/apis/buyerApis'
 import { useDebounceFn } from '~/hooks/use-debounce'
 import { useLoading } from '~/contexts/LoadingContext'
 

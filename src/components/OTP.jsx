@@ -12,7 +12,7 @@ import {
 import { OTPInput } from 'input-otp'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { verifyOtpAPI } from '~/apis'
+import { verifyOtpAPI } from '~/apis/authApis'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 import { asyncHandler } from '~/utils/asyncHandler'
 

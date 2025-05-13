@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import Product from '~/components/Product/Product'
 import { createSearchParams, useSearchParams } from 'react-router-dom'
-import { getProductsAPI, getProductsWithFiltersAPI } from '~/apis'
+import { getProductsAPI, getProductsWithFiltersAPI } from '~/apis/buyerApis'
 
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
-import Loader from '~/components/Loader/Loader'
 import PaginationComponent from '~/components/Pagination/PaginationComponent'
 import { useForm } from 'react-hook-form'
 import {
@@ -145,7 +144,7 @@ function SearchPage() {
     filterByPrice,
     filterByCategory,
     filterByBrand,
-    handlePaginate,
+    handlePaginate
   ])
 
   const form = useForm({

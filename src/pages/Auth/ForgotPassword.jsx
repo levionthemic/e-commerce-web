@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom'
 import OTP from '~/components/OTP'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { forgotPasswordAPI } from '~/apis'
+import { forgotPasswordAPI } from '~/apis/authApis'
 import { asyncHandler } from '~/utils/asyncHandler'
 
 const formSchema = Joi.object({
