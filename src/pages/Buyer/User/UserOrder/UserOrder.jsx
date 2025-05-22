@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import UserHeader from '~/pages/Buyer/User/UserHeader'
 import { useEffect, useState } from 'react'
-import { fetchOrdersForBuyerAPI } from '~/apis'
+import { fetchOrdersAPI } from '~/apis/buyerApis'
 import { getAddressString } from '~/utils/helpers'
 import { useLoading } from '~/contexts/LoadingContext'
 
@@ -20,7 +20,7 @@ function UserOrder() {
 
   useEffect(() => {
     startLoading()
-    fetchOrdersForBuyerAPI()
+    fetchOrdersAPI()
       .then((data) => {
         Promise.all(
           data.map(async (d) => {

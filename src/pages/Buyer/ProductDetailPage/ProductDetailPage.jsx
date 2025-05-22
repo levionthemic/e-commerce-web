@@ -8,7 +8,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { IoMdAdd, IoMdStar, IoMdStarOutline } from 'react-icons/io'
 import { RiSubtractFill } from 'react-icons/ri'
 
-import { addCommentAPI, getProductDetailsAPI, getProductsAPI } from '~/apis'
+import {
+  addCommentAPI,
+  getProductDetailsAPI,
+  getProductsAPI
+} from '~/apis/buyerApis'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Loader from '~/components/Loader/Loader'
 import { Button } from '~/components/ui/button'
@@ -203,7 +207,8 @@ function ProductDetailPage() {
             type: product.types.find((t) => t.typeId.toString() === typeId),
             quantity: quantity
           }
-        ]
+        ],
+        buyNow: true
       }
     })
   }

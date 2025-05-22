@@ -9,7 +9,8 @@ export default {
         nunitoSans: ['Nunito Sans', 'sans-serif'],
         roboto: ['Roboto', 'sans-serif'],
         lexend: ['Lexend', 'sans-serif'],
-        nunito: ['Nunito', 'sans-serif']
+        nunito: ['Nunito', 'sans-serif'],
+        quicksand: ['Quicksand', 'sans-serif']
       },
       borderRadius: {
         lg: 'var(--radius)',

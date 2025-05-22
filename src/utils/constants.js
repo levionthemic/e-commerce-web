@@ -19,7 +19,13 @@ export const PAGE_TYPE = {
 export const DEFAULT_ITEMS_PER_PAGE = 40
 export const DEFAULT_PAGE = 1
 
-export const COMMENTS = ['Rất không hài lòng', 'Không hài lòng', 'Bình thường', 'Hài lòng', 'Cực kì hài lòng']
+export const COMMENTS = [
+  'Rất không hài lòng',
+  'Không hài lòng',
+  'Bình thường',
+  'Hài lòng',
+  'Cực kì hài lòng'
+]
 
 export const GENDER = {
   MALE: 'male',
@@ -35,4 +41,12 @@ export const ACCOUNT_STATUS = {
 export const SHIPPING_METHOD = {
   GHTK: 'ghtk',
   GHN: 'ghn'
+}
+
+export const ORDER_STATUS = {
+  PENDING: 'pending',
+  SHIPPING: 'shipping',
+  SUCCESS: 'success',
+  FAIL: 'fail',
+  CANCELLED: 'cancelled'
 }

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { toast } from 'sonner'
-import { refreshTokenAPI } from '~/apis'
+import { refreshTokenAPI } from '~/apis/authApis'
 import { logoutUserAPI } from '~/redux/user/userSlice'
 import { API_ROOT, PAGE_TYPE } from '~/utils/constants'
 import { getMessageApi } from './messageInstance'

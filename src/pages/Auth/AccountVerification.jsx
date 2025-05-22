@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useSearchParams } from 'react-router-dom'
-import { verifyUserAPI } from '~/apis'
+import { verifyUserAPI } from '~/apis/authApis'
 import Loader from '~/components/Loader/Loader'
 
 function AccountVerification() {
@@ -11,8 +11,7 @@ function AccountVerification() {
 
   useEffect(() => {
     if (email && token && role) {
-      verifyUserAPI({ email, token, role })
-        .then(() => setVerified(true))
+      verifyUserAPI({ email, token, role }).then(() => setVerified(true))
     }
   }, [email, token, role])
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Product from '~/components/Product/Product'
 import CategoryBar from './CategoryBar/CategoryBar'
-import { getCategoriesAPI, getProductsAPI } from '~/apis'
+import { getCategoriesAPI, getProductsAPI } from '~/apis/buyerApis'
 
 import { FaShippingFast } from 'react-icons/fa'
 import { MdSupportAgent } from 'react-icons/md'
