@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
@@ -64,24 +64,29 @@ import {
 import { getProductsAPI } from '~/apis/buyerApis'
 import { useDebounceFn } from '~/hooks/use-debounce'
 import { useLoading } from '~/contexts/LoadingContext'
+import { CartItem } from '~/types/cart'
+import { AppDispatch } from '~/redux/store'
+import { Product } from '~/types/product'
 
 function HeaderBuyer() {
   const navigate = useNavigate()
 
   const currentUser = useSelector(selectCurrentUser)
   const currentCart = useSelector(selectCurrentCart)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const { startLoading, endLoading } = useLoading()
 
-  const inputRef = useRef()
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (currentUser) {
       startLoading()
       if (currentCart && !currentCart.buyerId) {
         Promise.all(
-          currentCart?.itemList.map((item) => dispatch(addToCartAPI(item)))
+          currentCart?.itemList.map((item: CartItem) =>
+            dispatch(addToCartAPI(item))
+          )
         )
           .then(() => dispatch(fetchCurrentCartAPI()))
           .finally(() => endLoading())
@@ -91,9 +96,9 @@ function HeaderBuyer() {
     }
   }, [currentUser, dispatch])
 
-  const handleSearch = (event) => {
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const searchValue = inputRef.current.value
+    const searchValue = inputRef.current?.value
     if (searchValue) {
       navigate(`/buyer/search?${createSearchParams({ keyword: searchValue })}`)
       handleBlur()
@@ -112,7 +117,7 @@ function HeaderBuyer() {
   }
 
   const [open, setOpen] = useState(false)
-  const [searchProducts, setSearchProducts] = useState([])
+  const [searchProducts, setSearchProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(false)
 
   const [showBackgroundOverlay, setShowBackgroundOverlay] = useState(false)
@@ -123,39 +128,42 @@ function HeaderBuyer() {
   }
 
   const handleBlur = () => {
-    inputRef.current.blur()
+    inputRef.current?.blur()
     setShowBackgroundOverlay(false)
     document.body.style.overflow = 'auto'
     setSearchProducts([])
   }
 
-  const handleChange = useDebounceFn((event) => {
-    setLoading(true)
-    const keyword = event.target.value
-    if (!keyword) {
-      setSearchProducts([])
-      setLoading(false)
-      return
-    }
-    const searchPath = `?${createSearchParams({
-      'q[name]': keyword
-    })}`
-    getProductsAPI(searchPath)
-      .then((data) => {
-        setSearchProducts(data?.products || [])
-      })
-      .finally(() => {
+  const handleChange = useDebounceFn(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setLoading(true)
+      const keyword = event.target.value
+      if (!keyword) {
+        setSearchProducts([])
         setLoading(false)
-      })
-  }, 1000)
+        return
+      }
+      const searchPath = `?${createSearchParams({
+        'q[name]': keyword
+      })}`
+      getProductsAPI(searchPath)
+        .then((data) => {
+          setSearchProducts(data?.products || [])
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    },
+    1000
+  )
 
   return (
     <>
-      <div className='sticky top-0 left-0 bg-white z-50'>
-        <div className='container mx-auto pt-6 pb-4'>
+      <div className='sticky top-0 left-0 z-50 bg-white'>
+        <div className='container pt-6 pb-4 mx-auto'>
           <div className='flex items-center justify-between'>
             <div
-              className='text-4xl font-medium text-mainColor1-600 cursor-pointer hover:scale-105 transition-transform hover:duration-500'
+              className='text-4xl font-medium transition-transform cursor-pointer text-mainColor1-600 hover:scale-105 hover:duration-500'
               onClick={() => navigate('/')}
             >
               LEVI
@@ -173,7 +181,7 @@ function HeaderBuyer() {
                   onChange={handleChange}
                   ref={inputRef}
                 />
-                <div className='text-mainColor1-600/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+                <div className='absolute inset-y-0 flex items-center justify-center pointer-events-none text-mainColor1-600/80 start-0 ps-3 peer-disabled:opacity-50'>
                   <SearchIcon size={16} />
                 </div>
                 <button
@@ -187,13 +195,13 @@ function HeaderBuyer() {
             </div>
 
             <div className='flex items-center gap-10'>
-              <IoNotificationsOutline className='text-mainColor1-600 text-xl font-bold' />
+              <IoNotificationsOutline className='text-xl font-bold text-mainColor1-600' />
 
               <Sheet key={'right'}>
                 <SheetTrigger asChild>
-                  <div className='relative cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform'>
-                    <LuShoppingCart className='text-mainColor1-600 text-xl' />
-                    <Badge className='w-2 h-2 rounded-full p-2 text-center absolute -top-3 -right-3 bg-mainColor1-600'>
+                  <div className='relative transition-transform cursor-pointer hover:scale-105 hover:ease-out hover:duration-300'>
+                    <LuShoppingCart className='text-xl text-mainColor1-600' />
+                    <Badge className='absolute w-2 h-2 p-2 text-center rounded-full -top-3 -right-3 bg-mainColor1-600'>
                       {currentCart?.itemList?.length || 0}
                     </Badge>
                   </div>
@@ -223,7 +231,7 @@ function HeaderBuyer() {
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className='text-sm line-clamp-1 text-mainColor2-800 leading-none'>
+                                <span className='text-sm leading-none line-clamp-1 text-mainColor2-800'>
                                   {product?.name}
                                 </span>
                               </TooltipTrigger>
@@ -251,7 +259,7 @@ function HeaderBuyer() {
                   <SheetFooter>
                     <SheetClose asChild>
                       <Button
-                        className='bg-mainColor2-800/90 hover:bg-mainColor2-800 w-full hover:drop-shadow-lg'
+                        className='w-full bg-mainColor2-800/90 hover:bg-mainColor2-800 hover:drop-shadow-lg'
                         onClick={() => navigate('/buyer/cart')}
                       >
                         Xem giỏ hàng
@@ -297,7 +305,7 @@ function HeaderBuyer() {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <DropdownMenuItem
-                          className='text-red-600 font-medium hover:bg-red-100 hover:text-red-600 cursor-pointer'
+                          className='font-medium text-red-600 cursor-pointer hover:bg-red-100 hover:text-red-600'
                           onSelect={(event) => {
                             event.preventDefault()
                           }}
@@ -329,7 +337,7 @@ function HeaderBuyer() {
                 </DropdownMenu>
               ) : (
                 <div
-                  className='flex items-center gap-2 text-mainColor1-600 cursor-pointer hover:scale-105 hover:ease-out hover:duration-300 transition-transform'
+                  className='flex items-center gap-2 transition-transform cursor-pointer text-mainColor1-600 hover:scale-105 hover:ease-out hover:duration-300'
                   onClick={() => navigate('/login')}
                 >
                   <LogInIcon />
@@ -355,7 +363,7 @@ function HeaderBuyer() {
               ? searchProducts.map((prod) => (
                   <div
                     key={prod._id}
-                    className='flex items-center gap-4 hover:bg-gray-100 px-1 rounded-sm my-1 cursor-pointer py-2'
+                    className='flex items-center gap-4 px-1 py-2 my-1 rounded-sm cursor-pointer hover:bg-gray-100'
                     onMouseDown={() => {
                       navigate(`/buyer/product/${prod._id}`)
                     }}

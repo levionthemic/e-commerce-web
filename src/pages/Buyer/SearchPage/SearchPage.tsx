@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import Product from '~/components/Product/ProductCard'
+import ProductCard from '~/components/Product/ProductCard'
 import { createSearchParams, useSearchParams } from 'react-router-dom'
 import { getProductsAPI, getProductsWithFiltersAPI } from '~/apis/buyerApis'
 
 import { DEFAULT_ITEMS_PER_PAGE, DEFAULT_PAGE } from '~/utils/constants'
 import PaginationComponent from '~/components/Pagination/PaginationComponent'
-import { useForm } from 'react-hook-form'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Form,
   FormControl,
@@ -25,25 +25,27 @@ import {
 import Rating from 'react-rating'
 import { FaRegStar, FaStar } from 'react-icons/fa'
 import { useLoading } from '~/contexts/LoadingContext'
+import { Category } from '~/types/category'
+import { Brand } from '~/types/brand'
 
 function SearchPage() {
   const [products, setProducts] = useState([])
   const [totalProducts, setTotalProducts] = useState(1)
-  const [categories, setCategories] = useState([])
-  const [brands, setBrands] = useState([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [brands, setBrands] = useState<Brand[]>([])
 
   const { startLoading, endLoading, apiLoadingCount } = useLoading()
 
   const [searchParams, setSearchParams] = useSearchParams()
   const keyword = searchParams.get('keyword')
-  const page = parseInt(searchParams.get('page')) || DEFAULT_PAGE
+  const page = parseInt(searchParams.get('page') as string) || DEFAULT_PAGE
 
-  const [filterByRate, setFilterByRate] = useState()
-  const [filterByPrice, setFilterByPrice] = useState()
-  const [filterByCategory, setFilterByCategory] = useState()
-  const [filterByBrand, setFilterByBrand] = useState()
+  const [filterByRate, setFilterByRate] = useState<string>('')
+  const [filterByPrice, setFilterByPrice] = useState<string>('')
+  const [filterByCategory, setFilterByCategory] = useState<string>('')
+  const [filterByBrand, setFilterByBrand] = useState<string>('')
 
-  const getPriceRange = (rate) => {
+  const getPriceRange = (rate: string) => {
     let minPrice = 0,
       maxPrice = 0
     switch (rate) {
@@ -74,8 +76,8 @@ function SearchPage() {
   }
 
   const handlePaginate = useCallback(
-    (page) => {
-      searchParams.set('page', page)
+    (page: number) => {
+      searchParams.set('page', page.toString())
       setSearchParams(searchParams)
     },
     [searchParams, setSearchParams]
@@ -85,8 +87,16 @@ function SearchPage() {
     // const { sortKey, sortValue } = defineSort(sortOption)
     startLoading()
 
-    const searchObject = {
-      'q[name]': keyword,
+    const searchObject: {
+      page: number
+      'q[name]': string
+      'q[rating]'?: string
+      'q[minPrice]'?: string
+      'q[maxPrice]'?: string
+      'q[categoryId]'?: string
+      'q[brandId]'?: string
+    } = {
+      'q[name]': keyword as string,
       page: page
     }
 
@@ -99,8 +109,8 @@ function SearchPage() {
     if (filterByPrice && filterByPrice !== 'all') {
       filterFlag = true
       const { minPrice, maxPrice } = getPriceRange(filterByPrice)
-      searchObject['q[minPrice]'] = minPrice
-      searchObject['q[maxPrice]'] = maxPrice
+      searchObject['q[minPrice]'] = String(minPrice)
+      searchObject['q[maxPrice]'] = String(maxPrice)
     }
     if (filterByCategory) {
       searchObject['q[categoryId]'] = filterByCategory
@@ -111,7 +121,15 @@ function SearchPage() {
       filterFlag = true
     }
 
-    const searchPath = `?${createSearchParams(searchObject)}`
+    const cleanedSearchObject: Record<string, string> = {}
+
+    Object.entries(searchObject).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        cleanedSearchObject[key] = String(value)
+      }
+    })
+
+    const searchPath = `?${createSearchParams(cleanedSearchObject)}`
 
     if (!filterFlag) {
       getProductsAPI(searchPath)
@@ -122,7 +140,7 @@ function SearchPage() {
           setBrands(data?.brands || [])
         })
         .finally(() => {
-          window.scrollTo(top)
+          window.scrollTo(0, 0)
           endLoading()
         })
     } else {
@@ -133,7 +151,7 @@ function SearchPage() {
           setTotalProducts(data?.totalProducts || 0)
         })
         .finally(() => {
-          window.scrollTo(top)
+          window.scrollTo(0, 0)
           endLoading()
         })
     }
@@ -147,14 +165,21 @@ function SearchPage() {
     handlePaginate
   ])
 
-  const form = useForm({
+  interface FilterFormData {
+    filterByRate: string
+    filterByPrice: string
+    filterByCategory: string
+    filterByBrand: string
+  }
+
+  const form = useForm<FilterFormData>({
     defaultValues: {
       filterByRate: 'all',
       filterByPrice: 'all'
     }
   })
 
-  const handleFilter = (data) => {
+  const handleFilter: SubmitHandler<FilterFormData> = (data) => {
     setFilterByRate(data.filterByRate)
     setFilterByPrice(data.filterByPrice)
     setFilterByCategory(data.filterByCategory)
@@ -167,9 +192,9 @@ function SearchPage() {
 
   return (
     <div className='container mx-auto my-6'>
-      <div className='flex gap-6 h-full relative'>
+      <div className='relative flex h-full gap-6'>
         <div className='w-[20%] px-6 h-full sticky top-36 left-0 max-h-full'>
-          <div className='text-mainColor2-800 font-medium text-xl'>
+          <div className='text-xl font-medium text-mainColor2-800'>
             Bộ lọc sản phẩm
           </div>
 
@@ -193,7 +218,7 @@ function SearchPage() {
                           defaultValue={field.value}
                           className='flex flex-col gap-2'
                         >
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'all'}
@@ -205,7 +230,7 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'5'}
@@ -224,7 +249,7 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'4'}
@@ -243,7 +268,7 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'3'}
@@ -279,7 +304,7 @@ function SearchPage() {
                           defaultValue={field.value}
                           className='flex flex-col gap-2'
                         >
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'all'}
@@ -291,7 +316,7 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'1'}
@@ -303,7 +328,7 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'500'}
@@ -315,7 +340,7 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'1000'}
@@ -327,7 +352,7 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'5000'}
@@ -339,7 +364,7 @@ function SearchPage() {
                             </FormLabel>
                           </FormItem>
 
-                          <FormItem className='flex items-center space-x-3 space-y-0 px-4 rounded-md cursor-pointer'>
+                          <FormItem className='flex items-center px-4 space-x-3 space-y-0 rounded-md cursor-pointer'>
                             <FormControl>
                               <RadioGroupItem
                                 value={'10000'}
@@ -372,7 +397,7 @@ function SearchPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {categories?.map((category) => (
+                          {categories?.map((category: Category) => (
                             <SelectItem
                               key={category?._id}
                               value={category?._id}
@@ -424,17 +449,17 @@ function SearchPage() {
         <div className='flex-1'>
           <div>
             <div className='flex items-end justify-between mb-4'>
-              <span className='font-medium text-xl text-mainColor2-800'>
+              <span className='text-xl font-medium text-mainColor2-800'>
                 Kết quả tìm kiếm cho &quot;{keyword}&quot;
               </span>
               <span>Trang {page}</span>
             </div>
 
-            <div className='grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3'>
+            <div className='grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
               {apiLoadingCount > 0 ? (
                 <>
                   {Array.from({ length: 40 }).map((_, index) => (
-                    <Product product={null} loading={true} key={index} />
+                    <ProductCard loading={true} key={index} />
                   ))}
                 </>
               ) : (
@@ -454,11 +479,11 @@ function SearchPage() {
                   ) : (
                     <>
                       {products.map((product, index) => (
-                        <Product
+                        <ProductCard
                           product={product}
                           loading={false}
                           key={index}
-                          width={'minmax(250px, 1fr)'}
+                          // width={'minmax(250px, 1fr)'}
                         />
                       ))}
                     </>

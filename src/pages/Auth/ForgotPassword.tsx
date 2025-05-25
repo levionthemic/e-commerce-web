@@ -32,7 +32,7 @@ const formSchema = Joi.object({
 })
 
 function ForgotPassword() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState<boolean>(false)
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
@@ -42,7 +42,7 @@ function ForgotPassword() {
 
   const navigate = useNavigate()
 
-  const handleForgotPassword = async (data) => {
+  const handleForgotPassword = async (data: { email: string }) => {
     const toastId = toast.loading('Đang xử lý...')
 
     const [res] = await asyncHandler(forgotPasswordAPI(data))
@@ -56,13 +56,13 @@ function ForgotPassword() {
 
   return (
     <div className='w-[100vw] h-[100vh] bg-[url("~/assets/background-auth.jpg")] bg-cover bg-no-repeat bg-center'>
-      <div className='w-full h-full bg-gray-900 bg-opacity-60 flex items-center justify-center animate-fadeIn'>
+      <div className='flex items-center justify-center w-full h-full bg-gray-900 bg-opacity-60 animate-fadeIn'>
         <div className='w-[500px] min-h-[500px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-4 animate-fadeInTop backdrop-blur-sm'>
-          <div className='text-center font-semibold text-3xl text-white mt-10'>
+          <div className='mt-10 text-3xl font-semibold text-center text-white'>
             Lấy lại mật khẩu
           </div>
 
-          <div className='text-white text-sm mt-8 mb-10'>
+          <div className='mt-8 mb-10 text-sm text-white'>
             Bạn quên mật khẩu? Đừng quá lo lắng, chỉ cần điền email và chúng tôi
             có thể giúp bạn khôi phục lại mật khẩu!
           </div>
@@ -77,7 +77,7 @@ function ForgotPassword() {
                 name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Email
                     </FormLabel>
                     <FormControl>
@@ -96,16 +96,16 @@ function ForgotPassword() {
 
               <Button
                 type='submit'
-                className='bg-mainColor2-800/85 rounded-full w-full animate-fadeInTop py-5 text-md'
+                className='w-full py-5 rounded-full bg-mainColor2-800/85 animate-fadeInTop text-md'
               >
                 Tiếp tục
               </Button>
             </form>
           </Form>
 
-          <div className='mt-8 text-xs text-white mb-2'>
+          <div className='mt-8 mb-2 text-xs text-white'>
             <div
-              className='hover:underline cursor-pointer flex items-center gap-2'
+              className='flex items-center gap-2 cursor-pointer hover:underline'
               onClick={() => navigate('/login')}
             >
               <ArrowLeft size={16} />

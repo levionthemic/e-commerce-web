@@ -47,10 +47,11 @@ import { useDispatch } from 'react-redux'
 import { toast } from 'sonner'
 import { logoutUserAPI } from '~/redux/user/userSlice'
 import { clearCart } from '~/redux/cart/cartSlice'
+import { AppDispatch } from '~/redux/store'
 
 function SellerSidebar() {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleLogout = async () => {
     dispatch(clearCart())
@@ -65,13 +66,13 @@ function SellerSidebar() {
 
   return (
     <Sidebar
-      className='px-4 bg-mainColor1-800 border-none pb-4'
+      className='px-4 pb-4 border-none bg-mainColor1-800'
       collapsible='icon'
       variant='inset'
     >
       <SidebarHeader className='p-0'>
         <div
-          className='text-4xl font-medium text-white text-center cursor-pointer hover:scale-105 transition-transform hover:duration-500 my-10 flex justify-center'
+          className='flex justify-center my-10 text-4xl font-medium text-center text-white transition-transform cursor-pointer hover:scale-105 hover:duration-500'
           onClick={() => navigate('/')}
         >
           {open ? 'LEVI' : <Home />}
@@ -220,7 +221,7 @@ function SellerSidebar() {
         <Separator className='my-6' />
 
         <SidebarGroup className='p-0'>
-          <SidebarGroupLabel className='text-gray-300 mb-1'>
+          <SidebarGroupLabel className='mb-1 text-gray-300'>
             CHUNG
           </SidebarGroupLabel>
           <SidebarGroupContent>

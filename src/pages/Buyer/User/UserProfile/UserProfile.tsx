@@ -53,9 +53,10 @@ import Autocomplete from '~/components/Autocomplete'
 import OTP from '~/components/OTP'
 import { clearCart } from '~/redux/cart/cartSlice'
 import { useLoading } from '~/contexts/LoadingContext'
+import { AppDispatch } from '~/redux/store'
 
 function UserProfile() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleLogout = async () => {
     dispatch(clearCart())
@@ -105,7 +106,7 @@ function UserProfile() {
   const leftForm = useForm({
     resolver: joiResolver(joiSchema),
     defaultValues: {
-      buyerAddress: currentUser?.buyerAddress[0] || {},
+      buyerAddress: currentUser?.buyerAddress?.[0] || {},
       phone: currentUser?.phone || '',
       name: currentUser?.name || '',
       gender: currentUser?.gender || GENDER.MALE
@@ -125,13 +126,13 @@ function UserProfile() {
   const [listWards, setListWards] = useState([])
 
   const [provinceId, setProvinceId] = useState(
-    currentUser?.buyerAddress[0].province || null
+    currentUser?.buyerAddress?.[0].province || null
   )
   const [districtId, setDistrictId] = useState(
-    currentUser?.buyerAddress[0].district || null
+    currentUser?.buyerAddress?.[0].district || null
   )
   const [wardId, setWardId] = useState(
-    currentUser?.buyerAddress[0].ward || null
+    currentUser?.buyerAddress?.[0].ward || null
   )
 
   const { startLoading, endLoading } = useLoading()
@@ -259,10 +260,10 @@ function UserProfile() {
 
           {/* Content */}
           <div>
-            <div className='text-3xl text-mainColor1-800 font-semibold uppercase'>
+            <div className='text-3xl font-semibold uppercase text-mainColor1-800'>
               Hồ sơ
             </div>
-            <p className='text-gray-500 text-sm'>
+            <p className='text-sm text-gray-500'>
               Chào mừng bạn trở về nhà! Đây là nơi bạn có thể kiểm tra các hoạt
               động đã làm của mình.
             </p>
@@ -282,7 +283,7 @@ function UserProfile() {
                     control={leftForm.control}
                     name='name'
                     render={({ field }) => (
-                      <FormItem className='mb-4 mt-2'>
+                      <FormItem className='mt-2 mb-4'>
                         <FormLabel className='text-base'>Họ và tên</FormLabel>
                         <FormControl>
                           <Input
@@ -299,7 +300,7 @@ function UserProfile() {
                     )}
                   />
 
-                  <div className='grid grid-cols-2 my-4 gap-4'>
+                  <div className='grid grid-cols-2 gap-4 my-4'>
                     <FormField
                       control={leftForm.control}
                       name='gender'
@@ -508,7 +509,7 @@ function UserProfile() {
                     control={rightForm.control}
                     name='username'
                     render={({ field }) => (
-                      <FormItem className='mb-4 mt-2'>
+                      <FormItem className='mt-2 mb-4'>
                         <FormLabel className='text-base'>
                           Tên tài khoản
                         </FormLabel>
@@ -637,22 +638,22 @@ function UserProfile() {
               <div className='text-lg font-medium text-mainColor2-800 mb-1/2'>
                 Sản phẩm đã xem gần đây
               </div>
-              <p className='text-sm text-muted-foreground mb-3'>
+              <p className='mb-3 text-sm text-muted-foreground'>
                 Hãy xem tuần vừa rồi bạn đã xem các sản phẩm nào!
               </p>
               <ul>
                 <li className='flex items-center gap-4 mb-4'>
-                  <div className='flex items-center gap-3 flex-1'>
+                  <div className='flex items-center flex-1 gap-3'>
                     <img
                       src={productImg}
                       alt=''
                       className='w-10 h-10 rounded-lg'
                     />
                     <div className='flex flex-col'>
-                      <span className='line-clamp-1 font-medium'>
+                      <span className='font-medium line-clamp-1'>
                         Tên sản phẩm
                       </span>
-                      <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+                      <div className='flex items-center gap-2 text-xs text-muted-foreground'>
                         <span>{4.5}</span>
                         <Rating
                           emptySymbol={<IoMdStarOutline />}
@@ -669,17 +670,17 @@ function UserProfile() {
                   </div>
                 </li>
                 <li className='flex items-center gap-4 mb-4'>
-                  <div className='flex items-center gap-3 flex-1'>
+                  <div className='flex items-center flex-1 gap-3'>
                     <img
                       src={productImg}
                       alt=''
                       className='w-10 h-10 rounded-lg'
                     />
                     <div className='flex flex-col'>
-                      <span className='line-clamp-1 font-medium'>
+                      <span className='font-medium line-clamp-1'>
                         Tên sản phẩm
                       </span>
-                      <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+                      <div className='flex items-center gap-2 text-xs text-muted-foreground'>
                         <span>{4.5}</span>
                         <Rating
                           emptySymbol={<IoMdStarOutline />}
@@ -696,17 +697,17 @@ function UserProfile() {
                   </div>
                 </li>
                 <li className='flex items-center gap-4 mb-4'>
-                  <div className='flex items-center gap-3 flex-1'>
+                  <div className='flex items-center flex-1 gap-3'>
                     <img
                       src={productImg}
                       alt=''
                       className='w-10 h-10 rounded-lg'
                     />
                     <div className='flex flex-col'>
-                      <span className='line-clamp-1 font-medium'>
+                      <span className='font-medium line-clamp-1'>
                         Tên sản phẩm
                       </span>
-                      <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+                      <div className='flex items-center gap-2 text-xs text-muted-foreground'>
                         <span>{4.5}</span>
                         <Rating
                           emptySymbol={<IoMdStarOutline />}
@@ -723,17 +724,17 @@ function UserProfile() {
                   </div>
                 </li>
                 <li className='flex items-center gap-4 mb-4'>
-                  <div className='flex items-center gap-3 flex-1'>
+                  <div className='flex items-center flex-1 gap-3'>
                     <img
                       src={productImg}
                       alt=''
                       className='w-10 h-10 rounded-lg'
                     />
                     <div className='flex flex-col'>
-                      <span className='line-clamp-1 font-medium'>
+                      <span className='font-medium line-clamp-1'>
                         Tên sản phẩm
                       </span>
-                      <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+                      <div className='flex items-center gap-2 text-xs text-muted-foreground'>
                         <span>{4.5}</span>
                         <Rating
                           emptySymbol={<IoMdStarOutline />}
@@ -752,10 +753,10 @@ function UserProfile() {
               </ul>
             </div>
             <div className=''>
-              <div className='text-lg font-medium text-mainColor2-800 text-right'>
+              <div className='text-lg font-medium text-right text-mainColor2-800'>
                 Đánh giá của bạn
               </div>
-              <p className='text-sm text-muted-foreground mb-3 text-right'>
+              <p className='mb-3 text-sm text-right text-muted-foreground'>
                 Hãy xem tuần vừa rồi bạn đã tương tác như thế nào!
               </p>
             </div>
@@ -764,10 +765,10 @@ function UserProfile() {
 
         <div className='flex-1 px-4 flex items-center sticky top-0 right-0 min-h-[100vh]'>
           <div className='bg-gray-100/80 h-[95vh] rounded-xl flex-1 grid grid-rows-2 py-4'>
-            <div className='text-center relative flex flex-col items-center justify-center'>
+            <div className='relative flex flex-col items-center justify-center text-center'>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <IoIosLogOut className='absolute top-0 right-3 text-mainColor1-800 text-xl cursor-pointer' />
+                  <IoIosLogOut className='absolute top-0 text-xl cursor-pointer right-3 text-mainColor1-800' />
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -788,20 +789,20 @@ function UserProfile() {
                 </AlertDialogContent>
               </AlertDialog>
               <UploadAvatar avatar={currentUser?.avatar} />
-              <div className='text-xl mt-6 text-mainColor2-800 font-medium'>
+              <div className='mt-6 text-xl font-medium text-mainColor2-800'>
                 {currentUser?.name}
               </div>
               <div className='text-xs text-mainColor2-800/90'>
                 {currentUser?.email}
               </div>
             </div>
-            <div className='bg-white rounded-xl grid grid-rows-4 mx-6 py-2'>
-              <div className='mx-2 py-2'>
+            <div className='grid grid-rows-4 py-2 mx-6 bg-white rounded-xl'>
+              <div className='py-2 mx-2'>
                 <div className='bg-[#F7F7FE] w-fit text-center text-xs text-mainColor1-600 px-2 py-1.5 rounded-lg font-medium'>
                   Sản phẩm đã xem
                 </div>
                 <div className='flex items-end justify-between mt-1 mb-4'>
-                  <span className='font-bold ml-1 my-1 text-xl leading-none'>
+                  <span className='my-1 ml-1 text-xl font-bold leading-none'>
                     2380
                   </span>
                   <div className='flex items-center gap-2 text-sm text-green-500'>
@@ -813,12 +814,12 @@ function UserProfile() {
                 <Separator />
               </div>
 
-              <div className='mx-2 py-2'>
+              <div className='py-2 mx-2'>
                 <div className='bg-[#F9F6FE] w-fit text-center text-xs text-mainColor2-800/90 px-3 py-1.5 rounded-lg font-medium'>
                   Đơn đặt hàng
                 </div>
                 <div className='flex items-end justify-between mt-1 mb-4'>
-                  <span className='font-bold ml-1 my-1 text-xl leading-none'>
+                  <span className='my-1 ml-1 text-xl font-bold leading-none'>
                     32
                   </span>
                   <div className='flex items-center gap-2 text-sm text-green-500'>
@@ -829,12 +830,12 @@ function UserProfile() {
                 <Separator />
               </div>
 
-              <div className='mx-2 py-2'>
+              <div className='py-2 mx-2'>
                 <div className='bg-[#FEF6F5] w-fit text-center text-xs text-red-500 px-3 py-1.5 rounded-lg font-medium'>
                   Sản phẩm yêu thích
                 </div>
                 <div className='flex items-end justify-between mt-1 mb-4'>
-                  <span className='font-bold ml-1 my-1 text-xl leading-none'>
+                  <span className='my-1 ml-1 text-xl font-bold leading-none'>
                     127
                   </span>
                   <div className='flex items-center gap-2 text-sm text-green-500'>
@@ -844,12 +845,12 @@ function UserProfile() {
                 </div>
                 <Separator />
               </div>
-              <div className='mx-2 py-2'>
+              <div className='py-2 mx-2'>
                 <div className='bg-[#F3FEF8] w-fit text-center text-xs text-green-500 px-3 py-1.5 rounded-lg font-medium'>
                   Đánh giá
                 </div>
                 <div className='flex items-end justify-between mt-1'>
-                  <span className='font-bold ml-1 my-1 text-xl leading-none'>
+                  <span className='my-1 ml-1 text-xl font-bold leading-none'>
                     12
                   </span>
                   <div className='flex items-center gap-2 text-sm text-green-500'>

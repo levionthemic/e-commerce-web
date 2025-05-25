@@ -3,6 +3,7 @@ import authorizedAxiosInstance from '~/utils/authorizedAxios'
 import { PAGE_TYPE } from '~/utils/constants'
 import { RootState } from '../store'
 import { User } from '~/types/user'
+import { TokenResponse } from '@react-oauth/google'
 
 //  Define types
 interface UserState {
@@ -10,11 +11,14 @@ interface UserState {
 }
 
 //  Define payload types
-interface LoginPayload {
-  email?: string
-  password?: string
-  access_token?: string
-}
+type LoginPayload =
+  | {
+      email: string
+      password: string
+      access_token?: string
+      rememberMe?: boolean
+    }
+  | Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>
 
 interface UpdatePayload {
   role?: string

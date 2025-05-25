@@ -13,21 +13,20 @@ function SellerHeader() {
 
   const currentUser = useSelector(selectCurrentUser)
 
-  // eslint-disable-next-line no-unused-vars
-  const handleSearch = (data) => {
+  const handleSearch = () => {
     //
   }
 
   const { open, toggleSidebar } = useSidebar()
 
   return (
-    <div className='grid grid-cols-5 px-4 py-2 gap-4 bg-white'>
-      <div className='col-span-1 flex items-center'>
+    <div className='grid grid-cols-5 gap-4 px-4 py-2 bg-white'>
+      <div className='flex items-center col-span-1'>
         <Button variant='outline' size='icon' onClick={toggleSidebar}>
           {open ? <SidebarCloseIcon /> : <SidebarOpenIcon />}
         </Button>
       </div>
-      <div className='col-span-3 flex items-center justify-between'>
+      <div className='flex items-center justify-between col-span-3'>
         <form
           action='#'
           onSubmit={handleSubmit(handleSearch)}
@@ -38,12 +37,12 @@ function SellerHeader() {
             placeholder='Tìm kiếm...'
             {...register('searchValue')}
           />
-          <div className='text-gray-300 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50'>
+          <div className='absolute inset-y-0 flex items-center justify-center text-gray-300 pointer-events-none start-0 ps-3 peer-disabled:opacity-50'>
             <SearchIcon size={16} />
           </div>
         </form>
       </div>
-      <div className='col-span-1 flex items-center justify-between'>
+      <div className='flex items-center justify-between col-span-1'>
         <div className='bg-[#ECEEF6] p-2 rounded-lg'>
           <TbBellRinging2 className='text-xl text-gray-500' />
         </div>

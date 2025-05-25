@@ -27,7 +27,8 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { registerUserAPI } from '~/apis/authApis'
 import { FaGoogle } from 'react-icons/fa'
-import { useGoogleLogin } from '@react-oauth/google'
+import { TokenResponse, useGoogleLogin } from '@react-oauth/google'
+import { Role, RoleValue } from '~/types/role'
 
 const formSchema = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).messages({
@@ -59,13 +60,17 @@ function Register() {
       email: '',
       password: '',
       confirmPassword: '',
-      role: PAGE_TYPE.BUYER
+      role: Role.Buyer
     }
   })
 
   const navigate = useNavigate()
 
-  const submitRegister = (data) => {
+  const submitRegister = (data: {
+    email: string
+    password: string
+    role: RoleValue
+  }) => {
     const { email, password, role } = data
     toast.promise(registerUserAPI({ email, password, role }), {
       loading: 'Đang đăng ký...',
@@ -78,7 +83,9 @@ function Register() {
       }
     })
   }
-  const submitRegisterWithGoogle = (data) => {
+  const submitRegisterWithGoogle = (
+    data: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>
+  ) => {
     toast.promise(registerUserAPI(data), {
       loading: 'Đang đăng ký...',
       success: (res) => {
@@ -95,14 +102,14 @@ function Register() {
     onSuccess: (codeResponse) => {
       submitRegisterWithGoogle(codeResponse)
     },
-    onError: (error) => toast.error(error)
+    onError: (error) => toast.error(error as string)
   })
 
   return (
     <div className='w-[100vw] h-[100vh] bg-[url("~/assets/background-auth.jpg")] bg-cover bg-no-repeat bg-center'>
-      <div className='w-full h-full bg-gray-900 bg-opacity-60 flex items-center justify-center animate-fadeIn'>
+      <div className='flex items-center justify-center w-full h-full bg-gray-900 bg-opacity-60 animate-fadeIn'>
         <div className='min-w-[500px] min-h-[600px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-4 animate-fadeInTop backdrop-blur-sm'>
-          <div className='text-center font-semibold uppercase text-4xl text-white mt-10'>
+          <div className='mt-10 text-4xl font-semibold text-center text-white uppercase'>
             SIGN UP
           </div>
 
@@ -116,7 +123,7 @@ function Register() {
                 name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Email
                     </FormLabel>
                     <FormControl>
@@ -135,7 +142,7 @@ function Register() {
                 name='password'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Mật khẩu
                     </FormLabel>
                     <FormControl>
@@ -155,7 +162,7 @@ function Register() {
                 name='confirmPassword'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Xác nhận mật khẩu
                     </FormLabel>
                     <FormControl>
@@ -175,20 +182,20 @@ function Register() {
                 name='role'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Vai trò
                     </FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className='flex gap-2 text-white justify-center'
+                        className='flex justify-center gap-2 text-white'
                       >
                         <FormItem className='flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer has-[button[data-state=checked]]:bg-mainColor2-800/50'>
                           <FormControl>
                             <RadioGroupItem
                               value={PAGE_TYPE.BUYER}
-                              className='border-white bg-white'
+                              className='bg-white border-white'
                             />
                           </FormControl>
                           <FormLabel className='font-normal cursor-pointer'>
@@ -199,7 +206,7 @@ function Register() {
                           <FormControl>
                             <RadioGroupItem
                               value={PAGE_TYPE.SELLER}
-                              className='border-white bg-white'
+                              className='bg-white border-white'
                             />
                           </FormControl>
                           <FormLabel className='font-normal cursor-pointer'>
@@ -215,7 +222,7 @@ function Register() {
               />
               <Button
                 type='submit'
-                className='bg-mainColor2-800/85 rounded-full w-full animate-fadeInTop py-5 text-md'
+                className='w-full py-5 rounded-full bg-mainColor2-800/85 animate-fadeInTop text-md'
               >
                 Đăng ký
               </Button>
@@ -223,23 +230,23 @@ function Register() {
           </Form>
 
           {form.getValues('role') === PAGE_TYPE.BUYER && (
-            <div className='text-white mt-6 text-sm flex items-center justify-center gap-6'>
+            <div className='flex items-center justify-center gap-6 mt-6 text-sm text-white'>
               <span>hoặc đăng ký bằng: </span>
               <div className='flex items-center justify-between gap-2'>
                 <div
-                  onClick={handleRegisterWithGoogle}
+                  onClick={() => handleRegisterWithGoogle()}
                   className='border border-white rounded-full p-1.5 cursor-pointer hover:bg-mainColor1-600 hover:border-[2px] hover:scale-105 hover:duration-300 hover:ease-in-out transition-transform'
                 >
                   <FaGoogle />
                 </div>
-                <span className='text-muted text-xs'>(Chỉ cho Người mua)</span>
+                <span className='text-xs text-muted'>(Chỉ cho Người mua)</span>
               </div>
             </div>
           )}
           <div className='mt-8 text-xs text-center text-white'>
             Đã có tài khoản?{' '}
             <div
-              className='underline cursor-pointer scale-100 font-semibold hover:scale-110 hover:transition-transform hover:ease-in-out hover:duration-200'
+              className='font-semibold underline scale-100 cursor-pointer hover:scale-110 hover:transition-transform hover:ease-in-out hover:duration-200'
               onClick={() => navigate('/login')}
             >
               Đăng nhập

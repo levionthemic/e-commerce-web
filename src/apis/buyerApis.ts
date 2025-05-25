@@ -1,4 +1,4 @@
-/* eslint-disable no-useless-catch */
+import { Product } from '~/types/product'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
 
 /**
@@ -17,12 +17,15 @@ export const getProductsWithFiltersAPI = async (searchPath = '') => {
   return response.data
 }
 
-export const getProductDetailsAPI = async (productId) => {
+export const getProductDetailsAPI = async (productId: string | undefined) => {
   const response = await authorizedAxiosInstance.get(`/products/${productId}`)
   return response.data
 }
 
-export const updateProductDetailAPI = async (productId, updateData) => {
+export const updateProductDetailAPI = async (
+  productId: string,
+  updateData: Product
+) => {
   const response = await authorizedAxiosInstance.put(
     `/products/${productId}`,
     updateData

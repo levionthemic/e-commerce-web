@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { cn } from '~/lib/utils'
 import { Button } from '~/components/ui/button'
 import {
@@ -6,23 +7,30 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger
+  DialogTitle
 } from '~/components/ui/dialog'
 import { OTPInput } from 'input-otp'
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { verifyOtpAPI } from '~/apis/authApis'
 import { createSearchParams, useNavigate } from 'react-router-dom'
 import { asyncHandler } from '~/utils/asyncHandler'
 
-export default function OTP({ trigger, open, setOpen, email }) {
-  const [value, setValue] = useState('')
-  const [token, setToken] = useState('')
+export default function OTP({
+  open,
+  setOpen,
+  email
+}: {
+  open: boolean
+  setOpen: (open: boolean) => void | undefined
+  email: string
+}) {
+  const [value, setValue] = useState<string>('')
+  const [token, setToken] = useState<string>('')
   const navigate = useNavigate()
-  const [hasGuessed, setHasGuessed] = useState(undefined)
-  const inputRef = useRef(null)
-  const closeButtonRef = useRef(null)
+  const [hasGuessed, setHasGuessed] = useState<boolean | undefined>(undefined)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (hasGuessed) {
@@ -30,7 +38,7 @@ export default function OTP({ trigger, open, setOpen, email }) {
     }
   }, [hasGuessed])
 
-  async function onSubmit(e) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e?.preventDefault?.()
 
     inputRef.current?.select()
@@ -64,11 +72,11 @@ export default function OTP({ trigger, open, setOpen, email }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {/* <DialogTrigger asChild>{trigger}</DialogTrigger> */}
       <DialogContent>
         <div className='flex flex-col items-center gap-2'>
           <div
-            className='flex size-11 shrink-0 items-center justify-center rounded-full border'
+            className='flex items-center justify-center border rounded-full size-11 shrink-0'
             aria-hidden='true'
           >
             <svg
@@ -129,14 +137,14 @@ export default function OTP({ trigger, open, setOpen, email }) {
             </div>
             {hasGuessed === false && (
               <p
-                className='text-muted-foreground text-center text-xs'
+                className='text-xs text-center text-muted-foreground'
                 role='alert'
                 aria-live='polite'
               >
                 Mã không hợp lệ. Hãy thử lại.
               </p>
             )}
-            <p className='text-center text-sm'>
+            <p className='text-sm text-center'>
               <a className='underline hover:no-underline' href='#'>
                 Gửi lại mã
               </a>
@@ -148,7 +156,7 @@ export default function OTP({ trigger, open, setOpen, email }) {
   )
 }
 
-function Slot(props) {
+function Slot(props: { isActive: boolean; char: string | null; key: number }) {
   return (
     <div
       className={cn(

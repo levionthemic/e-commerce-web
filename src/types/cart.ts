@@ -1,4 +1,4 @@
-import { Product } from './product'
+import { Product, ProductType } from './product'
 
 export interface CartItem {
   productId: string
@@ -6,12 +6,16 @@ export interface CartItem {
   quantity: number
 }
 
-interface FullProductItem extends Product {
+export interface FullProductItem extends Product {
   _id: string
   sellerId: string
+  avatar: string
+  name: string
+  type: ProductType
 }
 
 export interface Cart {
+  buyerId: string
   itemList: CartItem[]
   fullProducts: FullProductItem[]
 }

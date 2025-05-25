@@ -1,4 +1,10 @@
-function Bar({ animationDuration, progress }) {
+function Bar({
+  animationDuration,
+  progress
+}: {
+  animationDuration: number
+  progress: number
+}) {
   return (
     <div
       style={{

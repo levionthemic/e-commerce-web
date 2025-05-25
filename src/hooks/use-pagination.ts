@@ -1,12 +1,17 @@
-export function usePagination(
-  {
-    currentPage,
-    totalPages,
-    paginationItemsToDisplay
-  }
-) {
+interface PropTypes {
+  currentPage: number
+  totalPages: number
+  paginationItemsToDisplay: number
+}
+
+export function usePagination({
+  currentPage,
+  totalPages,
+  paginationItemsToDisplay
+}: PropTypes) {
   const showLeftEllipsis = currentPage - 1 > paginationItemsToDisplay / 2
-  const showRightEllipsis = totalPages - currentPage + 1 > paginationItemsToDisplay / 2
+  const showRightEllipsis =
+    totalPages - currentPage + 1 > paginationItemsToDisplay / 2
 
   function calculatePaginationRange() {
     if (totalPages <= paginationItemsToDisplay) {

@@ -42,10 +42,10 @@ function UserSidebar() {
     }
   ]
   return (
-    <Sidebar className='px-4 bg-white border-none pb-4'>
+    <Sidebar className='px-4 pb-4 bg-white border-none'>
       <SidebarHeader className='p-0'>
         <span
-          className='text-4xl font-medium text-mainColor1-600 cursor-pointer hover:scale-105 transition-transform hover:duration-500 my-10'
+          className='my-10 text-4xl font-medium transition-transform cursor-pointer text-mainColor1-600 hover:scale-105 hover:duration-500'
           onClick={() => navigate('/')}
         >
           LEVI
@@ -58,7 +58,10 @@ function UserSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton className='h-fit py-2 text-md mb-4 cursor-pointer text-white bg-mainColor1-800 hover:bg-mainColor1-800/90 hover:text-white rounded-lg' asChild>
+                  <SidebarMenuButton
+                    className='py-2 mb-4 text-white rounded-lg cursor-pointer h-fit text-md bg-mainColor1-800 hover:bg-mainColor1-800/90 hover:text-white'
+                    asChild
+                  >
                     <Link to={item.url}>
                       {item.icon}
                       <span>{item.title}</span>
@@ -72,12 +75,17 @@ function UserSidebar() {
       </SidebarContent>
 
       <SidebarFooter className='p-0'>
-        <div className='bg-mainColor1-100/30 rounded-xl p-4'>
-          <div className='text-mainColor1-800 font-medium text-lg mb-4'>Có Sản phẩm trong giỏ hàng của bạn</div>
+        <div className='p-4 bg-mainColor1-100/30 rounded-xl'>
+          <div className='mb-4 text-lg font-medium text-mainColor1-800'>
+            Có Sản phẩm trong giỏ hàng của bạn
+          </div>
           <div className='flex items-center justify-end gap-4'>
             <p className='text-sm'>Kiểm tra ngay</p>
-            <div className='rounded-full bg-white p-2'>
-              <FaArrowRight className='text-mainColor1-600 cursor-pointer' onClick={() => navigate('/buyer/cart')}/>
+            <div className='p-2 bg-white rounded-full'>
+              <FaArrowRight
+                className='cursor-pointer text-mainColor1-600'
+                onClick={() => navigate('/buyer/cart')}
+              />
             </div>
           </div>
         </div>

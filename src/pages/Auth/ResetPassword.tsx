@@ -50,7 +50,7 @@ function ResetPassword() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
-  const handleChangePassword = async (data) => {
+  const handleChangePassword = async (data: { password: string }) => {
     const toastId = toast.loading('Đang cập nhật...')
 
     const [res] = await asyncHandler(
@@ -77,9 +77,9 @@ function ResetPassword() {
 
   return (
     <div className='w-[100vw] h-[100vh] bg-[url("~/assets/background-auth.jpg")] bg-cover bg-no-repeat bg-center'>
-      <div className='w-full h-full bg-gray-900 bg-opacity-60 flex items-center justify-center animate-fadeIn'>
+      <div className='flex items-center justify-center w-full h-full bg-gray-900 bg-opacity-60 animate-fadeIn'>
         <div className='w-[500px] min-h-[500px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-4 animate-fadeInTop backdrop-blur-sm'>
-          <div className='text-center font-semibold text-3xl text-white my-10'>
+          <div className='my-10 text-3xl font-semibold text-center text-white'>
             Đổi mật khẩu
           </div>
 
@@ -93,7 +93,7 @@ function ResetPassword() {
                 name='password'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Mật khẩu
                     </FormLabel>
                     <FormControl>
@@ -113,7 +113,7 @@ function ResetPassword() {
                 name='confirmPassword'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Xác nhận mật khẩu
                     </FormLabel>
                     <FormControl>
@@ -131,16 +131,16 @@ function ResetPassword() {
 
               <Button
                 type='submit'
-                className='bg-mainColor2-800/85 rounded-full w-full animate-fadeInTop py-5 text-md'
+                className='w-full py-5 rounded-full bg-mainColor2-800/85 animate-fadeInTop text-md'
               >
                 Tiếp tục
               </Button>
             </form>
           </Form>
 
-          <div className='mt-8 text-xs text-white mb-2'>
+          <div className='mt-8 mb-2 text-xs text-white'>
             <div
-              className='hover:underline cursor-pointer flex items-center gap-2'
+              className='flex items-center gap-2 cursor-pointer hover:underline'
               onClick={() => navigate('/login')}
             >
               <ArrowLeft size={16} />

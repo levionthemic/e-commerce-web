@@ -42,22 +42,25 @@ import {
 } from '~/redux/cart/cartSlice'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import { cloneDeep } from 'lodash'
-import { Product } from '~/types/product'
+import { Product, ProductType } from '~/types/product'
+import { AppDispatch } from '~/redux/store'
+import { Cart, CartItem, FullProductItem } from '~/types/cart'
 
-type PropTypes = {
-  product: Product
+interface ProductCardPropTypes {
+  product?: Product
   loading: boolean
+  key?: number | string
 }
 
-function ProductCard({ product, loading }: PropTypes) {
+function ProductCard({ product, loading }: ProductCardPropTypes) {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const currentUser = useSelector(selectCurrentUser)
   const currentCart = useSelector(selectCurrentCart)
 
-  const [typeId, setTypeId] = useState(null)
-  const [quantity, setQuantity] = useState(1)
+  const [typeId, setTypeId] = useState<string>('')
+  const [quantity, setQuantity] = useState<number>(1)
   const [isAddToCart, setIsAddToCart] = useState(false)
 
   const handleAddToCart = () => {
@@ -65,7 +68,7 @@ function ProductCard({ product, loading }: PropTypes) {
       toast.error('Bạn chưa chọn loại sản phẩm!', { position: 'top-right' })
       return
     }
-    const data = { productId: product?._id, typeId, quantity }
+    const data = { productId: product?._id, typeId, quantity } as CartItem
 
     if (!currentUser) {
       const itemList = cloneDeep(currentCart?.itemList) || []
@@ -84,15 +87,15 @@ function ProductCard({ product, loading }: PropTypes) {
       })
       if (!isExistedItem) {
         itemList.push(data)
-        const newProduct = cloneDeep(product)
+        const newProduct: FullProductItem = cloneDeep(product) as Product
         newProduct.type = newProduct.types.find(
           (t) => t.typeId.toString() === data.typeId
-        )
+        ) as ProductType
         newProduct.sellerId = newProduct.seller._id
         fullProducts.push(newProduct)
       }
 
-      const newCart = { itemList, fullProducts }
+      const newCart = { itemList, fullProducts } as Cart
 
       dispatch(setCart(newCart))
       setIsAddToCart(false)
@@ -100,17 +103,18 @@ function ProductCard({ product, loading }: PropTypes) {
       return
     }
 
-    toast.promise(dispatch(addToCartAPI(data)).unwrap(), {
-      loading: 'Đang thêm vào giỏ hàng...',
-      success: (res) => {
-        if (!res.error) {
-          dispatch(fetchCurrentCartAPI(data))
+    toast.promise(
+      dispatch(addToCartAPI(data))
+        .unwrap()
+        .then(() => {
+          dispatch(fetchCurrentCartAPI())
           setIsAddToCart(false)
-          return 'Thêm vào giỏ hàng thành công!'
-        }
-        throw res
+        }),
+      {
+        loading: 'Đang thêm vào giỏ hàng...',
+        success: 'Thêm vào giỏ hàng thành công!'
       }
-    })
+    )
   }
 
   const handleCheckout = () => {
@@ -148,9 +152,9 @@ function ProductCard({ product, loading }: PropTypes) {
     }
   }
 
-  const handleCloseDrawer = (open) => {
+  const handleCloseDrawer = (open: boolean) => {
     if (!open) {
-      setTypeId(null)
+      setTypeId('')
       setQuantity(1)
       setIsAddToCart(false)
     }
@@ -166,7 +170,7 @@ function ProductCard({ product, loading }: PropTypes) {
     >
       <CardContent
         className='p-2'
-        onClick={() => navigate(`/buyer/product/${product._id}`)}
+        onClick={() => navigate(`/buyer/product/${product?._id}`)}
       >
         {loading ? (
           <Skeleton className='w-full aspect-square' />
@@ -174,14 +178,14 @@ function ProductCard({ product, loading }: PropTypes) {
           <img
             src={product?.avatar}
             alt=''
-            className='w-full aspect-square object-contain'
+            className='object-contain w-full aspect-square'
           />
         )}
       </CardContent>
 
       <CardHeader
         className='px-4'
-        onClick={() => navigate(`/buyer/product/${product._id}`)}
+        onClick={() => navigate(`/buyer/product/${product?._id}`)}
       >
         {loading ? (
           <Skeleton className='h-[32px]' />
@@ -199,7 +203,7 @@ function ProductCard({ product, loading }: PropTypes) {
               {product?.avgPrice.toLocaleString()}
               <sup>đ</sup>
             </div>
-            <div className='text-sm text-gray-400 flex justify-between items-center my-2'>
+            <div className='flex items-center justify-between my-2 text-sm text-gray-400'>
               <div className='flex items-center gap-2'>
                 <span>{product?.rating || '0'}</span>
                 <Rating
@@ -220,19 +224,19 @@ function ProductCard({ product, loading }: PropTypes) {
       {!loading && <Separator className='border-gray-200' />}
 
       {loading ? (
-        <Skeleton className='pl-4 py-2 h-4' />
+        <Skeleton className='h-4 py-2 pl-4' />
       ) : (
         <Drawer onAnimationEnd={(open) => handleCloseDrawer(open)}>
           <DrawerTrigger asChild>
-            <CardFooter className='p-0 text-sm cursor-pointer grid grid-cols-2 text-center'>
+            <CardFooter className='grid grid-cols-2 p-0 text-sm text-center cursor-pointer'>
               <div
-                className='hover:bg-mainColor2-800 text-mainColor2-800 hover:text-white flex items-center justify-center p-2 border-r border-r-gray-200'
+                className='flex items-center justify-center p-2 border-r hover:bg-mainColor2-800 text-mainColor2-800 hover:text-white border-r-gray-200'
                 onClick={() => setIsAddToCart(true)}
               >
                 <MdAddShoppingCart className='text-2xl' />
               </div>
 
-              <div className='hover:bg-mainColor1-800 p-2 text-mainColor1-800 hover:text-white flex items-center justify-center'>
+              <div className='flex items-center justify-center p-2 hover:bg-mainColor1-800 text-mainColor1-800 hover:text-white'>
                 <BsHandbag className='text-2xl' />
               </div>
             </CardFooter>
@@ -247,27 +251,26 @@ function ProductCard({ product, loading }: PropTypes) {
 
             <div className='p-4'>
               <div className='flex items-center gap-10 mb-6'>
-                <div className='w-28 h-28 border border-gray-300 rounded-lg overflow-hidden'>
+                <div className='overflow-hidden border border-gray-300 rounded-lg w-28 h-28'>
                   <img
                     src={product?.avatar}
                     alt=''
-                    className='w-full aspect-square object-contain'
+                    className='object-contain w-full aspect-square'
                   />
                 </div>
                 <div className='flex flex-col gap-2'>
                   <div>{product?.name}</div>
                   <div className='text-[#f90606] font-bold text-2xl'>
-                    {/* eslint-disable-next-line no-unsafe-optional-chaining */}
                     {(
                       product?.types.find((t) => t.typeId.toString() === typeId)
                         ?.price || product?.avgPrice
-                    ).toLocaleString()}
+                    )?.toLocaleString()}
                     <sup>đ</sup>
                   </div>
                   <div className='flex items-center gap-20'>
-                    <div className='flex items-center justify-between border border-mainColor1-100 rounded-lg p-1'>
+                    <div className='flex items-center justify-between p-1 border rounded-lg border-mainColor1-100'>
                       <RiSubtractFill
-                        className='cursor-pointer text-xl text-mainColor1-800 hover:bg-mainColor1-800/40 rounded-md'
+                        className='text-xl rounded-md cursor-pointer text-mainColor1-800 hover:bg-mainColor1-800/40'
                         onClick={() =>
                           setQuantity(quantity > 1 ? quantity - 1 : 1)
                         }
@@ -275,7 +278,7 @@ function ProductCard({ product, loading }: PropTypes) {
                       <input
                         value={quantity}
                         onChange={(e) => {
-                          setQuantity(e.target.value)
+                          setQuantity(parseInt(e.target.value))
                         }}
                         readOnly
                         className='w-[50px] text-center mx-1.5 border-none outline-none text-md font-semibold text-mainColor1-800'
@@ -284,23 +287,24 @@ function ProductCard({ product, loading }: PropTypes) {
                         onClick={() =>
                           setQuantity(
                             quantity <
-                              (product.types.find(
+                              (product?.types.find(
                                 (t) => t.typeId.toString() === typeId
                               )?.stock || 1000)
                               ? quantity + 1
-                              : product.types.find(
+                              : product?.types.find(
                                   (t) => t.typeId.toString() === typeId
                                 )?.stock || 1000
                           )
                         }
-                        className='cursor-pointer text-xl text-mainColor1-800 hover:bg-mainColor2-800/40 rounded-md'
+                        className='text-xl rounded-md cursor-pointer text-mainColor1-800 hover:bg-mainColor2-800/40'
                       />
                     </div>
 
                     <div className='text-sm text-gray-500'>
                       Còn lại:{' '}
-                      {product.types.find((t) => t.typeId.toString() === typeId)
-                        ?.stock || '(Chọn loại để hiện số lượng)'}
+                      {product?.types.find(
+                        (t) => t.typeId.toString() === typeId
+                      )?.stock || '(Chọn loại để hiện số lượng)'}
                     </div>
                   </div>
                 </div>

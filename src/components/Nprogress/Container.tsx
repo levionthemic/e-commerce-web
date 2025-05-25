@@ -1,4 +1,14 @@
-function NContainer({ animationDuration, children, isFinished }) {
+import React from 'react'
+
+function NContainer({
+  animationDuration,
+  children,
+  isFinished
+}: {
+  animationDuration: number
+  children: React.ReactNode
+  isFinished: boolean
+}) {
   return (
     <div
       style={{

@@ -1,8 +1,21 @@
-import { Role } from './role'
+import { RoleValue } from './role'
 
 export interface User {
-  id: string
+  _id: string
   name: string
+  username: string
   email: string
-  role: Role
+  avatar: string
+  role: RoleValue
+  buyerAddress?: [
+    {
+      address: string
+      ward: string
+      district: number
+      province: number
+    }
+  ]
+  gender: 'male' | 'female'
+  phone?: string
+  status: 'active' | 'inactive'
 }

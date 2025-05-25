@@ -1,30 +1,33 @@
-'use client'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 export function useImageUpload({
   onUpload
-} = {}) {
-  const previewRef = useRef(null)
-  const fileInputRef = useRef(null)
-  const [previewUrl, setPreviewUrl] = useState(null)
-  const [fileName, setFileName] = useState(null)
-  const [file, setFile] = useState(null)
+  // eslint-disable-next-line no-unused-vars
+}: { onUpload?: (url: string) => void } = {}) {
+  const previewRef = useRef<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [fileName, setFileName] = useState<string | null>(null)
+  const [file, setFile] = useState<File | null>(null)
 
   const handleThumbnailClick = useCallback(() => {
     fileInputRef.current?.click()
   }, [])
 
-  const handleFileChange = useCallback((event) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      setFileName(file.name)
-      setFile(file)
-      const url = URL.createObjectURL(file)
-      setPreviewUrl(url)
-      previewRef.current = url
-      onUpload?.(url)
-    }
-  }, [onUpload])
+  const handleFileChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0]
+      if (file) {
+        setFileName(file.name)
+        setFile(file)
+        const url = URL.createObjectURL(file)
+        setPreviewUrl(url)
+        previewRef.current = url
+        onUpload?.(url)
+      }
+    },
+    [onUpload]
+  )
 
   const handleRemove = useCallback(() => {
     if (previewUrl) {

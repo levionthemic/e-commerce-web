@@ -1,17 +1,17 @@
 import { useDispatch, useSelector } from 'react-redux'
 import { logoutUserAPI, selectCurrentUser } from '~/redux/user/userSlice'
-import { TbBellRinging2 } from 'react-icons/tb'
 import { UserOutlined } from '@ant-design/icons'
 import { Avatar, Dropdown, Popconfirm } from 'antd'
 import { Input } from 'antd'
 import { Link } from 'react-router-dom'
 import { getMessageApi } from '~/utils/messageInstance'
 import { asyncHandler } from '~/utils/asyncHandler'
+import { AppDispatch } from '~/redux/store'
 const { Search } = Input
 
 function HeaderAdmin() {
   const currentUser = useSelector(selectCurrentUser)
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleLogout = async () => {
     const hide = getMessageApi().loading('Đang đăng xuất...', 0)
@@ -62,13 +62,13 @@ function HeaderAdmin() {
   }
 
   return (
-    <div className='grid grid-cols-4 p-4 gap-8 w-full'>
-      <div className='col-span-3 flex items-center justify-between'>
+    <div className='grid w-full grid-cols-4 gap-8 p-4'>
+      <div className='flex items-center justify-between col-span-3'>
         <Search placeholder='Search...' onSearch={handleSearch} />
       </div>
       <div className='col-span-1'>
         <Dropdown menu={{ items }} trigger={['click']}>
-          <div className='flex items-center gap-3 cursor-pointer hover:bg-gray-100 py-2 px-4 rounded-lg'>
+          <div className='flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-100'>
             <Avatar icon={<UserOutlined />} />
             <div>
               <div className='text-sm font-semibold'>{currentUser?.name}</div>
@@ -77,7 +77,7 @@ function HeaderAdmin() {
           </div>
         </Dropdown>
         {/* 
-        <div className='bg-white p-2 rounded-lg'>
+        <div className='p-2 bg-white rounded-lg'>
           <TbBellRinging2 className='text-xl text-gray-400' />
         </div> */}
       </div>

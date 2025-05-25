@@ -2,11 +2,11 @@ import { SidebarProvider } from '~/components/ui/sidebar'
 import { Outlet, useLocation } from 'react-router-dom'
 import UserSidebar from '~/pages/Buyer/User/UserSidebar'
 import { useLoading } from '~/contexts/LoadingContext'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import NProgress from '~/components/Nprogress/Progress'
 
 function UserLayout() {
-  const { isPageLoading, setPageLoading, apiLoadingCount } = useLoading()
+  const { setPageLoading, apiLoadingCount } = useLoading()
 
   const location = useLocation()
 
@@ -24,7 +24,7 @@ function UserLayout() {
       <NProgress isAnimating={apiLoadingCount > 0} key={location.key} />
       <SidebarProvider
         className='font-nunitoSans'
-        style={{ '--sidebar-width': '14rem' }}
+        style={{ '--sidebar-width': '14rem' } as React.CSSProperties}
       >
         <UserSidebar />
         <main className='flex-1 overflow-x-auto'>

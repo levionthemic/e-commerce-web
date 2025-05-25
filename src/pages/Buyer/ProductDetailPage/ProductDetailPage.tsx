@@ -42,7 +42,7 @@ import {
 } from 'react-icons/fa'
 import { IoBagCheckOutline, IoShareSocialOutline } from 'react-icons/io5'
 import { COMMENTS, DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
-import Product from '~/components/Product/ProductCard'
+import ProductCard from '~/components/Product/ProductCard'
 import {
   addToCartAPI,
   fetchCurrentCartAPI,
@@ -58,18 +58,21 @@ import { socketIoInstance } from '~/socket'
 import { cloneDeep } from 'lodash'
 import PaginationComponent from '~/components/Pagination/PaginationComponent'
 import { useLoading } from '~/contexts/LoadingContext'
+import { AppDispatch } from '~/redux/store'
+import { Product, ProductType } from '~/types/product'
+import { Cart, CartItem, FullProductItem } from '~/types/cart'
 
 function ProductDetailPage() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
   const { productId } = useParams()
 
-  const [product, setProduct] = useState(null)
-  const [discount, setDiscount] = useState(0)
+  const [product, setProduct] = useState<Product | null>(null)
+  const [discount, setDiscount] = useState<number>(0)
   const [quantity, setQuantity] = useState(1)
   const [typeId, setTypeId] = useState()
-  const [productEndPrice, setProductEndPrice] = useState()
-  const [recommendedProducts, setRecommendedProducts] = useState([])
+  const [productEndPrice, setProductEndPrice] = useState<number>(0)
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([])
 
   const { startLoading, endLoading } = useLoading()
 
@@ -85,9 +88,9 @@ function ProductDetailPage() {
 
   useEffect(() => {
     if (typeId) {
-      const type = product.types.find((type) => type.typeId === typeId)
-      setProductEndPrice(type?.price)
-      setDiscount(type?.discount)
+      const type = product?.types.find((type) => type.typeId === typeId)
+      setProductEndPrice(type?.price as number)
+      setDiscount(type?.discount as number)
     }
   }, [product?.types, typeId])
 
@@ -103,12 +106,12 @@ function ProductDetailPage() {
 
     socketIoInstance.on('BE_UPDATE_TYPING', ({ productId: id, users }) => {
       if (id === productId)
-        setTypingUsers(users.filter((id) => id !== currentUser?._id))
+        setTypingUsers(users.filter((id: string) => id !== currentUser?._id))
     })
 
     socketIoInstance.on('BE_NEW_REVIEW', (data) => {
       setProduct((prevProduct) => {
-        const newProduct = cloneDeep(prevProduct)
+        const newProduct = cloneDeep(prevProduct) as Product
         newProduct.reviews = data.reviewList
         newProduct.rating = data.updatedProduct.rating
         return newProduct
@@ -141,10 +144,10 @@ function ProductDetailPage() {
       toast.error('Bạn chưa chọn loại sản phẩm!', { position: 'top-right' })
       return
     }
-    const data = { productId, typeId, quantity }
+    const data = { productId, typeId, quantity } as CartItem
     if (!currentUser) {
-      let itemList = cloneDeep(currentCart?.itemList) || []
-      let fullProducts = cloneDeep(currentCart?.fullProducts) || []
+      const itemList = cloneDeep(currentCart?.itemList) || []
+      const fullProducts = cloneDeep(currentCart?.fullProducts) || []
 
       let isExistedItem = false
       itemList.forEach((item) => {
@@ -159,31 +162,30 @@ function ProductDetailPage() {
       })
       if (!isExistedItem) {
         itemList.push(data)
-        const newProduct = cloneDeep(product)
+        const newProduct = cloneDeep(product) as FullProductItem
         newProduct.type = newProduct.types.find(
           (t) => t.typeId.toString() === data.typeId
-        )
+        ) as ProductType
         newProduct.sellerId = newProduct.seller._id
         fullProducts.push(newProduct)
       }
 
-      const newCart = { itemList, fullProducts }
+      const newCart = { itemList, fullProducts } as Cart
 
       dispatch(setCart(newCart))
       toast.success('Thêm vào giỏ hàng thành công!')
       return
     }
 
-    toast.promise(dispatch(addToCartAPI(data)).unwrap(), {
-      loading: 'Đang thêm vào giỏ hàng...',
-      success: (res) => {
-        if (!res.error) {
-          dispatch(fetchCurrentCartAPI(data))
-          return 'Thêm vào giỏ hàng thành công!'
-        }
-        throw res
+    toast.promise(
+      dispatch(addToCartAPI(data))
+        .unwrap()
+        .then(() => dispatch(fetchCurrentCartAPI())),
+      {
+        loading: 'Đang thêm vào giỏ hàng...',
+        success: 'Thêm vào giỏ hàng thành công!'
       }
-    })
+    )
   }
 
   const handleCheckout = () => {
@@ -204,7 +206,7 @@ function ProductDetailPage() {
         selectedRows: [
           {
             ...product,
-            type: product.types.find((t) => t.typeId.toString() === typeId),
+            type: product?.types.find((t) => t.typeId.toString() === typeId),
             quantity: quantity
           }
         ],
@@ -213,9 +215,9 @@ function ProductDetailPage() {
     })
   }
 
-  const onSubmitReview = (data) => {
+  const onSubmitReview = (data: { rating: number; comment: string }) => {
     const reviewData = {
-      productId: product._id,
+      productId: product?._id,
       ...data,
       medias: []
     }
@@ -254,7 +256,7 @@ function ProductDetailPage() {
   const [page, setPage] = useState(1)
   const sectionRef = useRef(null)
 
-  const handlePaginate = (page) => {
+  const handlePaginate = (page: number) => {
     sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     setTimeout(() => {
       window.scrollBy({ top: -120, behavior: 'smooth' })
@@ -285,11 +287,11 @@ function ProductDetailPage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className='grid grid-cols-4 gap-6 relative'>
+        <div className='relative grid grid-cols-4 gap-6'>
           <div className='col-span-3'>
-            <div className='grid grid-cols-3 gap-6 h-fit relative mb-6'>
-              <div className='bg-white flex items-center justify-center h-fit rounded-lg p-4 pb-32 sticky top-36 left-0'>
-                <div className='rounded-2xl overflow-hidden border'>
+            <div className='relative grid grid-cols-3 gap-6 mb-6 h-fit'>
+              <div className='sticky left-0 flex items-center justify-center p-4 pb-32 bg-white rounded-lg h-fit top-36'>
+                <div className='overflow-hidden border rounded-2xl'>
                   <img
                     src={product?.avatar}
                     alt={product?.name}
@@ -299,15 +301,15 @@ function ProductDetailPage() {
               </div>
 
               <div className='col-span-2'>
-                <div className='rounded-lg bg-white p-4 mb-6'>
-                  <span className='inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-green-600/20 ring-inset mb-2'>
+                <div className='p-4 mb-6 bg-white rounded-lg'>
+                  <span className='inline-flex items-center px-2 py-1 mb-2 text-xs font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-green-600/20 ring-inset'>
                     Còn hàng!
                   </span>
-                  <div className='font-bold text-mainColor1-600 text-2xl'>
+                  <div className='text-2xl font-bold text-mainColor1-600'>
                     {product?.name}
                   </div>
 
-                  <div className='flex items-center gap-2 text-sm mt-2'>
+                  <div className='flex items-center gap-2 mt-2 text-sm'>
                     <span>{product?.rating || 0}</span>
                     <Rating
                       emptySymbol={<IoMdStarOutline />}
@@ -335,14 +337,14 @@ function ProductDetailPage() {
                       {`-${discount}%`}
                     </div>
 
-                    <div className='text-gray-500 line-through text-sm'>
-                      {productEndPrice.toLocaleString()}
+                    <div className='text-sm text-gray-500 line-through'>
+                      {productEndPrice?.toLocaleString()}
                       <sup>đ</sup>
                     </div>
                   </div>
 
                   <div className='mt-10'>
-                    <div className='text-mainColor1-600 font-medium mb-2'>
+                    <div className='mb-2 font-medium text-mainColor1-600'>
                       Loại sản phẩm
                     </div>
                     <fieldset className='space-y-4'>
@@ -377,17 +379,17 @@ function ProductDetailPage() {
                   </div>
                 </div>
 
-                <div className='rounded-lg bg-white p-4 mb-6'>
-                  <div className='text-lg font-semibold text-mainColor1-600 mb-1'>
+                <div className='p-4 mb-6 bg-white rounded-lg'>
+                  <div className='mb-1 text-lg font-semibold text-mainColor1-600'>
                     Thông tin vận chuyển
                   </div>
                   <p className='text-sm'>Giao đến: {address}</p>
-                  <div className='divider w-full h-px border border-t-0 border-gray-200 my-2'></div>
+                  <div className='w-full h-px my-2 border border-t-0 border-gray-200 divider'></div>
                   <div>GHTK</div>
                 </div>
 
-                <div className='rounded-lg bg-white p-4 mb-6'>
-                  <div className='text-lg font-semibold text-mainColor1-600 mb-3'>
+                <div className='p-4 mb-6 bg-white rounded-lg'>
+                  <div className='mb-3 text-lg font-semibold text-mainColor1-600'>
                     Thông tin chi tiết
                   </div>
                   {product?.features?.map((feature, index) => (
@@ -403,8 +405,8 @@ function ProductDetailPage() {
                   ))}
                 </div>
 
-                <div className='rounded-lg bg-white p-4'>
-                  <div className='text-lg font-semibold text-mainColor1-800 mb-2'>
+                <div className='p-4 bg-white rounded-lg'>
+                  <div className='mb-2 text-lg font-semibold text-mainColor1-800'>
                     Mô tả sản phẩm
                   </div>
                   <div
@@ -417,7 +419,7 @@ function ProductDetailPage() {
 
             <div className=''>
               <div
-                className='rounded-lg bg-white p-4 mb-6 relative h-fit'
+                className='relative p-4 mb-6 bg-white rounded-lg h-fit'
                 ref={sectionRef}
               >
                 <div className='flex items-center justify-between'>
@@ -430,15 +432,15 @@ function ProductDetailPage() {
                     </p>
                   </div>
                   <ReviewModal
-                    product={product}
+                    // product={product}
                     onSubmitReview={onSubmitReview}
                     updateStopTyping={updateStopTyping}
                     updateStartTyping={updateStartTyping}
                   />
                 </div>
                 {typingUsers.length > 0 && (
-                  <div className='text-muted-foreground text-sm flex items-center justify-center gap-2 my-8'>
-                    <div className='flex items-center space-x-1 bg-muted rounded-full p-2'>
+                  <div className='flex items-center justify-center gap-2 my-8 text-sm text-muted-foreground'>
+                    <div className='flex items-center p-2 space-x-1 rounded-full bg-muted'>
                       <span className='w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0s]'></span>
                       <span className='w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]'></span>
                       <span className='w-1 h-1 bg-gray-400 rounded-full animate-bounce [animation-delay:0.4s]'></span>
@@ -447,13 +449,13 @@ function ProductDetailPage() {
                   </div>
                 )}
                 <div className='mt-4'>
-                  {(!product?.reviews || product?.reviews?.length === 0) && (
-                    <span className='pl-12 text-md font-medium text-gray-400'>
+                  {(!product?.reviews || product?.reviews.length == 0) && (
+                    <span className='pl-12 font-medium text-gray-400 text-md'>
                       Chưa có đánh giá!
                     </span>
                   )}
                   {product?.reviews[page - 1]?.comments.map(
-                    (comment, index) => (
+                    (comment, index: number) => (
                       <div key={index}>
                         <div className='flex items-center gap-8 mb-4'>
                           <div className='flex gap-3 mb-1.5 w-[20%] min-w-44'>
@@ -471,7 +473,7 @@ function ProductDetailPage() {
                               </Tooltip>
                             </TooltipProvider>
                             <div className='flex flex-col'>
-                              <span className='font-bold mr-2'>
+                              <span className='mr-2 font-bold'>
                                 {comment?.buyerName}
                               </span>
 
@@ -504,11 +506,11 @@ function ProductDetailPage() {
                               </span>
                             </div>
 
-                            <div className='block py-2 mt-1/2 mb-2 break-words text-sm'>
+                            <div className='block py-2 mb-2 text-sm break-words mt-1/2'>
                               {comment?.content}
                             </div>
 
-                            <div className='flex items-center gap-10 text-gray-500 text-lg cursor-pointer'>
+                            <div className='flex items-center gap-10 text-lg text-gray-500 cursor-pointer'>
                               <FaRegThumbsUp />
                               <FaRegCommentDots />
                               <IoShareSocialOutline />
@@ -531,13 +533,13 @@ function ProductDetailPage() {
             </div>
           </div>
 
-          <div className='sticky top-36 left-0 h-fit'>
-            <div className='rounded-lg bg-white p-4 mb-6'>
-              <div className='text-xl font-semibold text-mainColor1-600 mb-2'>
+          <div className='sticky left-0 top-36 h-fit'>
+            <div className='p-4 mb-6 bg-white rounded-lg'>
+              <div className='mb-2 text-xl font-semibold text-mainColor1-600'>
                 Tóm tắt
               </div>
 
-              <div className='flex items-center justify-between text-sm mb-2'>
+              <div className='flex items-center justify-between mb-2 text-sm'>
                 <span className='w-[35%] text-gray-500'>Tên hàng:</span>
                 <span className='flex-1 text-right'>{product?.name}</span>
               </div>
@@ -556,15 +558,15 @@ function ProductDetailPage() {
                 <div className='font-semibold text-mainColor1-800'>
                   Số lượng:
                 </div>
-                <div className='flex items-center justify-between border border-mainColor1-100 rounded-lg p-1'>
+                <div className='flex items-center justify-between p-1 border rounded-lg border-mainColor1-100'>
                   <RiSubtractFill
-                    className='cursor-pointer text-xl text-mainColor1-800 hover:bg-mainColor1-800/40 rounded-md'
+                    className='text-xl rounded-md cursor-pointer text-mainColor1-800 hover:bg-mainColor1-800/40'
                     onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}
                   />
                   <input
                     value={quantity}
                     onChange={(e) => {
-                      setQuantity(e.target.value)
+                      setQuantity(parseInt(e.target.value))
                     }}
                     readOnly
                     className='w-[50px] text-center mx-1.5 border-none outline-none text-md font-semibold text-mainColor1-800'
@@ -577,14 +579,14 @@ function ProductDetailPage() {
                           : product?.quantityInStock || 1000
                       )
                     }
-                    className='cursor-pointer text-xl text-mainColor1-800 hover:bg-mainColor2-800/40 rounded-md'
+                    className='text-xl rounded-md cursor-pointer text-mainColor1-800 hover:bg-mainColor2-800/40'
                   />
                 </div>
               </div>
 
               <div className='my-5'>
                 <div className='mb-1 text-mainColor1-800/90'>Tạm tính</div>
-                <div className='text-gray-700 font-bold text-2xl tracking-normal'>
+                <div className='text-2xl font-bold tracking-normal text-gray-700'>
                   {(productEndPrice * (1 - discount / 100)).toLocaleString()}
                   <sup>đ</sup>
                 </div>
@@ -592,14 +594,14 @@ function ProductDetailPage() {
 
               <div className='flex flex-col gap-2 mt-4 mb-2'>
                 <Button
-                  className='w-full py-5 bg-mainColor1-800 hover:bg-mainColor1-600 hover:drop-shadow-xl text-lg'
+                  className='w-full py-5 text-lg bg-mainColor1-800 hover:bg-mainColor1-600 hover:drop-shadow-xl'
                   onClick={handleCheckout}
                 >
                   {' '}
                   <IoBagCheckOutline /> Mua ngay
                 </Button>
                 <Button
-                  className='w-full bg-white border-mainColor2-800 text-mainColor2-800 border hover:bg-mainColor2-800/90 hover:text-white'
+                  className='w-full bg-white border border-mainColor2-800 text-mainColor2-800 hover:bg-mainColor2-800/90 hover:text-white'
                   onClick={handleAddToCart}
                 >
                   <MdAddShoppingCart />
@@ -608,8 +610,8 @@ function ProductDetailPage() {
               </div>
             </div>
 
-            <div className='rounded-lg bg-white p-4 mb-6'>
-              <div className='text-xl font-semibold text-mainColor1-600 mb-2'>
+            <div className='p-4 mb-6 bg-white rounded-lg'>
+              <div className='mb-2 text-xl font-semibold text-mainColor1-600'>
                 Đánh giá
               </div>
               <span className='font-semibold'>Tổng quan</span>
@@ -627,7 +629,7 @@ function ProductDetailPage() {
                     className='text-[#FBCA04] text-4xl leading-none flex-1'
                   />
                 </div>
-                <span className='text-gray-400 text-sm'>
+                <span className='text-sm text-gray-400'>
                   (
                   {
                     product.reviews.map((review) => review.comments).flat(1)
@@ -646,17 +648,17 @@ function ProductDetailPage() {
           </div>
         </div>
 
-        <div className='bg-white rounded-lg p-4'>
+        <div className='p-4 bg-white rounded-lg'>
           <div className='flex items-center gap-2'>
-            <div className='h-7 w-3 bg-mainColor2-800 rounded-sm'></div>
-            <span className='text-mainColor2-800 text-sm font-semibold'>
+            <div className='w-3 rounded-sm h-7 bg-mainColor2-800'></div>
+            <span className='text-sm font-semibold text-mainColor2-800'>
               Sản phẩm tương tự
             </span>
           </div>
 
-          <div className='font-bold text-2xl text-mainColor1-600 mx-auto flex items-center justify-between mt-3'>
+          <div className='flex items-center justify-between mx-auto mt-3 text-2xl font-bold text-mainColor1-600'>
             Khám phá thêm các sản phẩm của chúng tôi!
-            <Button className='bg-mainColor1-800 hover:bg-mainColor1-600 px-8'>
+            <Button className='px-8 bg-mainColor1-800 hover:bg-mainColor1-600'>
               Xem tất cả
             </Button>
           </div>
@@ -668,10 +670,14 @@ function ProductDetailPage() {
               ? recommendedProducts
                   .slice(0, DEFAULT_ITEMS_PER_PAGE)
                   .map((product) => (
-                    <Product product={product} key={product._id} />
+                    <ProductCard
+                      product={product}
+                      key={product._id}
+                      loading={false}
+                    />
                   ))
               : [...Array(40)].map((_, index) => (
-                  <Product product={null} loading={true} key={index} />
+                  <ProductCard loading={true} key={index} />
                 ))}
           </div>
         </div>

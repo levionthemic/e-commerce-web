@@ -38,13 +38,13 @@ export const updateCartQuantityAPI = createAsyncThunk<
   return response.data
 })
 
-export const deleteItemAPI = createAsyncThunk<void, { productId: string }>(
-  'cart/deleteItemAPI',
-  async (data) => {
-    const response = await authorizedAxiosInstance.put('/cart/delete', data)
-    return response.data
-  }
-)
+export const deleteItemAPI = createAsyncThunk<
+  void,
+  { productId: string; typeId: string }
+>('cart/deleteItemAPI', async (data) => {
+  const response = await authorizedAxiosInstance.put('/cart/delete', data)
+  return response.data
+})
 
 // -----------------------------
 // Slice

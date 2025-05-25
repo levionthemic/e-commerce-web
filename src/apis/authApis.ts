@@ -1,11 +1,22 @@
 /* eslint-disable no-useless-catch */
+import { TokenResponse } from '@react-oauth/google'
+import { RoleValue } from '~/types/role'
 import authorizedAxiosInstance from '~/utils/authorizedAxios'
 
 /**
  * Auth APIs
  * @author levi
  */
-export const registerUserAPI = async (data) => {
+export const registerUserAPI = async (
+  data:
+    | {
+        email: string
+        password: string
+        role: RoleValue
+        access_token?: string
+      }
+    | Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>
+) => {
   try {
     let response = null
     if (data.access_token) {
@@ -22,7 +33,11 @@ export const registerUserAPI = async (data) => {
   }
 }
 
-export const verifyUserAPI = async (data) => {
+export const verifyUserAPI = async (data: {
+  email: string
+  token: string
+  role: RoleValue
+}) => {
   const response = await authorizedAxiosInstance.put(
     '/auth/verify-account',
     data
@@ -35,7 +50,7 @@ export const refreshTokenAPI = async () => {
   return response.data
 }
 
-export const forgotPasswordAPI = async (data) => {
+export const forgotPasswordAPI = async (data: { email: string }) => {
   try {
     const response = await authorizedAxiosInstance.post(
       '/auth/forgot-password',
@@ -47,7 +62,10 @@ export const forgotPasswordAPI = async (data) => {
   }
 }
 
-export const verifyOtpAPI = async (data) => {
+export const verifyOtpAPI = async (data: {
+  email: string
+  otpCode: string
+}) => {
   try {
     const response = await authorizedAxiosInstance.post(
       '/auth/otp-verify',
@@ -59,7 +77,10 @@ export const verifyOtpAPI = async (data) => {
   }
 }
 
-export const resetPasswordAPI = async (data) => {
+export const resetPasswordAPI = async (data: {
+  resetToken: string | null
+  password: string
+}) => {
   try {
     const response = await authorizedAxiosInstance.put(
       '/auth/reset-password',

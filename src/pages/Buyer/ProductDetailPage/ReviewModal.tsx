@@ -3,8 +3,25 @@ import Joi from 'joi'
 import { useForm } from 'react-hook-form'
 import Rating from '~/components/ui/rating'
 import { Button } from '~/components/ui/button'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '~/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '~/components/ui/form'
 import { Textarea } from '~/components/ui/textarea'
 import { FIELD_REQUIRED_MESSAGE } from '~/utils/validators'
 import { useEffect, useState } from 'react'
@@ -45,9 +62,12 @@ function ReviewModal({ onSubmitReview, updateStartTyping, updateStopTyping }) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className='sm:max-w-[425px]'>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className='space-y-8'
+          >
             <DialogHeader>
               <DialogTitle>Đánh giá sản phẩm</DialogTitle>
               <DialogDescription>
@@ -57,14 +77,19 @@ function ReviewModal({ onSubmitReview, updateStartTyping, updateStopTyping }) {
 
             <FormField
               control={form.control}
-              name="rating"
+              name='rating'
               render={({ field }) => (
-                <FormItem className="flex flex-col items-start">
+                <FormItem className='flex flex-col items-start'>
                   <FormLabel className='text-base'>Đánh giá</FormLabel>
-                  <FormControl className="w-full">
-                    <Rating onChange={field.onChange} defaultSelected={field.value} />
+                  <FormControl className='w-full'>
+                    <Rating
+                      onChange={field.onChange}
+                      defaultSelected={field.value}
+                    />
                   </FormControl>
-                  <FormDescription>Hãy chọn số sao đánh giá cho sản phẩm vừa mua của bạn.</FormDescription>
+                  <FormDescription>
+                    Hãy chọn số sao đánh giá cho sản phẩm vừa mua của bạn.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -72,18 +97,20 @@ function ReviewModal({ onSubmitReview, updateStartTyping, updateStopTyping }) {
 
             <FormField
               control={form.control}
-              name="content"
+              name='content'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='text-base'>Bình luận</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Bình luận..."
-                      className="resize-none"
+                      placeholder='Bình luận...'
+                      className='resize-none'
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Bạn có thể viết bình luận kèm theo.</FormDescription>
+                  <FormDescription>
+                    Bạn có thể viết bình luận kèm theo.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -91,9 +118,11 @@ function ReviewModal({ onSubmitReview, updateStartTyping, updateStopTyping }) {
 
             <DialogFooter>
               <DialogClose asChild>
-                <Button type="button" variant='outline'>Hủy</Button>
+                <Button type='button' variant='outline'>
+                  Hủy
+                </Button>
               </DialogClose>
-              <Button type="submit">Hoàn tất</Button>
+              <Button type='submit'>Hoàn tất</Button>
             </DialogFooter>
           </form>
         </Form>

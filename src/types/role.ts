@@ -3,3 +3,5 @@ export enum Role {
   Buyer = 'BUYER',
   Seller = 'SELLER'
 }
+
+export type RoleValue = (typeof Role)[keyof typeof Role]

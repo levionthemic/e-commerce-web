@@ -31,11 +31,13 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { loginUserAPI } from '~/redux/user/userSlice'
 import { toast } from 'sonner'
-import { useGoogleLogin } from '@react-oauth/google'
+import { TokenResponse, useGoogleLogin } from '@react-oauth/google'
 import { FaGoogle } from 'react-icons/fa'
 import { asyncHandler } from '~/utils/asyncHandler'
 import { Checkbox } from '~/components/ui/checkbox'
 import { useState } from 'react'
+import { AppDispatch } from '~/redux/store'
+import { Role, RoleValue } from '~/types/role'
 
 const formSchema = Joi.object({
   email: Joi.string().required().pattern(EMAIL_RULE).messages({
@@ -51,18 +53,18 @@ const formSchema = Joi.object({
     .valid(...Object.values(PAGE_TYPE))
 })
 
-function Login({ role }) {
+function Login({ role }: { role: RoleValue }) {
   const form = useForm({
     resolver: joiResolver(formSchema),
     defaultValues: {
       email: '',
       password: '',
-      role: role || PAGE_TYPE.BUYER
+      role: role || Role.Buyer
     }
   })
 
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const [rememberMeCheck, setRememberMeCheck] = useState(false)
 
@@ -70,38 +72,42 @@ function Login({ role }) {
   const registeredEmail = searchParams.get('registeredEmail')
   const verifiedEmail = searchParams.get('verifiedEmail')
 
-  const submitLogIn = async (data) => {
+  const submitLogIn = async (
+    data:
+      | { email: string; password: string }
+      | Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>
+  ) => {
     const [res] = await asyncHandler(
       dispatch(loginUserAPI({ ...data, rememberMe: rememberMeCheck })),
       'Đang đăng nhập...'
     )
 
     if (res) {
-      if (res.payload.role === PAGE_TYPE.BUYER) navigate('/buyer')
+      if (res.payload.role === Role.Buyer) navigate('/buyer')
       else navigate('/seller')
       toast.success('Đăng nhập thành công!')
     }
   }
 
   const handleLoginWithGoogle = useGoogleLogin({
-    onSuccess: (codeResponse) => {
+    onSuccess: (codeResponse: TokenResponse) => {
       submitLogIn(codeResponse)
     },
-    onError: (error) => toast.error(error)
+    onError: (error) => toast.error(error as string)
   })
 
   return (
     <div className='w-[100vw] h-[100vh] bg-[url("~/assets/background-auth.jpg")] bg-cover bg-no-repeat bg-center'>
-      <div className='w-full h-full bg-gray-900 bg-opacity-60 flex items-center justify-center animate-fadeIn'>
+      <div className='flex items-center justify-center w-full h-full bg-gray-900 bg-opacity-60 animate-fadeIn'>
         <div className='w-[500px] min-h-[500px] bg-gray-200 bg-opacity-10 rounded-3xl border-gray-100 border-solid border-[1px] px-10 pb-4 animate-fadeInTop backdrop-blur-sm'>
-          <div className='text-center font-semibold uppercase text-4xl text-white mt-10'>
+          <div className='mt-10 text-4xl font-semibold text-center text-white uppercase'>
             Login
           </div>
 
           <div className='py-4'>
             {verifiedEmail && (
               <Alert className='bg-[#EDF7ED]/80'>
-                <Check className='h-4 w-4' />
+                <Check className='w-4 h-4' />
                 <AlertTitle className='font-semibold'>
                   Xác nhận thành công!
                 </AlertTitle>
@@ -118,7 +124,7 @@ function Login({ role }) {
             )}
             {registeredEmail && (
               <Alert className='bg-[#E5F6FD]/80'>
-                <Info className='h-4 w-4 items-center' />
+                <Info className='items-center w-4 h-4' />
                 <AlertTitle>Thông báo!</AlertTitle>
                 <AlertDescription>
                   Chúng tôi đã gửi 1 email đến email:&nbsp;
@@ -140,7 +146,7 @@ function Login({ role }) {
                 name='email'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Email
                     </FormLabel>
                     <FormControl>
@@ -161,7 +167,7 @@ function Login({ role }) {
                 name='password'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Mật khẩu
                     </FormLabel>
                     <FormControl>
@@ -182,7 +188,9 @@ function Login({ role }) {
                           id='remember-me'
                           className='border-white'
                           checked={rememberMeCheck}
-                          onCheckedChange={setRememberMeCheck}
+                          onCheckedChange={(checked) =>
+                            setRememberMeCheck(!!checked)
+                          }
                         />
                         <label
                           htmlFor='remember-me'
@@ -194,7 +202,7 @@ function Login({ role }) {
 
                       <Link
                         to='/forgot-password'
-                        className='text-right text-white text-xs cursor-pointer hover:underline'
+                        className='text-xs text-right text-white cursor-pointer hover:underline'
                       >
                         Quên mật khẩu?
                       </Link>
@@ -207,20 +215,20 @@ function Login({ role }) {
                 name='role'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='text-white text-base'>
+                    <FormLabel className='text-base text-white'>
                       Vai trò
                     </FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className='flex gap-2 text-white items-center justify-center'
+                        className='flex items-center justify-center gap-2 text-white'
                       >
                         <FormItem className='flex items-center space-x-3 space-y-0 hover:bg-mainColor2-800/50 px-4 py-3 rounded-md hover:transition-all hover:ease-in-out hover:duration-400 cursor-pointer has-[button[data-state=checked]]:bg-mainColor2-800/50'>
                           <FormControl>
                             <RadioGroupItem
                               value={PAGE_TYPE.BUYER}
-                              className='border-white bg-white'
+                              className='bg-white border-white'
                             />
                           </FormControl>
                           <FormLabel className='font-normal cursor-pointer'>
@@ -231,7 +239,7 @@ function Login({ role }) {
                           <FormControl>
                             <RadioGroupItem
                               value={PAGE_TYPE.SELLER}
-                              className='border-white bg-white'
+                              className='bg-white border-white'
                             />
                           </FormControl>
                           <FormLabel className='font-normal cursor-pointer'>
@@ -247,17 +255,17 @@ function Login({ role }) {
               />
               <Button
                 type='submit'
-                className='bg-mainColor2-800/85 rounded-full w-full animate-fadeInTop py-5 text-md'
+                className='w-full py-5 rounded-full bg-mainColor2-800/85 animate-fadeInTop text-md'
               >
                 Đăng nhập
               </Button>
             </form>
           </Form>
 
-          <div className='text-white mt-6 text-sm flex items-center justify-center gap-6'>
+          <div className='flex items-center justify-center gap-6 mt-6 text-sm text-white'>
             <span>hoặc đăng nhập bằng: </span>
             <div
-              onClick={handleLoginWithGoogle}
+              onClick={() => handleLoginWithGoogle()}
               className='border border-white rounded-full p-1.5 cursor-pointer hover:bg-mainColor1-600 hover:border-[2px] hover:scale-105 hover:duration-300 hover:ease-in-out transition-transform'
             >
               <FaGoogle />
@@ -267,7 +275,7 @@ function Login({ role }) {
           <div className='mt-8 text-xs text-center text-white'>
             Chưa có tài khoản?{' '}
             <div
-              className='underline cursor-pointer scale-100 font-semibold hover:scale-110 hover:transition-transform hover:ease-in-out hover:duration-200'
+              className='font-semibold underline scale-100 cursor-pointer hover:scale-110 hover:transition-transform hover:ease-in-out hover:duration-200'
               onClick={() => navigate('/register')}
             >
               Đăng kí

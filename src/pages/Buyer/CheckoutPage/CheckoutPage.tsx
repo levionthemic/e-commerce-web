@@ -13,7 +13,7 @@ function CheckoutPage() {
   const [step, setStep] = useState(1)
 
   const [checkoutInfo, setCheckoutInfo] = useState(
-    JSON.parse(localStorage.getItem('checkoutInfo'))
+    JSON.parse(localStorage.getItem('checkoutInfo') as string)
   )
   const [clusterOrders, setClusterOrders] = useState([])
 
@@ -119,8 +119,8 @@ function CheckoutPage() {
   ]
 
   return (
-    <div className='container mx-auto py-6'>
-      <div className='font-semibold text-3xl text-mainColor1-600 mb-8'>
+    <div className='container py-6 mx-auto'>
+      <div className='mb-8 text-3xl font-semibold text-mainColor1-600'>
         Thanh toán
       </div>
 

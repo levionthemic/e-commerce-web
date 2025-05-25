@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, useSearchParams } from 'react-router-dom'
 import { verifyUserAPI } from '~/apis/authApis'
 import Loader from '~/components/Loader/Loader'
+import { RoleValue } from '~/types/role'
 
 function AccountVerification() {
   const [isVerified, setVerified] = useState(false)
@@ -9,11 +10,15 @@ function AccountVerification() {
   const [searchParams] = useSearchParams()
   const { email, token, role } = Object.fromEntries([...searchParams])
 
+  const roleValue: RoleValue = role as RoleValue
+
   useEffect(() => {
-    if (email && token && role) {
-      verifyUserAPI({ email, token, role }).then(() => setVerified(true))
+    if (email && token && roleValue) {
+      verifyUserAPI({ email, token, role: roleValue }).then(() =>
+        setVerified(true)
+      )
     }
-  }, [email, token, role])
+  }, [email, token, roleValue])
 
   if (!email || !token) {
     return <Navigate to='/404' />
